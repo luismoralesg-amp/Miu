@@ -1,0 +1,7 @@
+.claude/
+docs/
+public/
+package-lock.json
+.next/
+playwright-report/
+test-results/
