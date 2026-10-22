@@ -24,3 +24,33 @@ Cada entrada: fecha · decisión · por qué · cómo revertirla.
   `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH` apunta a Brave, que es Chromium. Proyectos: claro, oscuro y móvil.
 - **Node:** `engines` y `.nvmrc` exigen 24.22.1. En esta máquina hay 24.19.0 hasta que Luis la actualice; npm solo
   avisa (`EBADENGINE`).
+
+## 2026-10-22 · E1
+
+- **Rojo UFM `#E22726`**, medido en el escudo de `logo-ufm01.png`. El degradado del acento va de `#E22726` a
+  `#C21D1D`, con texto blanco de al menos 4.6:1. Para texto y enlaces de acento: `#C21D1D` en claro y `#FF6F66` en
+  oscuro.
+- **El error usa rosa (`#BE123C`), no el rojo UFM,** y siempre va con ícono y texto, para que un error no se confunda
+  con el acento. **El foco y la información usan el azul del escudo** (`#0C4C91` / `#7DB3F5`) por el mismo motivo.
+- **Borde de campos `border-control` con 3:1** (WCAG 1.4.11); los divisores pueden ser más suaves.
+- **Contraste comprobado por prueba:** `tokens.test.ts` lee `tokens.css` y exige 4.5:1 en texto y 3:1 en controles,
+  en claro, en oscuro por sistema y en oscuro elegido (73 casos). Cambiar un color que lo rompa hace fallar `npm test`.
+- **Tema en cookie (`miu-theme`), sin script en línea:** el servidor pinta el tema elegido, así que no hay destello ni
+  excepción a la CSP. "Sistema" deja decidir a `prefers-color-scheme`. El cambio es instantáneo (apple-design).
+- **Movimiento:**
+  - Las entradas de contenido usan CSS (`reveal`: fade y 8 px hacia arriba, 360 ms, escalonadas 40 ms). Corren fuera
+    del hilo principal y no dependen de la hidratación (emil-design-eng).
+  - `motion` queda para gestos interrumpibles (hojas, arrastres), con resortes críticamente amortiguados por defecto
+    (`src/design-system/motion/presets.ts`).
+  - Presionar escala a 0.97 en 140 ms; el hover solo aplica con puntero fino. Los tabs y el cambio de tema no se
+    animan porque se usan muchas veces al día.
+  - Con reduced motion solo queda el fade.
+- **Componentes propios, sin librería headless:** `<dialog>` nativo (foco, Escape, capa superior), radios y casillas
+  nativos. Menos dependencias y menos superficie para la CSP.
+- **Marca:** `escudo.png` y `escudo-osc.png` son marcas de agua negras al 4 % y 12 % de opacidad (medido); sobre fondo
+  claro no se ven. En fondo claro se muestra **el escudo recortado de `logo-ufm01.png`** (los píxeles no cambian, solo
+  se encuadra) junto al nombre en Inter. En oscuro se usa el logo oficial completo.
+- **Componentes que se construyen en su etapa:** Combobox, DateRangePicker, DataTable, gráficas, CalendarWeek, mapa del
+  pensum, CommandPalette, Sheet, Toast y Timeline llegan con la pantalla que los usa (E2 a E7), para diseñarlos con
+  datos reales y no en abstracto.
+- **Catálogo `/dev/sistema`:** solo en desarrollo, o con `MIU_DEV_TOOLS=1` (lo activa Playwright).
