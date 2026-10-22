@@ -38,6 +38,7 @@ export default defineConfig({
     command: `npm run build && npm run start -- --port ${port}`,
     url: `${baseURL}/api/health`,
     reuseExistingServer: !process.env.CI,
+    env: { MIU_DEV_TOOLS: "1" },
     timeout: 180_000,
   },
 });
