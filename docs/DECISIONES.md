@@ -68,3 +68,13 @@ Cada entrada: fecha · decisión · por qué · cómo revertirla.
   se recalculó para 3:1 en las tres superficies.
 - **Comisión de tarjeta:** las maquetas muestran el total con comisión, pero en código **no se aplica recargo** hasta
   que la UFM lo decida (ver `INTEGRACIONES_PENDIENTES.md`).
+
+## 2026-10-22 · E2
+
+- **Sesión en cookie HttpOnly `miu-sesion`** (`SameSite=Lax`, `Secure` detrás de HTTPS). Dura 12 h, o 30 días con
+  "recordar". La cookie `miu-dispositivo` identifica al navegador para reutilizar su dispositivo y su passkey.
+- **El correo pendiente nunca va en la URL**: viaja en la cookie `miu-ingreso` (10 min, ruta `/login`).
+- **El enlace mágico pide confirmar**: abrirlo no inicia sesión, para que los escáneres de correo no lo gasten.
+- **⌘K sin animación de apertura** (atajo frecuente); los popovers usan transiciones CSS interrumpibles.
+- **Las secciones sin construir tienen URL desde ya** y dicen en qué etapa llegan; una ruta desconocida da 404 real.
+- **El selector de rol vive en el menú de cuenta** y solo con `MIU_DEV_TOOLS`.
