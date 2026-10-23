@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 360" preserveAspectRatio="xMidYMid slice">
+  <!-- Placeholder. Not a photo of the UFM campus: the real image comes from the UFM (see INTEGRACIONES_PENDIENTES.md). -->
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#9cc4e4"/><stop offset="0.6" stop-color="#d9e6ea"/><stop offset="1" stop-color="#e9e2cf"/>
+    </linearGradient>
+    <linearGradient id="hill" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#5f8a5a"/><stop offset="1" stop-color="#3d6640"/>
+    </linearGradient>
+  </defs>
+  <rect width="1440" height="360" fill="url(#sky)"/>
+  <path d="M0 210 C 220 150, 420 190, 640 160 S 1080 120, 1440 170 V 360 H 0 Z" fill="#7aa07a" opacity="0.55"/>
+  <g fill="#c9b79a">
+    <rect x="300" y="170" width="260" height="120"/><rect x="600" y="140" width="180" height="150"/><rect x="820" y="180" width="300" height="110"/>
+  </g>
+  <g fill="#a8957a" opacity="0.6">
+    <rect x="320" y="190" width="220" height="8"/><rect x="320" y="220" width="220" height="8"/><rect x="620" y="165" width="140" height="8"/><rect x="620" y="195" width="140" height="8"/><rect x="840" y="200" width="260" height="8"/>
+  </g>
+  <path d="M0 260 C 260 230, 520 270, 760 250 S 1200 230, 1440 255 V 360 H 0 Z" fill="url(#hill)"/>
+  <g fill="#2f5233">
+    <circle cx="140" cy="248" r="38"/><circle cx="200" cy="262" r="30"/><circle cx="1240" cy="240" r="44"/><circle cx="1310" cy="258" r="32"/><circle cx="700" cy="262" r="26"/>
+  </g>
+</svg>

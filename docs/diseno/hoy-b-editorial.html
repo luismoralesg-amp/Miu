@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Hoy · Dirección B · Editorial</title>
+<link rel="stylesheet" href="assets/base.css" />
+<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.3.3/dist/index.global.js"></script>
+<style type="text/tailwindcss">
+  @theme {
+    --color-paper: #ffffff;
+    --color-ink: #0b0b0d;
+    --color-muted: #5c606b;
+    --color-line: #e8e8ec;
+    --color-mist: #f6f6f8;
+    --color-ufm: #e22726;
+    --color-ufm-text: #c21d1d;
+    --color-ufm-soft: #fdebea;
+    --color-ok: #15803d;
+  }
+</style>
+</head>
+<body class="bg-paper text-ink">
+  <header class="border-b border-line">
+    <div class="mx-auto flex h-16 max-w-[1200px] items-center justify-between px-5 md:px-10">
+      <a href="#" class="flex items-center gap-2.5">
+        <span class="shield" style="--h: 28px"></span>
+        <span class="text-lg font-semibold tracking-[-0.02em]">MiU</span>
+      </a>
+      <nav aria-label="Principal" class="hidden items-center gap-8 text-[15px] md:flex">
+        <a href="#" aria-current="page" class="font-semibold">Hoy</a>
+        <a href="#" class="text-muted hover:text-ink">Cursos</a>
+        <a href="#" class="text-muted hover:text-ink">Horario</a>
+        <a href="#" class="text-muted hover:text-ink">Notas</a>
+        <a href="#" class="text-muted hover:text-ink">Pagos</a>
+      </nav>
+      <div class="flex items-center gap-1">
+        <button aria-label="Buscar" class="grid size-10 place-items-center rounded-full hover:bg-mist"><i data-lucide="search" class="size-5"></i></button>
+        <button aria-label="Notificaciones" class="grid size-10 place-items-center rounded-full hover:bg-mist"><i data-lucide="bell" class="size-5"></i></button>
+        <span class="ml-1 grid size-9 place-items-center rounded-full bg-mist text-sm font-semibold">AL</span>
+      </div>
+    </div>
+  </header>
+
+  <main class="mx-auto max-w-[1200px] px-5 pb-28 md:px-10 md:pb-20">
+    <!-- 1. Statement -->
+    <section class="pt-12 pb-14 md:pt-20 md:pb-20">
+      <p class="text-[15px] text-muted">Miércoles 22 de octubre</p>
+      <h1 class="mt-4 max-w-[19ch] text-[40px] leading-[1.04] font-semibold tracking-[-0.04em] text-balance md:text-[72px]">
+        Mañana tienes el Parcial 2 de Matemática Discreta.
+      </h1>
+      <p class="mt-6 max-w-[56ch] text-lg leading-relaxed text-muted md:text-xl">
+        A las 07:00 en el salón D-307. Vale 20% de tu nota y entra grafos, árboles y recurrencias.
+      </p>
+      <div class="mt-8 flex flex-wrap items-center gap-3">
+        <a href="#" class="inline-flex h-12 items-center gap-2 rounded-full bg-ufm-text px-6 font-semibold text-white">Repasar el temario<i data-lucide="arrow-right" class="size-[18px]"></i></a>
+        <a href="#" class="inline-flex h-12 items-center gap-2 rounded-full px-5 font-medium text-ink hover:bg-mist"><i data-lucide="calendar-plus" class="size-[18px]"></i>Agregar al calendario</a>
+      </div>
+    </section>
+
+    <!-- 2. The day on a real time axis -->
+    <section class="border-t border-line pt-10 pb-14 md:pb-20">
+      <div class="flex items-baseline justify-between">
+        <h2 class="text-2xl font-semibold tracking-[-0.025em]">Tu día</h2>
+        <a href="#" class="text-[15px] font-medium text-muted hover:text-ink">Semana completa</a>
+      </div>
+
+      <!-- desktop axis -->
+      <div class="relative mt-10 hidden md:block">
+        <div class="tnum flex justify-between text-xs text-muted">
+          <span>7</span><span>8</span><span>9</span><span>10</span><span>11</span><span>12</span><span>13</span><span>14</span><span>15</span><span>16</span><span>17</span><span>18</span>
+        </div>
+        <div class="relative mt-3 h-[104px] rounded-2xl bg-mist">
+          <div aria-hidden="true" class="absolute -top-1.5 -bottom-1.5 left-[6.4%] w-0.5 rounded-full bg-ink"><span class="absolute -top-1 -left-[3px] size-2 rounded-full bg-ink"></span></div>
+          <div class="absolute inset-y-2 left-[0.6%] z-10 w-[11.5%] rounded-xl bg-ufm-text p-3 text-white">
+            <p class="text-sm leading-tight font-semibold">Matemática Discreta</p>
+            <p class="tnum mt-1 text-xs text-white/90">D-307 · ahora, 07:42</p>
+          </div>
+          <div class="absolute inset-y-2 left-[18.2%] w-[12.1%] rounded-xl bg-white p-3 shadow-[0_1px_3px_rgb(0_0_0/0.06)]">
+            <p class="text-sm leading-tight font-semibold">Paradigmas</p>
+            <p class="mt-1 text-xs text-muted">D-210</p>
+          </div>
+          <div class="absolute inset-y-2 left-[63.6%] w-[12.1%] rounded-xl bg-white p-3 shadow-[0_1px_3px_rgb(0_0_0/0.06)]">
+            <p class="text-sm leading-tight font-semibold">Ética</p>
+            <p class="mt-1 text-xs text-muted">Auditorio</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- mobile list -->
+      <ol class="mt-6 flex flex-col divide-y divide-line md:hidden">
+        <li class="flex gap-4 py-4"><span class="tnum w-14 text-[15px] font-semibold text-ufm-text">07:00</span><span><span class="block font-semibold">Matemática Discreta</span><span class="text-sm text-muted">D-307 · ahora</span></span></li>
+        <li class="flex gap-4 py-4"><span class="tnum w-14 text-[15px] text-muted">09:00</span><span><span class="block font-semibold">Paradigmas de Programación</span><span class="text-sm text-muted">D-210</span></span></li>
+        <li class="flex gap-4 py-4"><span class="tnum w-14 text-[15px] text-muted">14:00</span><span><span class="block font-semibold">Ética de la Libertad</span><span class="text-sm text-muted">Auditorio Juan Bautista</span></span></li>
+      </ol>
+    </section>
+
+    <!-- 3–5. Three columns separated by hairlines -->
+    <section class="grid border-t border-line md:grid-cols-3 md:divide-x md:divide-line">
+      <div class="py-10 md:pr-10">
+        <h2 class="text-2xl font-semibold tracking-[-0.025em]">Por entregar</h2>
+        <ul class="mt-6 flex flex-col gap-5">
+          <li><p class="font-semibold">Ejercicio de llaves</p><p class="text-[15px] text-muted">Paradigmas · <span class="font-semibold text-ufm-text">mañana 23:59</span></p></li>
+          <li><p class="font-semibold">Quiz 4: grafos</p><p class="text-[15px] text-muted">Discreta · viernes</p></li>
+          <li><p class="font-semibold">Lectura: Hayek, cap. 3</p><p class="text-[15px] text-muted">Ética · lunes</p></li>
+        </ul>
+        <a href="#" class="mt-6 inline-flex items-center gap-1 text-[15px] font-medium text-ink">Ver las 5 entregas<i data-lucide="chevron-right" class="size-4"></i></a>
+      </div>
+      <div class="border-t border-line py-10 md:border-t-0 md:px-10">
+        <h2 class="text-2xl font-semibold tracking-[-0.025em]">Notas</h2>
+        <p class="tnum mt-6 text-[72px] leading-none font-semibold tracking-[-0.045em]">87.4</p>
+        <p class="mt-3 text-[15px] text-muted">Promedio del semestre, <span class="font-semibold text-ok">1.2 más</span> que el anterior.</p>
+        <p class="mt-5 text-[15px]">Última nota: <span class="font-semibold">92</span> en la Actividad 5 de Paradigmas.</p>
+      </div>
+      <div class="border-t border-line py-10 md:border-t-0 md:pl-10">
+        <h2 class="text-2xl font-semibold tracking-[-0.025em]">Pagos</h2>
+        <p class="tnum mt-6 text-[44px] leading-none font-semibold tracking-[-0.04em]">Q7,387.80</p>
+        <p class="mt-3 text-[15px] text-muted">Vence el 5 de noviembre. Estás solvente.</p>
+        <a href="#" class="mt-6 inline-flex h-11 items-center rounded-full border border-ink px-5 text-[15px] font-semibold">Pagar sin comisión</a>
+      </div>
+    </section>
+  </main>
+
+  <nav aria-label="Principal" class="fixed inset-x-0 bottom-0 border-t border-line bg-white/90 pb-5 backdrop-blur-xl md:hidden">
+    <ul class="grid grid-cols-5 pt-2 text-[11px] font-medium">
+      <li><a href="#" aria-current="page" class="flex flex-col items-center gap-1 text-ink"><i data-lucide="sun" class="size-6"></i>Hoy</a></li>
+      <li><a href="#" class="flex flex-col items-center gap-1 text-muted"><i data-lucide="book-open" class="size-6"></i>Cursos</a></li>
+      <li><a href="#" class="flex flex-col items-center gap-1 text-muted"><i data-lucide="calendar" class="size-6"></i>Horario</a></li>
+      <li><a href="#" class="flex flex-col items-center gap-1 text-muted"><i data-lucide="chart-no-axes-column" class="size-6"></i>Notas</a></li>
+      <li><a href="#" class="flex flex-col items-center gap-1 text-muted"><i data-lucide="wallet" class="size-6"></i>Pagos</a></li>
+    </ul>
+  </nav>
+
+  <script src="https://cdn.jsdelivr.net/npm/lucide@1.61.0/dist/umd/lucide.min.js"></script>
+  <script>lucide.createIcons({ attrs: { "stroke-width": 1.75, "aria-hidden": "true" } });</script>
+</body>
+</html>

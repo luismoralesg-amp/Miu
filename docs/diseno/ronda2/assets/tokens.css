@@ -1,0 +1,88 @@
+/* Ronda 2 tokens. Light on :root, dark on .dark (open any file with ?tema=oscuro). */
+@import url("../../assets/base.css");
+
+:root {
+  --canvas: #f4f4f6;
+  --card: #ffffff;
+  --subtle: #f4f4f6;
+  --line: #e7e7eb;
+  --ink: #111114;
+  --muted: #5f6470;
+  --ufm: #e22726;
+  --ufm-deep: #b5171a;
+  --ufm-text: #c21d1d;
+  --ufm-soft: #fdebea;
+  --ok: #15803d;
+  --ok-soft: #e9f7ee;
+  --warn: #9a4d00;
+  --warn-soft: #fff4e0;
+  --info: #0c4c91;
+  --info-soft: #eaf1fb;
+  --shadow: 0 1px 2px rgb(16 24 40 / 0.04), 0 8px 24px rgb(16 24 40 / 0.04);
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  color-scheme: light;
+}
+
+.dark {
+  --canvas: #09090b;
+  --card: #141417;
+  --subtle: #1c1c21;
+  --line: #26262b;
+  --ink: #f4f4f5;
+  --muted: #a1a1aa;
+  --ufm-text: #ff6f66;
+  --ufm-soft: #3a1416;
+  --ok: #4ade80;
+  --ok-soft: #0e2a18;
+  --warn: #fbbf24;
+  --warn-soft: #2e2208;
+  --info: #7db3f5;
+  --info-soft: #0e2340;
+  --shadow: none;
+  color-scheme: dark;
+}
+
+body {
+  background: var(--canvas);
+  color: var(--ink);
+}
+
+/* Entrance: blocks rise 8px and fade, 40 ms apart, 280 ms ease-out (emil-design-eng). */
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+.reveal {
+  animation: rise 280ms var(--ease-out) both;
+  animation-delay: calc(var(--i, 0) * 40ms);
+}
+
+/* Cards that open something: lift on hover (fine pointers only), press to 0.98. */
+.tap {
+  transition: transform 140ms var(--ease-out), box-shadow 200ms var(--ease-out), background-color 150ms ease;
+}
+.tap:active {
+  transform: scale(0.98);
+}
+@media (hover: hover) and (pointer: fine) {
+  .tap:hover {
+    background-color: var(--subtle);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  @keyframes rise {
+    from {
+      opacity: 0;
+    }
+  }
+  .tap:active {
+    transform: none;
+  }
+}
+
+.hatch {
+  background-image: repeating-linear-gradient(135deg, color-mix(in srgb, var(--muted) 45%, transparent) 0 1.5px, transparent 1.5px 5px);
+}

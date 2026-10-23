@@ -1,0 +1,51 @@
+/* Shared base for static mockups. Fonts and logo come from the repo; nothing is redrawn. */
+@font-face {
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: block;
+  src: url("../../../node_modules/@fontsource-variable/inter/files/inter-latin-wght-normal.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329,
+    U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: block;
+  src: url("../../../node_modules/@fontsource-variable/inter/files/inter-latin-ext-wght-normal.woff2") format("woff2");
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329,
+    U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+html {
+  font-family: "Inter", system-ui, sans-serif;
+  font-feature-settings: "cv11", "ss01";
+  -webkit-font-smoothing: antialiased;
+}
+
+.tnum {
+  font-variant-numeric: tabular-nums;
+}
+
+/* UFM shield, framed out of logo-ufm01.png (shield at x 11-158, y 10-186 of 412x250). */
+.shield {
+  --h: 32px;
+  display: inline-block;
+  flex-shrink: 0;
+  height: var(--h);
+  width: calc(var(--h) * 148 / 177);
+  background-image: url("../../../public/brand/logo-ufm01.png");
+  background-repeat: no-repeat;
+  background-size: calc(var(--h) * 412 / 177) auto;
+  background-position: calc(var(--h) * -11 / 177) calc(var(--h) * -10 / 177);
+}
+
+::selection {
+  background: rgb(226 39 38 / 0.18);
+}
+
+:focus-visible {
+  outline: 2px solid #0c4c91;
+  outline-offset: 2px;
+}

@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="es" data-piel="p1">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Hoy · P1 Editorial</title>
+<link rel="stylesheet" href="assets/tokens.css" />
+<script src="assets/seed.js"></script>
+<script src="assets/setup.js"></script>
+<script src="assets/p1.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.3.3/dist/index.global.js"></script>
+</head>
+<body>
+  <div class="mx-auto max-w-[1240px] px-5 pb-10 md:px-12 md:pb-20">
+    <div id="shell-top"></div>
+
+    <section class="reveal flex flex-col gap-4 pt-10 pb-8 md:flex-row md:items-end md:justify-between md:pt-14 md:pb-10" style="--i: 0">
+      <div>
+        <p class="text-[15px] text-muted"><span data-fill="fecha-larga"></span> · <span data-fill="semana"></span></p>
+        <h1 data-fill="saludo" class="display mt-2 text-[40px] leading-[1.02] font-medium md:text-[64px]"></h1>
+      </div>
+      <div id="aviso"></div>
+    </section>
+
+    <main class="flex flex-col">
+      <div id="hero" class="reveal" style="--i: 1"></div>
+
+      <section class="reveal border-b border-line py-10 md:py-12" style="--i: 2" aria-labelledby="dia-t">
+        <div class="flex items-baseline justify-between gap-4">
+          <h2 id="dia-t" class="display text-[28px] font-medium md:text-[34px]">Tu día</h2>
+          <a href="semana.html" class="inline-flex min-h-11 shrink-0 items-center text-sm font-medium text-muted hover:text-ink">Semana<span class="hidden sm:inline">&nbsp;completa</span></a>
+        </div>
+        <p id="dia-resumen" class="mt-1 text-[15px] text-muted"></p>
+        <div id="dia"></div>
+      </section>
+
+      <div class="grid md:grid-cols-12 md:divide-x md:divide-line">
+        <section class="reveal border-b border-line py-10 md:col-span-7 md:border-b-0 md:pr-12" style="--i: 3" aria-labelledby="pe-t">
+          <div class="flex items-baseline justify-between">
+            <h2 id="pe-t" class="display text-[28px] font-medium md:text-[34px]">Por entregar</h2>
+            <a id="pe-total" href="#" class="inline-flex min-h-11 items-center text-sm font-medium text-muted hover:text-ink"></a>
+          </div>
+          <ul id="pendientes" class="mt-4 divide-y divide-line border-t border-line"></ul>
+        </section>
+        <section class="reveal py-10 md:col-span-5 md:pl-12" style="--i: 4" aria-labelledby="no-t">
+          <div class="flex items-baseline justify-between">
+            <h2 id="no-t" class="display text-[28px] font-medium md:text-[34px]">Novedades</h2>
+            <span id="no-nuevas" class="text-sm text-muted"></span>
+          </div>
+          <ul id="novedades" class="mt-4 divide-y divide-line border-t border-line"></ul>
+        </section>
+      </div>
+    </main>
+  </div>
+  <div id="shell-bottom"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/lucide@1.61.0/dist/umd/lucide.min.js"></script>
+  <script>
+    const H = MIU.hoy(), $ = (id) => document.getElementById(id);
+    P1.shell("hoy");
+    $("aviso").innerHTML = P1.aviso(H);
+    $("hero").innerHTML = P1.hero(H.proximo);
+    $("dia-resumen").textContent = `${H.clases.length} clases · ${MIU.duracion(H.libre)} libres entre clases`;
+    $("dia").innerHTML = P1.dia(H);
+    $("pe-total").textContent = `Ver las ${H.totalPendientes}`;
+    $("pendientes").innerHTML = P1.pendientes(H.porEntregar);
+    $("no-nuevas").textContent = `${H.nuevas} nuevas`;
+    $("novedades").innerHTML = P1.novedades(H.novedades);
+    P1.iconos();
+  </script>
+</body>
+</html>

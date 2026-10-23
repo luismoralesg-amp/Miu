@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="es" data-piel="p1">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Pagos · MiU</title>
+<link rel="stylesheet" href="assets/tokens.css" />
+<script src="assets/seed.js"></script>
+<script src="assets/setup.js"></script>
+<script src="assets/p1.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.3.3/dist/index.global.js"></script>
+</head>
+<body>
+  <div class="mx-auto max-w-[1240px] px-5 pb-10 md:px-12 md:pb-20">
+    <div id="shell-top"></div>
+    <section class="reveal pt-10 pb-8 md:pt-14 md:pb-10" style="--i: 0">
+      <p class="text-[15px] text-muted"><span id="alumno"></span></p>
+      <h1 class="display mt-2 text-[40px] leading-[1.02] font-medium md:text-[64px]">Pagos</h1>
+    </section>
+    <main class="flex flex-col">
+      <section class="reveal border-y border-line py-10" style="--i: 1" aria-labelledby="estado-t">
+        <h2 id="estado-t" class="sr-only">Estado</h2>
+        <p class="text-[17px] md:text-xl"><span class="text-muted">Debes </span><span id="monto" class="display tnum text-[44px] md:text-[64px]"></span><span id="vence" class="text-muted"></span></p>
+        <details class="mt-4 max-w-[520px] text-[15px]"><summary class="inline-flex min-h-11 cursor-pointer items-center gap-1 font-medium">Ver el desglose</summary><dl id="desglose" class="tnum mt-2"></dl></details>
+      </section>
+
+      <section class="reveal grid gap-10 border-b border-line py-10 md:grid-cols-12 md:gap-0 md:divide-x md:divide-line" style="--i: 2" aria-labelledby="como-t">
+        <div class="md:col-span-7 md:pr-12">
+          <h2 id="como-t" class="display text-[28px] font-medium md:text-[34px]">Transferencia ACH</h2>
+          <p class="mt-2 text-[15px] text-muted">Sin comisión. Pagas desde tu banco en el checkout seguro de Recurrente y se verifica sola en minutos.</p>
+          <ol class="mt-6 flex flex-col gap-4 text-[15px]">
+            <li class="flex gap-3"><span class="display tnum w-5 shrink-0 text-xl leading-6">1</span><span>Toca <b class="font-semibold">Pagar con transferencia ACH</b>.</span></li>
+            <li class="flex gap-3"><span class="display tnum w-5 shrink-0 text-xl leading-6">2</span><span>Elige tu banco (BI, BAC, Banrural, G&amp;T y más) y autoriza el débito.</span></li>
+            <li class="flex gap-3"><span class="display tnum w-5 shrink-0 text-xl leading-6">3</span><span>Vuelves a MiU con el recibo listo. Tu solvencia se actualiza sola.</span></li>
+          </ol>
+          <a href="#" id="pagar" class="mt-8 inline-flex h-12 w-full items-center justify-center gap-2 rounded-full bg-ufm-text px-6 font-semibold text-white sm:w-auto dark:bg-[#c21d1d]"></a>
+        </div>
+        <div class="md:col-span-5 md:pl-12">
+          <h3 class="text-lg font-semibold">Tarjeta o Apple Pay</h3>
+          <p class="mt-1 text-[15px] text-muted">Al instante con Visa o Mastercard.</p>
+          <p class="tnum mt-4 text-[15px]">Comisión de 4.5% + Q2: <b id="comision" class="font-semibold"></b>. No te cobramos recargo; la absorbe la universidad.</p>
+          <a href="#" class="mt-5 inline-flex h-11 items-center rounded-full border border-ink px-5 text-[15px] font-semibold">Pagar con tarjeta</a>
+          <details class="mt-8 border-t border-line pt-4">
+            <summary class="flex min-h-11 cursor-pointer items-center justify-between text-[15px] font-medium">Otras formas de pagar<i data-lucide="chevron-down" class="size-4 text-muted"></i></summary>
+            <div class="mt-3 flex flex-col gap-4 text-[15px]">
+              <p><b class="font-semibold">Transferencia con comprobante.</b> <span class="text-muted">Usa la referencia <code id="ref" class="tnum font-semibold text-ink"></code> y sube el comprobante. Revisión de 1 a 2 días hábiles.</span></p>
+              <p><b class="font-semibold">Pago en caja.</b> <span class="text-muted">Edificio Académico, de lunes a viernes de 07:00 a 17:00. Presenta la misma referencia.</span></p>
+            </div>
+          </details>
+        </div>
+      </section>
+
+      <section class="reveal py-10" style="--i: 3" aria-labelledby="hist-t">
+        <div class="flex items-baseline justify-between"><h2 id="hist-t" class="display text-[28px] font-medium md:text-[34px]">Historial</h2><a href="#" class="inline-flex min-h-11 items-center text-sm font-medium text-muted hover:text-ink">Estado de cuenta</a></div>
+        <ul id="historial" class="tnum mt-4 divide-y divide-line border-t border-line"></ul>
+      </section>
+    </main>
+  </div>
+  <div id="shell-bottom"></div>
+  <script src="https://cdn.jsdelivr.net/npm/lucide@1.61.0/dist/umd/lucide.min.js"></script>
+  <script>
+    const $ = (id) => document.getElementById(id);
+    P1.shell("pagos");
+    const S = window.SEED, P = S.pago, u = S.usuario, dias = MIU.diasDesdeHoy(P.vence);
+    $("alumno").textContent = `${u.nombre} ${u.apellido} · carné ${u.carne}`;
+    $("monto").textContent = MIU.quetzales(P.monto);
+    $("vence").textContent = ` · vence el ${MIU.fechaLarga(P.vence)}, en ${dias} días`;
+    $("desglose").innerHTML = P.desglose.map(([k, v]) => `<div class="flex justify-between border-b border-line py-2"><dt class="text-muted">${k}</dt><dd>${MIU.quetzales(v)}</dd></div>`).join("") + `<div class="flex justify-between py-2 font-semibold"><dt>Total</dt><dd>${MIU.quetzales(P.monto)}</dd></div>`;
+    $("pagar").innerHTML = `Pagar ${MIU.quetzales(P.monto)} con transferencia ACH<i data-lucide="arrow-right" class="size-[18px]"></i>`;
+    $("comision").textContent = MIU.quetzales(Math.round((P.monto * 0.045 + 2) * 100) / 100);
+    $("ref").textContent = P.referencia;
+    const estado = { pagado: ["Pagado", "ok", "circle-check"], revision: ["En revisión", "warn", "clock"] };
+    $("historial").innerHTML = P.historial.map((h) => { const [t, tone, ic] = estado[h.estado]; return `
+      <li class="grid grid-cols-[1fr_auto] items-center gap-x-4 gap-y-1.5 py-4 md:grid-cols-[7rem_1fr_auto_8rem_2.75rem] md:gap-x-6">
+        <span class="order-3 text-sm text-muted md:order-none">${MIU.fechaCorta(h.fecha)} ${MIU.parse(h.fecha).getFullYear()}<span class="md:hidden"> · ${h.metodo}</span></span>
+        <span class="order-1 min-w-0 md:order-none"><span class="block font-medium">${h.concepto}</span><span class="hidden text-sm text-muted md:block">${h.metodo}</span></span>
+        <span class="order-2 text-right font-semibold md:order-none">${MIU.quetzales(h.monto)}</span>
+        <span class="order-4 flex items-center justify-end gap-1.5 text-sm font-medium text-${tone} md:order-none md:justify-start"><i data-lucide="${ic}" class="size-4"></i>${t}</span>
+        <span class="order-5 col-start-2 justify-self-end md:col-start-auto">${h.estado === "pagado" ? `<a href="#" aria-label="Descargar recibo de ${h.concepto.toLowerCase()}" class="grid size-11 place-items-center rounded-full hover:bg-subtle"><i data-lucide="download" class="size-[18px]"></i></a>` : ""}</span></li>`; }).join("");
+
+    P1.iconos();
+  </script>
+</body>
+</html>

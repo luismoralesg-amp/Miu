@@ -1,0 +1,178 @@
+/* Ronda 3 tokens. Skin on <html data-piel="p1|p2|p3">; dark with .dark (?tema=oscuro). */
+@import url("../../assets/base.css");
+
+@font-face {
+  font-family: "Fraunces";
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: block;
+  src: url("fonts/fraunces-latin-standard-normal.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329,
+    U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: "Fraunces";
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: block;
+  src: url("fonts/fraunces-latin-ext-standard-normal.woff2") format("woff2");
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+1E00-1E9F, U+2020, U+20A0-20AB,
+    U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+:root {
+  color-scheme: light;
+  --ufm: #e22726;
+  --ufm-deep: #b5171a;
+  --ufm-text: #c21d1d;
+  --ufm-soft: #fdebea;
+  --ok: #15803d;
+  --ok-soft: #e9f7ee;
+  --warn: #9a4d00;
+  --warn-soft: #fff4e0;
+  --danger: #be123c;
+  --danger-soft: #ffeef1;
+  --info: #0c4c91;
+  --info-soft: #eaf1fb;
+  --display-font: "Inter", system-ui, sans-serif;
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+
+  /* Course palette, validated with dataviz (light and dark, adjacent pairs). Never used for text. */
+  --c1: #2a78d6;
+  --c2: #b07400;
+  --c3: #138a61;
+  --c4: #6250d6;
+  --c5: #008300;
+  --c6: #0e8fb3;
+
+  /* neutral defaults (P2) */
+  --canvas: #f6f6f4;
+  --card: #ffffff;
+  --subtle: #f1f1ef;
+  --line: #e6e6e3;
+  --ink: #141414;
+  --muted: #5f6066;
+  --shadow: 0 1px 2px rgb(16 24 40 / 0.04), 0 6px 20px rgb(16 24 40 / 0.04);
+  --shadow-float: 0 12px 40px rgb(16 24 40 / 0.14);
+}
+
+.dark {
+  color-scheme: dark;
+  --ufm-text: #ff6f66;
+  --ufm-soft: #3a1416;
+  --ok: #4ade80;
+  --ok-soft: #0e2a18;
+  --warn: #fbbf24;
+  --warn-soft: #2e2208;
+  --danger: #fb7185;
+  --danger-soft: #3a0e18;
+  --info: #7db3f5;
+  --info-soft: #0e2340;
+  --c1: #3987e5;
+  --c2: #c98500;
+  --c3: #199e70;
+  --c4: #9085e9;
+  --c5: #2f9e2f;
+  --c6: #1aa3c9;
+  --canvas: #0b0b0c;
+  --card: #151517;
+  --subtle: #1d1d20;
+  --line: #2a2a2e;
+  --ink: #f4f4f5;
+  --muted: #a1a1aa;
+  --shadow: none;
+  --shadow-float: 0 16px 48px rgb(0 0 0 / 0.6);
+}
+
+/* P1 · Editorial: warm paper, hairlines, Fraunces for display. */
+[data-piel="p1"] {
+  --display-font: "Fraunces", Georgia, serif;
+  --canvas: #f7f3ec;
+  --card: #fffdf9;
+  --subtle: #efe9df;
+  --line: #e2dacd;
+  --ink: #1c1814;
+  --muted: #655c52;
+  --shadow: none;
+}
+[data-piel="p1"].dark {
+  --canvas: #13110e;
+  --card: #1b1915;
+  --subtle: #24211c;
+  --line: #34302a;
+  --ink: #f2ede4;
+  --muted: #aaa196;
+}
+
+/* P3 · Depth: one light source from the top. Raised surfaces get an inner top highlight and a soft drop. */
+[data-piel="p3"] {
+  --canvas: #eceef2;
+  --card: #ffffff;
+  --subtle: #f3f4f7;
+  --line: #e1e4ea;
+  --ink: #12141a;
+  --muted: #5a6070;
+  --shadow: inset 0 1px 0 rgb(255 255 255 / 0.9), 0 1px 2px rgb(16 24 40 / 0.06), 0 10px 28px -6px rgb(16 24 40 / 0.12);
+  --shadow-float: 0 1px 0 rgb(255 255 255 / 0.6) inset, 0 24px 60px -12px rgb(16 24 40 / 0.28);
+  --glass: rgb(255 255 255 / 0.86);
+  --glass-line: rgb(255 255 255 / 0.7);
+}
+[data-piel="p3"].dark {
+  --canvas: #08090c;
+  --card: #15171c;
+  --subtle: #1c1f25;
+  --line: #262a32;
+  --ink: #f3f4f6;
+  --muted: #a3a8b3;
+  --shadow: inset 0 1px 0 rgb(255 255 255 / 0.06), 0 1px 2px rgb(0 0 0 / 0.5), 0 14px 32px -8px rgb(0 0 0 / 0.6);
+  --shadow-float: inset 0 1px 0 rgb(255 255 255 / 0.08), 0 28px 70px -12px rgb(0 0 0 / 0.75);
+  --glass: rgb(21 23 28 / 0.86);
+  --glass-line: rgb(255 255 255 / 0.08);
+}
+
+body {
+  background: var(--canvas);
+  color: var(--ink);
+}
+
+.display {
+  font-family: var(--display-font);
+  font-variant-numeric: lining-nums tabular-nums;
+  font-optical-sizing: auto;
+}
+[data-piel="p1"] .display {
+  font-variation-settings: "SOFT" 30;
+  letter-spacing: -0.02em;
+}
+
+/* Floating glass (P3 only): navigation, ⌘K, sheets. Never on reading content. */
+.glass {
+  background: var(--glass, var(--card));
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  backdrop-filter: blur(20px) saturate(180%);
+  box-shadow: inset 0 0 0 1px var(--glass-line, transparent), var(--shadow-float);
+}
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .glass { background: var(--card); }
+}
+@media (prefers-reduced-transparency: reduce) {
+  .glass { background: var(--card); backdrop-filter: none; -webkit-backdrop-filter: none; }
+}
+
+/* Course color helpers (P2): marks and tints, text stays ink. */
+.c-1 { --c: var(--c1); } .c-2 { --c: var(--c2); } .c-3 { --c: var(--c3); }
+.c-4 { --c: var(--c4); } .c-5 { --c: var(--c5); } .c-6 { --c: var(--c6); }
+.bg-c { background: var(--c); }
+.tint-c { background: color-mix(in srgb, var(--c) 12%, var(--card)); }
+.border-c { border-color: var(--c); }
+
+@keyframes rise { from { opacity: 0; transform: translateY(8px); } }
+.reveal { animation: rise 280ms var(--ease-out) both; animation-delay: calc(var(--i, 0) * 40ms); }
+.tap { transition: transform 140ms var(--ease-out), background-color 150ms ease; }
+.tap:active { transform: scale(0.98); }
+@media (hover: hover) and (pointer: fine) { .tap:hover { background-color: var(--subtle); } }
+@media (prefers-reduced-motion: reduce) {
+  @keyframes rise { from { opacity: 0; } }
+  .tap:active { transform: none; }
+}
+.hatch { background-image: repeating-linear-gradient(135deg, color-mix(in srgb, var(--muted) 45%, transparent) 0 1.5px, transparent 1.5px 5px); }

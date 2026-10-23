@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Pagos · Ronda 2</title>
+<link rel="stylesheet" href="assets/tokens.css" />
+<script src="assets/setup.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.3.3/dist/index.global.js"></script>
+</head>
+<body>
+  <div class="mx-auto max-w-[1280px] px-5 pb-10 md:px-10 md:pb-16">
+    <!-- Header -->
+    <header class="flex h-16 items-center justify-between gap-4 md:h-20">
+      <a href="#" class="flex items-center gap-2.5">
+        <span class="shield" style="--h: 30px"></span>
+        <span class="text-[19px] font-semibold tracking-[-0.02em]">MiU</span>
+      </a>
+      <nav aria-label="Principal" class="hidden rounded-full bg-card p-1 shadow-card lg:flex dark:border dark:border-line">
+        <a href="hoy-a1.html" class="rounded-full px-4 py-2 text-sm font-medium text-muted hover:text-ink">Hoy</a>
+        <a href="#" class="rounded-full px-4 py-2 text-sm font-medium text-muted hover:text-ink">Cursos</a>
+        <a href="#" class="rounded-full px-4 py-2 text-sm font-medium text-muted hover:text-ink">Horario</a>
+        <a href="notas.html" class="rounded-full px-4 py-2 text-sm font-medium text-muted hover:text-ink">Notas</a>
+        <a href="pagos.html" aria-current="page" class="rounded-full bg-ink px-4 py-2 text-sm font-medium text-card">Pagos</a>
+        <a href="#" class="rounded-full px-4 py-2 text-sm font-medium text-muted hover:text-ink">Más</a>
+      </nav>
+      <div class="flex items-center gap-2">
+        <button class="hidden h-11 items-center gap-2 rounded-full bg-card pr-2 pl-4 text-sm text-muted shadow-card md:flex dark:border dark:border-line">
+          <i data-lucide="search" class="size-4"></i>Buscar<kbd class="ml-6 rounded-md bg-subtle px-1.5 py-0.5 text-xs">⌘K</kbd>
+        </button>
+        <button aria-label="Notificaciones, 4 nuevas" class="relative grid size-11 place-items-center rounded-full bg-card shadow-card dark:border dark:border-line">
+          <i data-lucide="bell" class="size-[18px]"></i>
+          <span class="absolute top-2.5 right-3 size-2 rounded-full bg-info ring-2 ring-card"></span>
+        </button>
+        <span class="grid size-11 place-items-center rounded-full bg-card text-sm font-semibold shadow-card dark:border dark:border-line">AL</span>
+      </div>
+    </header>
+
+    <section class="reveal pt-6 pb-8 md:pt-10 md:pb-10" style="--i: 0">
+      <h1 class="text-[34px] leading-[1.05] font-semibold tracking-[-0.035em] md:text-[48px]">Pagos</h1>
+      <p class="mt-2 text-base text-muted md:text-lg">Ana López · carné 2024-0187 · Ciencias de la Computación</p>
+    </section>
+
+    <main class="flex flex-col gap-6">
+      <!-- 1. Status -->
+      <section class="reveal grid gap-8 rounded-[28px] bg-card p-6 shadow-card md:grid-cols-12 md:p-10 dark:border dark:border-line" style="--i: 1">
+        <div class="md:col-span-7">
+          <h2 class="text-xl font-semibold tracking-[-0.02em] md:text-2xl">Debes la cuota de noviembre</h2>
+          <p class="tnum mt-4 text-[56px] leading-none font-semibold tracking-[-0.045em] md:text-[80px]">Q7,387.80</p>
+          <p class="mt-4 flex flex-wrap items-center gap-x-3 gap-y-2 text-[15px] text-muted">
+            <span>Vence el martes 28 de octubre, en 6 días.</span>
+            <span class="inline-flex items-center gap-1.5 rounded-full bg-ok-soft px-2.5 py-1 text-sm font-medium text-ok"><i data-lucide="circle-check" class="size-4"></i>Solvente hasta esa fecha</span>
+          </p>
+        </div>
+        <dl class="tnum self-end text-[15px] md:col-span-5">
+          <div class="flex justify-between border-b border-line py-3"><dt class="text-muted">Colegiatura</dt><dd>Q6,950.00</dd></div>
+          <div class="flex justify-between border-b border-line py-3"><dt class="text-muted">Laboratorio de cómputo</dt><dd>Q312.80</dd></div>
+          <div class="flex justify-between border-b border-line py-3"><dt class="text-muted">Seguro estudiantil</dt><dd>Q125.00</dd></div>
+          <div class="flex justify-between py-3 font-semibold"><dt>Total</dt><dd>Q7,387.80</dd></div>
+        </dl>
+      </section>
+
+      <!-- 2. How to pay, cheapest first -->
+      <section class="reveal" style="--i: 2" aria-labelledby="como-pagar">
+        <h2 id="como-pagar" class="mb-4 px-1 text-xl font-semibold tracking-[-0.02em] md:text-2xl">Cómo pagar</h2>
+        <div class="grid gap-6 md:grid-cols-12">
+          <article class="flex flex-col gap-6 rounded-[28px] bg-card p-6 shadow-card ring-2 ring-ink md:col-span-7 md:p-8 dark:border dark:border-line">
+            <div class="flex flex-col-reverse items-start gap-3 sm:flex-row sm:justify-between sm:gap-4">
+              <div>
+                <h3 class="text-lg font-semibold tracking-[-0.015em]">Transferencia ACH</h3>
+                <p class="mt-1 text-[15px] text-muted">Desde tu banca en línea. Se verifica sola en minutos.</p>
+              </div>
+              <span class="shrink-0 rounded-full bg-ok-soft px-3 py-1 text-sm font-semibold text-ok">Sin comisión</span>
+            </div>
+            <ol class="flex flex-col gap-4 text-[15px]">
+              <li class="flex gap-3"><span class="tnum grid size-7 shrink-0 place-items-center rounded-full bg-subtle text-sm font-semibold">1</span><span>Abre la banca en línea de tu banco y elige <b class="font-semibold">Transferencia ACH</b> a otro banco.</span></li>
+              <li class="flex gap-3"><span class="tnum grid size-7 shrink-0 place-items-center rounded-full bg-subtle text-sm font-semibold">2</span><span>Cuenta monetaria <b class="tnum font-semibold">0000-000000-0</b> <span class="text-muted">(ejemplo)</span> de la Universidad Francisco Marroquín, por <b class="tnum font-semibold">Q7,387.80</b>.</span></li>
+              <li class="flex flex-col gap-2"><span class="flex gap-3"><span class="tnum grid size-7 shrink-0 place-items-center rounded-full bg-subtle text-sm font-semibold">3</span><span>Escribe esta referencia en la descripción:</span></span>
+                <span class="flex items-center justify-between gap-3 rounded-2xl bg-subtle py-2 pr-2 pl-4 sm:ml-10"><code class="tnum text-base font-semibold whitespace-nowrap sm:text-lg sm:tracking-wide">MIU-26-004127</code><button class="inline-flex h-11 items-center gap-2 rounded-full bg-card px-4 text-sm font-semibold shadow-card dark:border dark:border-line"><i data-lucide="copy" class="size-4"></i>Copiar</button></span>
+              </li>
+            </ol>
+            <a href="#" class="inline-flex h-12 items-center justify-center gap-2 rounded-full bg-ufm-text px-6 font-semibold text-white transition-transform duration-150 active:scale-[0.97] dark:bg-[#c21d1d]">Pagar con transferencia ACH<i data-lucide="arrow-right" class="size-[18px]"></i></a>
+            <p class="-mt-3 text-center text-sm text-muted">También puedes pagar desde el checkout seguro de Recurrente, sin salir de MiU.</p>
+          </article>
+
+          <div class="flex flex-col gap-6 md:col-span-5">
+            <article class="flex flex-col gap-4 rounded-[28px] bg-card p-6 shadow-card md:p-8 dark:border dark:border-line">
+              <div>
+                <h3 class="text-lg font-semibold tracking-[-0.015em]">Tarjeta o Apple Pay</h3>
+                <p class="mt-1 text-[15px] text-muted">Al instante. Visa y Mastercard, crédito o débito.</p>
+              </div>
+              <p class="tnum rounded-2xl bg-subtle p-4 text-sm leading-relaxed">Comisión de 4.5% + Q2 = <b class="font-semibold">Q334.45</b>. Tú no pagas recargo; con transferencia, la universidad tampoco.</p>
+              <a href="#" class="inline-flex h-11 items-center justify-center rounded-full border border-line px-5 text-sm font-semibold hover:bg-subtle">Pagar con tarjeta</a>
+            </article>
+            <article class="flex flex-col gap-3 rounded-[28px] bg-card p-6 shadow-card md:p-8 dark:border dark:border-line">
+              <h3 class="text-lg font-semibold tracking-[-0.015em]">Otras formas</h3>
+              <a href="#" class="tap -mx-3 flex min-h-14 items-center gap-3 rounded-xl px-3 py-2"><i data-lucide="receipt" class="size-5 text-muted"></i><span class="flex-1"><span class="block text-[15px] font-medium">Depósito con comprobante</span><span class="text-sm text-muted">Revisión de 1 a 2 días hábiles</span></span><i data-lucide="chevron-right" class="size-4 text-muted"></i></a>
+              <a href="#" class="tap -mx-3 flex min-h-14 items-center gap-3 rounded-xl px-3 py-2"><i data-lucide="landmark" class="size-5 text-muted"></i><span class="flex-1"><span class="block text-[15px] font-medium">Pago en caja</span><span class="text-sm text-muted">Edificio Académico, lunes a viernes de 7:00 a 17:00</span></span><i data-lucide="chevron-right" class="size-4 text-muted"></i></a>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <!-- 3. History -->
+      <section class="reveal rounded-[28px] bg-card p-6 shadow-card md:p-8 dark:border dark:border-line" style="--i: 3">
+        <div class="flex items-baseline justify-between">
+          <h2 class="text-xl font-semibold tracking-[-0.02em] md:text-2xl">Historial</h2>
+          <a href="#" class="inline-flex min-h-11 items-center text-sm font-medium text-muted hover:text-ink">Estado de cuenta</a>
+        </div>
+        <ul class="tnum mt-3 flex flex-col divide-y divide-line">
+          <li class="grid grid-cols-[1fr_auto] items-center gap-x-4 gap-y-2 py-4 md:grid-cols-[7rem_1fr_auto_auto_2.75rem] md:gap-x-6"><span class="order-3 text-sm text-muted md:order-none">14 oct 2026 <span class="md:hidden">· Depósito con comprobante</span></span><span class="order-1 min-w-0 md:order-none"><span class="block font-medium">Multa de biblioteca</span><span class="hidden text-sm text-muted md:block">Depósito con comprobante</span></span><span class="order-2 text-right font-semibold md:order-none">Q45.00</span><span class="order-4 flex items-center justify-end gap-2 md:order-none md:contents"><span class="inline-flex items-center gap-1.5 rounded-full bg-warn-soft px-2.5 py-1 text-sm font-medium text-warn"><i data-lucide="clock" class="size-4"></i>En revisión</span><span class="hidden size-11 md:block"></span></span></li>
+          <li class="grid grid-cols-[1fr_auto] items-center gap-x-4 gap-y-2 py-4 md:grid-cols-[7rem_1fr_auto_auto_2.75rem] md:gap-x-6"><span class="order-3 text-sm text-muted md:order-none">26 sep 2026 <span class="md:hidden">· Transferencia ACH</span></span><span class="order-1 min-w-0 md:order-none"><span class="block font-medium">Cuota de octubre</span><span class="hidden text-sm text-muted md:block">Transferencia ACH</span></span><span class="order-2 text-right font-semibold md:order-none">Q7,387.80</span><span class="order-4 flex items-center justify-end gap-2 md:order-none md:contents"><span class="inline-flex items-center gap-1.5 rounded-full bg-ok-soft px-2.5 py-1 text-sm font-medium text-ok"><i data-lucide="circle-check" class="size-4"></i>Pagado</span><a href="#" aria-label="Descargar recibo de la cuota de octubre" class="grid size-11 place-items-center rounded-full hover:bg-subtle"><i data-lucide="download" class="size-[18px]"></i></a></span></li>
+          <li class="grid grid-cols-[1fr_auto] items-center gap-x-4 gap-y-2 py-4 md:grid-cols-[7rem_1fr_auto_auto_2.75rem] md:gap-x-6"><span class="order-3 text-sm text-muted md:order-none">27 ago 2026 <span class="md:hidden">· Tarjeta terminada en 4417</span></span><span class="order-1 min-w-0 md:order-none"><span class="block font-medium">Cuota de septiembre</span><span class="hidden text-sm text-muted md:block">Tarjeta terminada en 4417</span></span><span class="order-2 text-right font-semibold md:order-none">Q7,387.80</span><span class="order-4 flex items-center justify-end gap-2 md:order-none md:contents"><span class="inline-flex items-center gap-1.5 rounded-full bg-ok-soft px-2.5 py-1 text-sm font-medium text-ok"><i data-lucide="circle-check" class="size-4"></i>Pagado</span><a href="#" aria-label="Descargar recibo de la cuota de septiembre" class="grid size-11 place-items-center rounded-full hover:bg-subtle"><i data-lucide="download" class="size-[18px]"></i></a></span></li>
+          <li class="grid grid-cols-[1fr_auto] items-center gap-x-4 gap-y-2 py-4 md:grid-cols-[7rem_1fr_auto_auto_2.75rem] md:gap-x-6"><span class="order-3 text-sm text-muted md:order-none">3 ago 2026 <span class="md:hidden">· Transferencia ACH</span></span><span class="order-1 min-w-0 md:order-none"><span class="block font-medium">Inscripción 2026-2</span><span class="hidden text-sm text-muted md:block">Transferencia ACH</span></span><span class="order-2 text-right font-semibold md:order-none">Q1,500.00</span><span class="order-4 flex items-center justify-end gap-2 md:order-none md:contents"><span class="inline-flex items-center gap-1.5 rounded-full bg-ok-soft px-2.5 py-1 text-sm font-medium text-ok"><i data-lucide="circle-check" class="size-4"></i>Pagado</span><a href="#" aria-label="Descargar recibo de la inscripción 2026-2" class="grid size-11 place-items-center rounded-full hover:bg-subtle"><i data-lucide="download" class="size-[18px]"></i></a></span></li>
+        </ul>
+      </section>
+    </main>
+  </div>
+
+  <nav aria-label="Principal" class="fixed inset-x-0 bottom-0 border-t border-line bg-card/85 pb-5 backdrop-blur-xl lg:hidden">
+    <ul class="grid grid-cols-5 text-[11px] font-medium">
+      <li><a href="hoy-a1.html" class="flex min-h-14 flex-col items-center justify-center gap-1 text-muted"><i data-lucide="sun" class="size-6"></i>Hoy</a></li>
+      <li><a href="#" class="flex min-h-14 flex-col items-center justify-center gap-1 text-muted"><i data-lucide="book-open" class="size-6"></i>Cursos</a></li>
+      <li><a href="#" class="flex min-h-14 flex-col items-center justify-center gap-1 text-muted"><i data-lucide="calendar" class="size-6"></i>Horario</a></li>
+      <li><a href="notas.html" class="flex min-h-14 flex-col items-center justify-center gap-1 text-muted"><i data-lucide="chart-no-axes-column" class="size-6"></i>Notas</a></li>
+      <li><a href="pagos.html" aria-current="page" class="flex min-h-14 flex-col items-center justify-center gap-1 text-ink"><i data-lucide="wallet" class="size-6"></i>Pagos</a></li>
+    </ul>
+  </nav>
+
+  <script src="https://cdn.jsdelivr.net/npm/lucide@1.61.0/dist/umd/lucide.min.js"></script>
+  <script>lucide.createIcons({ attrs: { "stroke-width": 1.75, "aria-hidden": "true" } });</script>
+</body>
+</html>

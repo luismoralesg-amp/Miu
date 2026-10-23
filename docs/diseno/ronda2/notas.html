@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Notas · Ronda 2</title>
+<link rel="stylesheet" href="assets/tokens.css" />
+<script src="assets/setup.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.3.3/dist/index.global.js"></script>
+</head>
+<body>
+  <div class="mx-auto max-w-[1280px] px-5 pb-10 md:px-10 md:pb-16">
+    <!-- Header -->
+    <header class="flex h-16 items-center justify-between gap-4 md:h-20">
+      <a href="#" class="flex items-center gap-2.5">
+        <span class="shield" style="--h: 30px"></span>
+        <span class="text-[19px] font-semibold tracking-[-0.02em]">MiU</span>
+      </a>
+      <nav aria-label="Principal" class="hidden rounded-full bg-card p-1 shadow-card lg:flex dark:border dark:border-line">
+        <a href="hoy-a1.html" class="rounded-full px-4 py-2 text-sm font-medium text-muted hover:text-ink">Hoy</a>
+        <a href="#" class="rounded-full px-4 py-2 text-sm font-medium text-muted hover:text-ink">Cursos</a>
+        <a href="#" class="rounded-full px-4 py-2 text-sm font-medium text-muted hover:text-ink">Horario</a>
+        <a href="notas.html" aria-current="page" class="rounded-full bg-ink px-4 py-2 text-sm font-medium text-card">Notas</a>
+        <a href="pagos.html" class="rounded-full px-4 py-2 text-sm font-medium text-muted hover:text-ink">Pagos</a>
+        <a href="#" class="rounded-full px-4 py-2 text-sm font-medium text-muted hover:text-ink">Más</a>
+      </nav>
+      <div class="flex items-center gap-2">
+        <button class="hidden h-11 items-center gap-2 rounded-full bg-card pr-2 pl-4 text-sm text-muted shadow-card md:flex dark:border dark:border-line">
+          <i data-lucide="search" class="size-4"></i>Buscar<kbd class="ml-6 rounded-md bg-subtle px-1.5 py-0.5 text-xs">⌘K</kbd>
+        </button>
+        <button aria-label="Notificaciones, 4 nuevas" class="relative grid size-11 place-items-center rounded-full bg-card shadow-card dark:border dark:border-line">
+          <i data-lucide="bell" class="size-[18px]"></i>
+          <span class="absolute top-2.5 right-3 size-2 rounded-full bg-info ring-2 ring-card"></span>
+        </button>
+        <span class="grid size-11 place-items-center rounded-full bg-card text-sm font-semibold shadow-card dark:border dark:border-line">AL</span>
+      </div>
+    </header>
+
+    <section class="reveal pt-6 pb-8 md:pt-10 md:pb-10" style="--i: 0">
+      <h1 class="text-[34px] leading-[1.05] font-semibold tracking-[-0.035em] md:text-[48px]">Notas</h1>
+      <p class="mt-2 text-base text-muted md:text-lg">Semestre 2026-2 · semana 12 de 18 · 4 cursos</p>
+    </section>
+
+    <main class="grid grid-cols-[minmax(0,1fr)] gap-6 lg:grid-cols-12">
+      <!-- 1. Semester average with its history -->
+      <section class="reveal flex flex-col justify-between gap-8 rounded-[28px] bg-card p-6 shadow-card md:p-8 lg:col-span-5 dark:border dark:border-line" style="--i: 1">
+        <div>
+          <h2 class="text-xl font-semibold tracking-[-0.02em] md:text-2xl">Promedio del semestre</h2>
+          <p class="mt-5 flex items-baseline gap-3">
+            <span class="tnum text-[72px] leading-none font-semibold tracking-[-0.045em] md:text-[88px]">85.0</span>
+            <span class="flex items-center gap-1 text-[15px] font-semibold text-ok"><i data-lucide="arrow-up-right" class="size-4"></i>1.2</span>
+          </p>
+          <p class="mt-3 text-[15px] text-muted">Sobre lo evaluado hasta hoy. El semestre anterior cerraste con 83.8.</p>
+        </div>
+        <figure>
+          <svg viewBox="0 0 400 120" class="h-auto w-full overflow-visible" role="img" aria-labelledby="trend-title">
+            <title id="trend-title">Promedio por semestre: 80.6, 82.1, 83.0, 83.8 y 85.0 en el semestre actual.</title>
+            <line x1="0" y1="96" x2="400" y2="96" stroke="var(--line)" stroke-width="1" />
+            <polyline points="12,78 104,57 196,44 288,33 388,16" fill="none" stroke="var(--ink)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+            <polyline points="288,33 388,16" fill="none" stroke="var(--card)" stroke-width="2" stroke-dasharray="0 6" />
+            <circle cx="12" cy="78" r="4" fill="var(--ink)" stroke="var(--card)" stroke-width="2" />
+            <circle cx="388" cy="16" r="5" fill="var(--card)" stroke="var(--ink)" stroke-width="2" />
+            <text x="12" y="66" fill="var(--muted)" font-size="12" text-anchor="start" class="tnum">80.6</text>
+            <text x="388" y="4" fill="var(--ink)" font-size="12" font-weight="600" text-anchor="end" class="tnum">85.0 en curso</text>
+            <g fill="var(--muted)" font-size="11" class="tnum">
+              <text x="12" y="114" text-anchor="start">2024-2</text><text x="104" y="114" text-anchor="middle">2025-1</text><text x="196" y="114" text-anchor="middle">2025-2</text><text x="288" y="114" text-anchor="middle">2026-1</text><text x="388" y="114" text-anchor="end">2026-2</text>
+            </g>
+          </svg>
+        </figure>
+      </section>
+
+      <!-- 2. By course, sorted by risk -->
+      <section class="reveal rounded-[28px] bg-card p-6 shadow-card md:p-8 lg:col-span-7 dark:border dark:border-line" style="--i: 2">
+        <div class="flex flex-wrap items-baseline justify-between gap-2">
+          <h2 class="text-xl font-semibold tracking-[-0.02em] md:text-2xl">Por curso</h2>
+          <p class="flex items-center gap-4 text-xs text-muted">
+            <span class="flex items-center gap-1.5"><span class="h-2 w-3 rounded-sm bg-ink"></span>Obtenido</span>
+            <span class="flex items-center gap-1.5"><span class="h-2 w-3 rounded-sm bg-line"></span>Perdido</span>
+            <span class="flex items-center gap-1.5"><span class="hatch h-2 w-3 rounded-sm"></span>Por evaluar</span>
+          </p>
+        </div>
+        <ul class="mt-4 -mx-3 flex flex-col">
+          <li>
+            <a href="#detalle" aria-current="true" class="flex flex-col gap-2.5 rounded-2xl bg-subtle px-3 py-4">
+              <span class="flex items-baseline justify-between gap-4"><span class="font-semibold">Matemática Discreta</span><span class="tnum text-sm"><span class="text-xl font-semibold">78</span> <span class="text-muted">· 60% evaluado</span></span></span>
+              <span class="flex h-2 gap-0.5 overflow-hidden rounded-full"><span class="w-[46.6%] rounded-l-full bg-ink"></span><span class="w-[13.4%] bg-line"></span><span class="hatch flex-1 rounded-r-full"></span></span>
+              <span class="tnum flex flex-wrap gap-x-4 gap-y-1 text-sm text-muted"><span>Para 71 necesitas <b class="font-semibold text-ink">61</b></span><span>Para 80, <b class="font-semibold text-ink">84</b></span><span>90 ya no es alcanzable</span></span>
+            </a>
+          </li>
+          <li>
+            <a href="#" class="tap flex flex-col gap-2.5 rounded-2xl px-3 py-4">
+              <span class="flex items-baseline justify-between gap-4"><span class="font-semibold">Bases de Datos I</span><span class="tnum text-sm"><span class="text-xl font-semibold">84</span> <span class="text-muted">· 45% evaluado</span></span></span>
+              <span class="flex h-2 gap-0.5 overflow-hidden rounded-full"><span class="w-[37.8%] rounded-l-full bg-ink"></span><span class="w-[7.2%] bg-line"></span><span class="hatch flex-1 rounded-r-full"></span></span>
+              <span class="tnum flex flex-wrap gap-x-4 gap-y-1 text-sm text-muted"><span>Para 71 necesitas <b class="font-semibold text-ink">61</b></span><span>Para 80, <b class="font-semibold text-ink">77</b></span><span>Para 90, <b class="font-semibold text-ink">95</b></span></span>
+            </a>
+          </li>
+          <li>
+            <a href="#" class="tap flex flex-col gap-2.5 rounded-2xl px-3 py-4">
+              <span class="flex items-baseline justify-between gap-4"><span class="font-semibold">Ética de la Libertad</span><span class="tnum text-sm"><span class="text-xl font-semibold">87</span> <span class="text-muted">· 50% evaluado</span></span></span>
+              <span class="flex h-2 gap-0.5 overflow-hidden rounded-full"><span class="w-[43.5%] rounded-l-full bg-ink"></span><span class="w-[6.5%] bg-line"></span><span class="hatch flex-1 rounded-r-full"></span></span>
+              <span class="tnum flex flex-wrap gap-x-4 gap-y-1 text-sm text-muted"><span>Para 71 necesitas <b class="font-semibold text-ink">55</b></span><span>Para 80, <b class="font-semibold text-ink">73</b></span><span>Para 90, <b class="font-semibold text-ink">93</b></span></span>
+            </a>
+          </li>
+          <li>
+            <a href="#" class="tap flex flex-col gap-2.5 rounded-2xl px-3 py-4">
+              <span class="flex items-baseline justify-between gap-4"><span class="flex items-center gap-2 font-semibold">Paradigmas de Programación <span class="rounded-full bg-info-soft px-2 py-0.5 text-xs font-semibold text-info">1 nueva</span></span><span class="tnum text-sm"><span class="text-xl font-semibold">91</span> <span class="text-muted">· 55% evaluado</span></span></span>
+              <span class="flex h-2 gap-0.5 overflow-hidden rounded-full"><span class="w-[50%] rounded-l-full bg-ink"></span><span class="w-[5%] bg-line"></span><span class="hatch flex-1 rounded-r-full"></span></span>
+              <span class="tnum flex flex-wrap gap-x-4 gap-y-1 text-sm text-muted"><span>Para 71 necesitas <b class="font-semibold text-ink">47</b></span><span>Para 80, <b class="font-semibold text-ink">67</b></span><span>Para 90, <b class="font-semibold text-ink">89</b></span></span>
+            </a>
+          </li>
+        </ul>
+      </section>
+
+      <!-- 3. Course detail -->
+      <section id="detalle" class="reveal rounded-[28px] bg-card p-6 shadow-card md:p-8 lg:col-span-8 dark:border dark:border-line" style="--i: 3">
+        <div class="flex flex-wrap items-baseline justify-between gap-2">
+          <h2 class="text-xl font-semibold tracking-[-0.02em] md:text-2xl">Matemática Discreta</h2>
+          <p class="text-sm text-muted">Catedrático: Jorge Castillo · Auxiliar: Sofía Ramírez</p>
+        </div>
+        <div class="mt-5 -mx-6 overflow-x-auto px-6 md:-mx-8 md:px-8">
+          <table class="tnum w-full min-w-[560px] text-left text-sm">
+            <thead class="text-xs text-muted">
+              <tr class="border-b border-line"><th class="py-3 pr-4 font-medium">Actividad</th><th class="py-3 pr-4 text-right font-medium">Peso</th><th class="py-3 pr-4 text-right font-medium">Nota</th><th class="py-3 pr-4 font-medium">Calificó</th><th class="py-3 font-medium">Publicada</th></tr>
+            </thead>
+            <tbody class="divide-y divide-line">
+              <tr><td class="py-3.5 pr-4 font-medium"><span class="flex items-center gap-2">Quiz 3: lógica <span class="rounded-full bg-info-soft px-2 py-0.5 text-xs font-semibold text-info">Nueva</span></span></td><td class="py-3.5 pr-4 text-right text-muted">5%</td><td class="py-3.5 pr-4 text-right font-semibold">90</td><td class="py-3.5 pr-4">Sofía Ramírez <span class="text-muted">· auxiliar</span></td><td class="py-3.5 text-muted">20 oct</td></tr>
+              <tr><td class="py-3.5 pr-4 font-medium">Avance del proyecto</td><td class="py-3.5 pr-4 text-right text-muted">10%</td><td class="py-3.5 pr-4 text-right font-semibold">79</td><td class="py-3.5 pr-4">Jorge Castillo <span class="text-muted">· catedrático</span></td><td class="py-3.5 text-muted">14 oct</td></tr>
+              <tr><td class="py-3.5 pr-4 font-medium">Parcial 1</td><td class="py-3.5 pr-4 text-right text-muted">20%</td><td class="py-3.5 pr-4 text-right font-semibold">72</td><td class="py-3.5 pr-4">Jorge Castillo <span class="text-muted">· catedrático</span></td><td class="py-3.5 text-muted">22 sep</td></tr>
+              <tr><td class="py-3.5 pr-4 font-medium">Tareas 1 a 3</td><td class="py-3.5 pr-4 text-right text-muted">15%</td><td class="py-3.5 pr-4 text-right font-semibold">80</td><td class="py-3.5 pr-4">Sofía Ramírez <span class="text-muted">· auxiliar</span></td><td class="py-3.5 text-muted">8 oct</td></tr>
+              <tr><td class="py-3.5 pr-4 font-medium">Quizzes 1 y 2</td><td class="py-3.5 pr-4 text-right text-muted">10%</td><td class="py-3.5 pr-4 text-right font-semibold">78</td><td class="py-3.5 pr-4">Sofía Ramírez <span class="text-muted">· auxiliar</span></td><td class="py-3.5 text-muted">1 oct</td></tr>
+              <tr class="text-muted"><td class="py-3.5 pr-4">Parcial 2 · mañana</td><td class="py-3.5 pr-4 text-right">20%</td><td class="py-3.5 pr-4 text-right">—</td><td class="py-3.5 pr-4">Pendiente</td><td class="py-3.5">—</td></tr>
+              <tr class="text-muted"><td class="py-3.5 pr-4">Proyecto final · 1 dic</td><td class="py-3.5 pr-4 text-right">20%</td><td class="py-3.5 pr-4 text-right">—</td><td class="py-3.5 pr-4">Pendiente</td><td class="py-3.5">—</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- 4. What do I need? -->
+      <section class="reveal flex flex-col gap-6 rounded-[28px] bg-card p-6 shadow-card md:p-8 lg:col-span-4 dark:border dark:border-line" style="--i: 4">
+        <div>
+          <h2 class="text-xl font-semibold tracking-[-0.02em] md:text-2xl">¿Qué nota necesito?</h2>
+          <p class="mt-1 text-sm text-muted">Matemática Discreta · falta el 40%</p>
+        </div>
+        <div>
+          <label for="sim" class="flex items-baseline justify-between text-sm"><span class="text-muted">Si en lo que falta saco</span><output id="sim-in" class="tnum text-xl font-semibold">75</output></label>
+          <input id="sim" type="range" min="0" max="100" value="75" class="mt-3 h-11 w-full cursor-pointer accent-[var(--ink)]" />
+        </div>
+        <div class="rounded-2xl bg-subtle p-5">
+          <p class="text-sm text-muted">Terminaría el curso con</p>
+          <p class="tnum mt-1 text-[56px] leading-none font-semibold tracking-[-0.045em]" id="sim-out">77</p>
+          <p class="mt-2 text-sm" id="sim-note">Apruebas con 71 y te faltan 3 puntos para 80.</p>
+        </div>
+      </section>
+    </main>
+  </div>
+  <script>
+    const sim = document.getElementById("sim");
+    const update = () => {
+      const x = Number(sim.value);
+      const final = Math.round(46.6 + 0.4 * x);
+      document.getElementById("sim-in").textContent = x;
+      document.getElementById("sim-out").textContent = final;
+      document.getElementById("sim-note").textContent =
+        final >= 80 ? `Llegas a 80${final >= 90 ? " y a 90" : ""}.` :
+        final >= 71 ? `Apruebas con 71 y te faltan ${80 - final} puntos para 80.` :
+        `Te faltan ${71 - final} puntos para aprobar con 71.`;
+    };
+    sim.addEventListener("input", update);
+  </script>
+
+  <nav aria-label="Principal" class="fixed inset-x-0 bottom-0 border-t border-line bg-card/85 pb-5 backdrop-blur-xl lg:hidden">
+    <ul class="grid grid-cols-5 text-[11px] font-medium">
+      <li><a href="hoy-a1.html" class="flex min-h-14 flex-col items-center justify-center gap-1 text-muted"><i data-lucide="sun" class="size-6"></i>Hoy</a></li>
+      <li><a href="#" class="flex min-h-14 flex-col items-center justify-center gap-1 text-muted"><i data-lucide="book-open" class="size-6"></i>Cursos</a></li>
+      <li><a href="#" class="flex min-h-14 flex-col items-center justify-center gap-1 text-muted"><i data-lucide="calendar" class="size-6"></i>Horario</a></li>
+      <li><a href="notas.html" aria-current="page" class="flex min-h-14 flex-col items-center justify-center gap-1 text-ink"><i data-lucide="chart-no-axes-column" class="size-6"></i>Notas</a></li>
+      <li><a href="pagos.html" class="flex min-h-14 flex-col items-center justify-center gap-1 text-muted"><i data-lucide="wallet" class="size-6"></i>Pagos</a></li>
+    </ul>
+  </nav>
+
+  <script src="https://cdn.jsdelivr.net/npm/lucide@1.61.0/dist/umd/lucide.min.js"></script>
+  <script>lucide.createIcons({ attrs: { "stroke-width": 1.75, "aria-hidden": "true" } });</script>
+</body>
+</html>

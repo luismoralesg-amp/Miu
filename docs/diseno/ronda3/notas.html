@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="es" data-piel="p1">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Notas · MiU</title>
+<link rel="stylesheet" href="assets/tokens.css" />
+<script src="assets/seed.js"></script>
+<script src="assets/setup.js"></script>
+<script src="assets/p1.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.3.3/dist/index.global.js"></script>
+</head>
+<body>
+  <div class="mx-auto max-w-[1240px] px-5 pb-10 md:px-12 md:pb-20">
+    <div id="shell-top"></div>
+    <section class="reveal pt-10 pb-8 md:pt-14 md:pb-10" style="--i: 0">
+      <p class="text-[15px] text-muted">Semestre 2026-2 · <span data-fill="semana"></span></p>
+      <h1 class="display mt-2 text-[40px] leading-[1.02] font-medium md:text-[64px]">Notas</h1>
+    </section>
+    <main class="flex flex-col">
+      <div class="grid items-start border-y border-line md:grid-cols-12 md:divide-x md:divide-line">
+        <section class="reveal py-10 md:col-span-5 md:pr-12" style="--i: 1" aria-labelledby="prom-t">
+          <h2 id="prom-t" class="text-[15px] text-muted">Promedio del semestre, sobre lo evaluado</h2>
+          <p class="mt-2 flex items-baseline gap-3"><span id="promedio" class="display tnum text-[88px] leading-none md:text-[112px]"></span><span class="flex items-center gap-1 text-[15px] font-semibold text-ok"><i data-lucide="arrow-up-right" class="size-4"></i><span id="delta"></span></span></p>
+          <p id="prom-nota" class="mt-3 text-[15px] text-muted"></p>
+          <figure class="mt-6"><svg id="tendencia" viewBox="0 0 400 110" class="h-auto w-full overflow-visible" role="img"></svg></figure>
+        </section>
+        <section class="reveal border-t border-line py-10 md:col-span-7 md:border-t-0 md:pl-12" style="--i: 2" aria-labelledby="cur-t">
+          <div class="flex flex-wrap items-baseline justify-between gap-2">
+            <h2 id="cur-t" class="display text-[28px] font-medium md:text-[34px]">Por curso</h2>
+            <p class="flex items-center gap-4 text-xs text-muted"><span class="flex items-center gap-1.5"><span class="h-2 w-3 rounded-sm bg-ink"></span>Obtenido</span><span class="flex items-center gap-1.5"><span class="h-2 w-3 rounded-sm bg-line"></span>Perdido</span><span class="flex items-center gap-1.5"><span class="hatch h-2 w-3 rounded-sm"></span>Por evaluar</span></p>
+          </div>
+          <ul id="cursos" class="mt-4 divide-y divide-line border-t border-line"></ul>
+        </section>
+      </div>
+      <div class="grid items-start md:grid-cols-12 md:divide-x md:divide-line">
+        <section class="reveal py-10 md:col-span-8 md:pr-12" style="--i: 3" aria-labelledby="det-t">
+          <div class="flex flex-wrap items-baseline justify-between gap-2"><h2 id="det-t" class="display text-[28px] font-medium md:text-[34px]">Matemática Discreta</h2><p class="text-sm text-muted">Catedrático: Jorge Castillo · Auxiliar: Sofía Ramírez</p></div>
+          <div class="mt-5 overflow-x-auto"><table class="tnum w-full min-w-[560px] text-left text-sm"><thead class="text-xs text-muted"><tr class="border-b border-line"><th class="py-3 pr-4 font-medium">Actividad</th><th class="py-3 pr-4 text-right font-medium">Peso</th><th class="py-3 pr-4 text-right font-medium">Nota</th><th class="py-3 pr-4 font-medium">Calificó</th><th class="py-3 font-medium">Publicada</th></tr></thead><tbody id="detalle" class="divide-y divide-line"></tbody></table></div>
+        </section>
+        <section class="reveal border-t border-line py-10 md:col-span-4 md:border-t-0 md:pl-12" style="--i: 4" aria-labelledby="sim-t">
+          <h2 id="sim-t" class="display text-[28px] font-medium md:text-[34px]">¿Qué nota necesito?</h2>
+          <p class="mt-1 text-sm text-muted">Matemática Discreta · falta el 40%</p>
+          <label for="sim" class="mt-6 flex items-baseline justify-between text-sm"><span class="text-muted">Si en lo que falta saco</span><output id="sim-in" class="display tnum text-[28px]">75</output></label>
+          <input id="sim" type="range" min="0" max="100" value="75" class="mt-2 h-11 w-full cursor-pointer accent-[var(--ink)]" />
+          <p class="mt-4 text-sm text-muted">Terminaría con</p>
+          <p id="sim-out" class="display tnum text-[64px] leading-none"></p>
+          <p id="sim-note" class="mt-2 text-[15px]"></p>
+        </section>
+      </div>
+    </main>
+  </div>
+  <div id="shell-bottom"></div>
+  <script src="https://cdn.jsdelivr.net/npm/lucide@1.61.0/dist/umd/lucide.min.js"></script>
+  <script>
+    const $ = (id) => document.getElementById(id);
+    P1.shell("notas");
+    const N = window.SEED.notas, metas = N.metas;
+    const actuales = N.cursos.map((c) => (c.obtenido / c.evaluado) * 100);
+    const prom = actuales.reduce((s, x) => s + x, 0) / actuales.length;
+    const anterior = N.historial[N.historial.length - 1][1];
+    $("promedio").textContent = prom.toFixed(1);
+    $("delta").textContent = (prom - anterior).toFixed(1);
+    $("prom-nota").textContent = `El semestre anterior cerraste con ${anterior.toFixed(1)}.`;
+    const serie = [...N.historial, ["2026-2", +prom.toFixed(1)]];
+    const xs = serie.map((_, i) => 12 + (i * 376) / (serie.length - 1));
+    const lo = 78, hi = 87, y = (v) => 82 - ((v - lo) / (hi - lo)) * 70;
+    $("tendencia").innerHTML = `<title>Promedio por semestre: ${serie.map(([s, v]) => `${s}, ${v}`).join("; ")} (en curso).</title>
+      <line x1="0" y1="92" x2="400" y2="92" stroke="var(--line)" />
+      <polyline points="${serie.map(([, v], i) => `${xs[i]},${y(v)}`).join(" ")}" fill="none" stroke="var(--ink)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+      <circle cx="${xs[0]}" cy="${y(serie[0][1])}" r="4" fill="var(--ink)" stroke="var(--canvas)" stroke-width="2" />
+      <circle cx="${xs.at(-1)}" cy="${y(serie.at(-1)[1])}" r="5" fill="var(--canvas)" stroke="var(--ink)" stroke-width="2" />
+      <text x="${xs[0]}" y="${y(serie[0][1]) - 10}" fill="var(--muted)" font-size="12" class="tnum">${serie[0][1]}</text>
+      <text x="${xs.at(-1)}" y="${y(serie.at(-1)[1]) - 12}" fill="var(--ink)" font-size="12" font-weight="600" text-anchor="end" class="tnum">${serie.at(-1)[1]} en curso</text>
+      ${serie.map(([s], i) => `<text x="${xs[i]}" y="108" fill="var(--muted)" font-size="11" text-anchor="${i === 0 ? "start" : i === serie.length - 1 ? "end" : "middle"}" class="tnum">${s}</text>`).join("")}`;
+    const necesita = (c, meta) => Math.ceil((meta - c.obtenido) / ((100 - c.evaluado) / 100));
+    $("cursos").innerHTML = N.cursos.map((c, i) => { const k = MIU.curso(c.curso), nota = Math.round((c.obtenido / c.evaluado) * 100); return `
+      <li><a href="#detalle" class="tap -mx-2 flex flex-col gap-2.5 rounded-lg px-2 py-4 ${i === 0 ? "bg-card" : ""}">
+        <span class="flex items-baseline justify-between gap-4"><span class="flex items-center gap-2 font-semibold">${P1.dot(c.curso)}${k.nombre}${c.nuevas ? ` <span class="rounded-full bg-info-soft px-2 py-0.5 text-xs font-semibold text-info">${c.nuevas} nueva</span>` : ""}</span><span class="tnum text-sm"><span class="display text-[26px]">${nota}</span> <span class="text-muted">· ${c.evaluado}% evaluado</span></span></span>
+        <span class="flex h-2 gap-0.5 overflow-hidden rounded-full"><span class="rounded-l-full bg-ink" style="width:${c.obtenido}%"></span><span class="bg-line" style="width:${c.evaluado - c.obtenido}%"></span><span class="hatch flex-1 rounded-r-full"></span></span>
+        <span class="tnum flex flex-wrap gap-x-4 gap-y-1 text-sm text-muted">${metas.map((m, j) => { const x = necesita(c, m); return x > 100 ? `<span>${m} ya no es alcanzable</span>` : `<span>${j === 0 ? `Para ${m} necesitas` : `Para ${m},`} <b class="font-semibold text-ink">${Math.max(x, 0)}</b></span>`; }).join("")}</span></a></li>`; }).join("");
+    $("detalle").innerHTML = N.detalleMD.map((r) => `<tr><td class="py-3.5 pr-4 font-medium"><span class="flex items-center gap-2">${r.actividad}${r.nueva ? ' <span class="rounded-full bg-info-soft px-2 py-0.5 text-xs font-semibold text-info">Nueva</span>' : ""}</span></td><td class="py-3.5 pr-4 text-right text-muted">${r.peso}%</td><td class="py-3.5 pr-4 text-right font-semibold">${r.nota}</td><td class="py-3.5 pr-4">${r.quien} <span class="text-muted">· ${r.rol}</span></td><td class="py-3.5 text-muted">${MIU.fechaCorta(r.fecha)}</td></tr>`).join("")
+      + window.SEED.examenes.filter((x) => x.curso === "MD").map((x) => `<tr class="text-muted"><td class="py-3.5 pr-4">${x.titulo} · ${MIU.relativo(x.fecha)}</td><td class="py-3.5 pr-4 text-right">${x.peso}%</td><td class="py-3.5 pr-4 text-right">—</td><td class="py-3.5 pr-4">Pendiente</td><td class="py-3.5">—</td></tr>`).join("")
+      + `<tr class="text-muted"><td class="py-3.5 pr-4">Proyecto final · 1 dic</td><td class="py-3.5 pr-4 text-right">20%</td><td class="py-3.5 pr-4 text-right">—</td><td class="py-3.5 pr-4">Pendiente</td><td class="py-3.5">—</td></tr>`;
+    const md = N.cursos[0], sim = $("sim");
+    const upd = () => { const x = +sim.value, fin = Math.round(md.obtenido + ((100 - md.evaluado) / 100) * x);
+      $("sim-in").textContent = x; $("sim-out").textContent = fin;
+      $("sim-note").textContent = fin >= 90 ? "Llegas a 90." : fin >= 80 ? "Llegas a 80." : fin >= 71 ? `Llegas a 71 y te faltan ${80 - fin} puntos para 80.` : `Te faltan ${71 - fin} puntos para llegar a 71.`; };
+    sim.addEventListener("input", upd); upd();
+
+    P1.iconos();
+  </script>
+</body>
+</html>

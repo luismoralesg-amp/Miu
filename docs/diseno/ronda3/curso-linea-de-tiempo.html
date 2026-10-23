@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="es" data-piel="p1">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Matemática Discreta · MiU</title>
+<link rel="stylesheet" href="assets/tokens.css" />
+<script src="assets/seed.js"></script>
+<script src="assets/setup.js"></script>
+<script src="assets/p1.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.3.3/dist/index.global.js"></script>
+</head>
+<body>
+  <div class="mx-auto max-w-[1240px] px-5 pb-10 md:px-12 md:pb-20">
+    <div id="shell-top"></div>
+    <section id="cabecera" class="pt-10 pb-8 md:pt-14 md:pb-10"></section>
+    <main class="grid gap-10 md:grid-cols-12">
+      <div class="md:col-span-8">
+        <div class="flex flex-wrap gap-2" role="group" aria-label="Filtrar la línea de tiempo">
+          <button aria-pressed="true" class="h-9 rounded-full bg-ink px-4 text-sm font-medium text-card">Todo</button>
+          <button aria-pressed="false" class="h-9 rounded-full border border-line px-4 text-sm text-muted">Actividades</button>
+          <button aria-pressed="false" class="h-9 rounded-full border border-line px-4 text-sm text-muted">Notas</button>
+          <button aria-pressed="false" class="h-9 rounded-full border border-line px-4 text-sm text-muted">Anuncios</button>
+          <button aria-pressed="false" class="h-9 rounded-full border border-line px-4 text-sm text-muted">Documentos</button>
+        </div>
+        <ol id="linea" class="relative mt-8"></ol>
+      </div>
+      <aside class="md:col-span-4 md:border-l md:border-line md:pl-10" aria-label="Datos del curso">
+        <dl id="datos" class="flex flex-col gap-5 text-[15px]"></dl>
+      </aside>
+    </main>
+  </div>
+  <div id="shell-bottom"></div>
+  <script src="https://cdn.jsdelivr.net/npm/lucide@1.61.0/dist/umd/lucide.min.js"></script>
+  <script>
+    const $ = (id) => document.getElementById(id);
+    P1.shell("cursos");
+    const S = window.SEED, c = MIU.curso("MD");
+    const nota = Math.round((S.notas.cursos[0].obtenido / S.notas.cursos[0].evaluado) * 100);
+    $("cabecera").innerHTML = `
+      <span aria-hidden="true" class="c-${c.slot} bg-c block h-1 w-16 rounded-full"></span>
+      <p class="mt-5 text-[15px] text-muted">Sección ${c.seccion} · Lunes, miércoles y jueves, 07:00 · D-307</p>
+      <h1 class="display mt-2 text-[40px] leading-[1.02] font-medium md:text-[64px]">${c.nombre}</h1>`;
+    $("datos").innerHTML = [
+      ["Nota actual", `<a href="notas.html" class="display tnum text-[40px] leading-none">${nota}</a> <span class="text-sm text-muted">sobre el 60% evaluado</span>`],
+      ["Catedrático", `${c.catedratico}<br><a href="#" class="text-sm text-muted underline underline-offset-4">Escribirle</a>`],
+      ["Auxiliar", `${c.auxiliar}<br><a href="#" class="text-sm text-muted underline underline-offset-4">Escribirle</a>`],
+      ["Programa del curso", `<a href="#" class="inline-flex items-center gap-1.5 underline underline-offset-4"><i data-lucide="file-text" class="size-4"></i>Programa 2026-2 (PDF)</a>`],
+    ].map(([k, v]) => `<div><dt class="text-sm text-muted">${k}</dt><dd class="mt-1">${v}</dd></div>`).join("");
+    const ev = [
+      { f: "2026-09-22", tipo: "nota", t: "Parcial 1", s: "Nota publicada: 72 · Jorge Castillo", pasado: true },
+      { f: "2026-10-01", tipo: "nota", t: "Quizzes 1 y 2", s: "Nota publicada: 78 · Sofía Ramírez", pasado: true },
+      { f: "2026-10-08", tipo: "nota", t: "Tareas 1 a 3", s: "Nota publicada: 80 · Sofía Ramírez", pasado: true },
+      { f: "2026-10-14", tipo: "nota", t: "Avance del proyecto", s: "Nota publicada: 79 · Jorge Castillo" },
+      { f: "2026-10-20", tipo: "nota", t: "Quiz 3: lógica", s: "Nota publicada: 90 · Sofía Ramírez", nueva: true },
+      { f: "2026-10-21T17:10", tipo: "documento", t: "Guía de repaso del Parcial 2", s: "Documento nuevo · Jorge Castillo", nueva: true },
+      { f: "2026-10-22T07:00", tipo: "clase", t: "Clase de hoy", s: "07:00 a 08:20 · D-307 · en curso", hoy: true },
+      { f: "2026-10-23T07:00", tipo: "examen", t: "Parcial 2", s: "07:00 · D-307 · vale 20% · grafos, árboles y recurrencias" },
+      { f: "2026-10-25T23:59", tipo: "entrega", t: "Quiz 4: grafos", s: "En línea, 20 min · hasta las 23:59" },
+      { f: "2026-12-01T23:59", tipo: "entrega", t: "Proyecto final", s: "Vale 20% · repositorio" },
+    ];
+    const ic = { nota: "badge-check", documento: "file-text", clase: "presentation", examen: "pencil-line", entrega: "upload" };
+    const pasados = ev.filter((x) => x.pasado);
+    const fila = (x) => { const d = MIU.parse(x.f), n = MIU.diasDesdeHoy(d), futuro = n > 0; return `
+      <li class="relative grid grid-cols-[4.5rem_1fr] gap-4 pb-7 md:grid-cols-[6rem_1fr]">
+        <span class="tnum pt-0.5 text-sm ${x.hoy ? "font-semibold" : "text-muted"}">${x.hoy ? "Hoy" : n === 1 ? "Mañana" : `${d.getDate()} ${MIU.MESES[d.getMonth()].slice(0, 3)}`}</span>
+        <span class="relative border-l ${futuro ? "border-dashed" : ""} border-line pl-6">
+          <span class="absolute top-0.5 -left-[13px] grid size-6 place-items-center rounded-full ${x.hoy ? "bg-ink text-card" : x.tipo === "examen" ? "border border-ink bg-canvas" : "border border-line bg-canvas text-muted"}"><i data-lucide="${ic[x.tipo]}" class="size-3.5"></i></span>
+          <span class="block text-[15px] font-semibold">${x.t}${x.nueva ? ' <span class="ml-1 rounded-full bg-info-soft px-2 py-0.5 align-middle text-xs font-semibold text-info">Nueva</span>' : ""}${x.tipo === "examen" ? ' <span class="ml-1 rounded-full border border-ink px-2 py-0.5 align-middle text-xs font-semibold">Examen</span>' : ""}</span>
+          <span class="block text-sm text-muted">${x.s}</span>
+        </span></li>`; };
+    const pintar = (abierto) => {
+      $("linea").innerHTML = (abierto ? pasados.map(fila).join("") : `<li class="pb-7 pl-[5.5rem] md:pl-[7rem]"><button id="mas" class="inline-flex min-h-11 items-center gap-2 rounded-full border border-line px-4 text-sm font-medium"><i data-lucide="chevrons-up" class="size-4"></i>Ver ${pasados.length} elementos anteriores</button></li>`)
+        + ev.filter((x) => !x.pasado).map(fila).join("");
+      P1.iconos();
+      const b = document.getElementById("mas"); if (b) b.addEventListener("click", () => pintar(true));
+    };
+    pintar(false);
+
+    P1.iconos();
+  </script>
+</body>
+</html>

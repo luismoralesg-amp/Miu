@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="es" data-piel="p3">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Hoy · P3 Profundidad</title>
+<link rel="stylesheet" href="assets/tokens.css" />
+<script src="assets/seed.js"></script>
+<script src="assets/setup.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.3.3/dist/index.global.js"></script>
+<style>
+  /* The day axis is a groove; classes are raised tiles; the current one is the highest. */
+  .groove { background: var(--subtle); box-shadow: inset 0 1px 3px rgb(16 24 40 / 0.10), inset 0 0 0 1px var(--line); }
+  .dark .groove { box-shadow: inset 0 2px 4px rgb(0 0 0 / 0.6), inset 0 0 0 1px var(--line); }
+  .tile { background: var(--card); box-shadow: var(--shadow); }
+  .tile-up { background: var(--card); box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.9), 0 2px 4px rgb(16 24 40 / 0.08), 0 16px 32px -8px rgb(16 24 40 / 0.28); transform: translateY(-3px); }
+  .dark .tile-up { box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.1), 0 2px 4px rgb(0 0 0 / 0.6), 0 18px 36px -8px rgb(0 0 0 / 0.8); }
+  .hero-urgent { box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.25), 0 2px 4px rgb(181 23 26 / 0.25), 0 20px 40px -12px rgb(181 23 26 / 0.45); }
+</style>
+</head>
+<body>
+  <!-- Floating glass navigation: the only blurred surface on the page -->
+  <header class="sticky top-3 z-40 mx-auto mt-3 flex h-14 max-w-[1240px] items-center justify-between gap-4 px-3 md:top-4 md:mt-4 md:px-4">
+    <div class="glass flex h-14 w-full items-center justify-between gap-4 rounded-full px-3 md:px-4">
+      <a href="#" class="flex items-center gap-2.5 pl-1"><span class="shield" style="--h: 28px"></span><span class="text-[18px] font-semibold tracking-[-0.02em]">MiU</span></a>
+      <nav aria-label="Principal" class="hidden items-center gap-1 lg:flex">
+        <a href="#" aria-current="page" class="tile rounded-full px-4 py-1.5 text-sm font-semibold">Hoy</a>
+        <a href="#" class="rounded-full px-4 py-1.5 text-sm font-medium text-muted hover:text-ink">Cursos</a>
+        <a href="#" class="rounded-full px-4 py-1.5 text-sm font-medium text-muted hover:text-ink">Horario</a>
+        <a href="#" class="rounded-full px-4 py-1.5 text-sm font-medium text-muted hover:text-ink">Notas</a>
+        <a href="#" class="rounded-full px-4 py-1.5 text-sm font-medium text-muted hover:text-ink">Pagos</a>
+      </nav>
+      <div class="flex items-center gap-1.5">
+        <button class="hidden h-10 items-center gap-2 rounded-full px-3 text-sm text-muted hover:bg-subtle md:flex"><i data-lucide="search" class="size-4"></i>Buscar<kbd class="rounded-md bg-subtle px-1.5 py-0.5 text-xs">⌘K</kbd></button>
+        <button aria-label="Notificaciones" class="grid size-11 place-items-center rounded-full hover:bg-subtle"><i data-lucide="bell" class="size-[18px]"></i></button>
+        <span data-fill="iniciales" class="tile grid size-10 place-items-center rounded-full text-sm font-semibold"></span>
+      </div>
+    </div>
+  </header>
+
+  <div class="mx-auto max-w-[1240px] px-4 pb-10 md:px-8 md:pb-16">
+    <section class="reveal flex flex-col gap-5 pt-10 pb-8 md:flex-row md:items-end md:justify-between md:pt-14" style="--i: 0">
+      <div>
+        <p class="text-[15px] text-muted"><span data-fill="fecha-larga"></span> · <span data-fill="semana"></span></p>
+        <h1 data-fill="saludo" class="mt-1 text-[34px] leading-[1.05] font-semibold tracking-[-0.035em] md:text-[52px]"></h1>
+      </div>
+      <div id="aviso"></div>
+    </section>
+
+    <main class="flex flex-col gap-6">
+      <div id="hero" class="reveal" style="--i: 1"></div>
+      <section class="tile reveal rounded-[26px] p-6 md:p-8" style="--i: 2" aria-labelledby="dia-t">
+        <div class="flex items-baseline justify-between gap-4">
+          <div><h2 id="dia-t" class="text-xl font-semibold tracking-[-0.02em] md:text-2xl">Tu día</h2><p id="dia-resumen" class="mt-1 text-sm text-muted"></p></div>
+          <a href="#" class="inline-flex min-h-11 shrink-0 items-center text-sm font-medium text-muted hover:text-ink">Semana<span class="hidden sm:inline">&nbsp;completa</span></a>
+        </div>
+        <div id="dia"></div>
+      </section>
+      <div class="grid gap-6 md:grid-cols-12">
+        <section class="tile reveal rounded-[26px] p-6 md:col-span-7 md:p-8" style="--i: 3" aria-labelledby="pe-t">
+          <div class="flex items-baseline justify-between"><h2 id="pe-t" class="text-xl font-semibold tracking-[-0.02em] md:text-2xl">Por entregar</h2><a id="pe-total" href="#" class="inline-flex min-h-11 items-center text-sm font-medium text-muted hover:text-ink"></a></div>
+          <ul id="pendientes" class="mt-3 -mx-3 flex flex-col"></ul>
+        </section>
+        <section class="tile reveal rounded-[26px] p-6 md:col-span-5 md:p-8" style="--i: 4" aria-labelledby="no-t">
+          <div class="flex items-baseline justify-between"><h2 id="no-t" class="text-xl font-semibold tracking-[-0.02em] md:text-2xl">Novedades</h2><span id="no-nuevas" class="text-sm text-muted"></span></div>
+          <ul id="novedades" class="mt-3 -mx-3 flex flex-col"></ul>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <nav aria-label="Principal" class="fixed inset-x-3 bottom-3 rounded-[24px] lg:hidden">
+    <ul class="glass grid grid-cols-5 rounded-[24px] text-[11px] font-medium">
+      <li><a href="#" aria-current="page" class="flex min-h-14 flex-col items-center justify-center gap-1 text-ink"><i data-lucide="sun" class="size-6"></i>Hoy</a></li>
+      <li><a href="#" class="flex min-h-14 flex-col items-center justify-center gap-1 text-muted"><i data-lucide="book-open" class="size-6"></i>Cursos</a></li>
+      <li><a href="#" class="flex min-h-14 flex-col items-center justify-center gap-1 text-muted"><i data-lucide="calendar" class="size-6"></i>Horario</a></li>
+      <li><a href="#" class="flex min-h-14 flex-col items-center justify-center gap-1 text-muted"><i data-lucide="chart-no-axes-column" class="size-6"></i>Notas</a></li>
+      <li><a href="#" class="flex min-h-14 flex-col items-center justify-center gap-1 text-muted"><i data-lucide="wallet" class="size-6"></i>Pagos</a></li>
+    </ul>
+  </nav>
+
+  <script src="https://cdn.jsdelivr.net/npm/lucide@1.61.0/dist/umd/lucide.min.js"></script>
+  <script>
+    const H = MIU.hoy(), $ = (id) => document.getElementById(id);
+    const icono = { nota: "badge-check", documento: "file-text", anuncio: "megaphone" };
+
+    if (H.aviso) $("aviso").innerHTML = `
+      <a href="#" class="tile tap flex min-h-11 items-center gap-3 self-start rounded-full py-1.5 pr-4 pl-1.5 text-sm">
+        <span class="grid size-8 place-items-center rounded-full bg-warn-soft text-warn"><i data-lucide="wallet" class="size-4"></i></span>
+        <span><span class="tnum font-semibold">${MIU.quetzales(H.aviso.monto)}</span> <span class="text-muted">vence en ${H.aviso.dias} días</span></span>
+        <i data-lucide="chevron-right" class="size-4 text-muted"></i></a>`;
+
+    const p = H.proximo, f = MIU.faltan(p.fecha), c = MIU.curso(p.curso), urgente = p.estado === "urgente";
+    $("hero").innerHTML = `
+      <article class="${urgente ? "hero-urgent bg-gradient-to-b from-ufm to-ufm-deep text-white" : "tile"} flex flex-col gap-6 rounded-[26px] p-6 md:flex-row md:items-center md:justify-between md:px-9 md:py-7">
+        <div>
+          <h2 class="text-[28px] leading-[1.08] font-semibold tracking-[-0.03em] md:text-[36px]">${p.titulo} de ${c.nombre}</h2>
+          <p class="mt-1.5 text-[15px] ${urgente ? "text-white/90" : "text-muted"}">${MIU.cap(MIU.relativo(p.fecha))}, ${MIU.hhmm(MIU.parse(p.fecha))} · ${p.salon} · vale ${p.peso}%</p>
+        </div>
+        <div class="flex flex-wrap items-center justify-between gap-x-6 gap-y-4 md:justify-end">
+          <p class="tnum flex items-baseline gap-1 leading-none font-semibold tracking-[-0.045em] [text-shadow:0_1px_0_rgb(0_0_0/0.15)]"><span class="text-[52px] md:text-[64px]">${f.h}</span><span class="text-lg font-medium">h</span><span class="ml-2 text-[52px] md:text-[64px]">${f.min}</span><span class="text-lg font-medium">min</span></p>
+          <a href="#" class="inline-flex h-12 shrink-0 items-center gap-2 rounded-full bg-white px-5 text-[15px] font-semibold text-[#c21d1d] shadow-[0_1px_0_rgb(255_255_255/0.6)_inset,0_6px_14px_-4px_rgb(0_0_0/0.35)]">Repasar<i data-lucide="arrow-right" class="size-[18px]"></i></a>
+        </div>
+      </article>`;
+
+    $("dia-resumen").textContent = `${H.clases.length} clases · ${MIU.duracion(H.libre)} libres entre clases`;
+    const horas = Array.from({ length: 12 }, (_, i) => i + 7);
+    $("dia").innerHTML = `
+      <div class="relative mt-8 hidden md:block">
+        <div class="tnum relative h-4 text-xs text-muted">${horas.map((h, i) => `<span class="absolute ${i === 0 ? "" : i === 11 ? "-translate-x-full" : "-translate-x-1/2"}" style="left:${(i / 11) * 100}%">${String(h).padStart(2, "0")}</span>`).join("")}</div>
+        <div class="groove relative mt-3 h-[96px] rounded-2xl">
+          ${H.huecos.map((h) => `<p class="absolute inset-y-0 flex items-center justify-center gap-1.5 text-sm text-muted" style="left:${h.left}%;width:${h.width}%">${h.min >= 90 ? `<i data-lucide="coffee" class="size-4"></i>${MIU.duracion(h.min)} libres` : MIU.duracion(h.min)}</p>`).join("")}
+          <span aria-hidden="true" class="absolute -top-1.5 -bottom-1.5 w-0.5 rounded-full bg-ink" style="left:${H.ahoraPos}%"><span class="absolute -top-1 -left-[3px] size-2 rounded-full bg-ink"></span></span>
+          ${H.clases.map((k) => `<a href="#" class="${k.estado === "ahora" ? "tile-up z-10" : "tile"} absolute inset-y-2 rounded-xl px-3 py-2.5" style="left:${k.left}%;width:${k.width}%">
+              <p class="truncate text-sm font-semibold">${k.corto}</p>
+              <p class="mt-1 truncate text-xs ${k.estado === "ahora" ? "font-semibold text-ink" : "text-muted"}">${k.estado === "ahora" ? "Ahora" : k.ini} · ${k.salon.split(" ")[0]}</p></a>`).join("")}
+        </div>
+      </div>
+      <ol class="mt-5 flex flex-col gap-2 md:hidden">${H.clases.map((k, i) => `
+        ${i > 0 && H.huecos[i - 1] ? `<li class="px-4 py-1 text-sm text-muted">${MIU.duracion(H.huecos[i - 1].min)} libres</li>` : ""}
+        <li><a href="#" class="${k.estado === "ahora" ? "tile-up" : "groove"} flex min-h-14 items-center gap-4 rounded-2xl px-4 py-3"><span class="tnum w-12 text-sm ${k.estado === "ahora" ? "font-semibold" : "text-muted"}">${k.ini}</span><span class="flex-1"><span class="block font-semibold">${k.nombre}</span><span class="text-sm text-muted">${k.estado === "ahora" ? "Ahora · " : ""}${k.salon}</span></span></a></li>`).join("")}</ol>`;
+
+    $("pe-total").textContent = `Ver las ${H.totalPendientes}`;
+    $("pendientes").innerHTML = H.porEntregar.map((e) => `
+      <li><a href="#" class="tap flex min-h-16 items-center justify-between gap-4 rounded-xl px-3 py-3">
+        <span class="min-w-0"><span class="block font-semibold">${e.titulo}</span><span class="text-sm text-muted">${MIU.curso(e.curso).nombre}</span></span>
+        <span class="tnum shrink-0 text-sm ${MIU.diasDesdeHoy(e.fecha) <= 1 ? "font-semibold" : "text-muted"}">${MIU.vence(e.fecha)}</span></a></li>`).join("");
+
+    $("no-nuevas").textContent = `${H.nuevas} nuevas`;
+    $("novedades").innerHTML = H.novedades.map((n) => `
+      <li><a href="#" class="tap flex min-h-16 items-start gap-3 rounded-xl px-3 py-3">
+        <span class="groove mt-0.5 grid size-9 shrink-0 place-items-center rounded-full"><i data-lucide="${icono[n.tipo]}" class="size-[18px]"></i></span>
+        <span class="min-w-0 flex-1"><span class="block text-[15px] ${n.nueva ? "font-semibold" : ""}">${n.texto}</span><span class="text-sm text-muted">${MIU.curso(n.curso).corto} · ${n.quien} · ${MIU.hace(n.fecha)}</span></span>
+        ${n.nueva ? '<span class="sr-only">Nueva</span><span aria-hidden="true" class="mt-2 size-2 shrink-0 rounded-full bg-info"></span>' : ""}</a></li>`).join("");
+
+    lucide.createIcons({ attrs: { "stroke-width": 1.75, "aria-hidden": "true" } });
+  </script>
+</body>
+</html>
