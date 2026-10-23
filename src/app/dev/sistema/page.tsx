@@ -123,7 +123,7 @@ export default function FoundationsPage() {
           ].map(([radius, name, use]) => (
             <div
               key={name}
-              className={`${radius} flex h-28 flex-col justify-end gap-0.5 border border-transparent bg-surface p-4 shadow-card dark:border-border`}
+              className={`${radius} flex h-28 flex-col justify-end gap-0.5 border border-border bg-surface p-4`}
             >
               <code className="text-label font-medium text-fg">{name}</code>
               <span className="text-caption text-fg-muted">{use}</span>

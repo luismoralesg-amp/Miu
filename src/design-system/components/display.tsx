@@ -134,7 +134,7 @@ export function Card({
   return (
     <Element
       className={cx(
-        "flex flex-col rounded-lg border border-transparent bg-surface shadow-card dark:border-border",
+        "flex flex-col rounded-lg border border-border bg-surface",
         padding === "default" && "p-6",
         className,
       )}
@@ -359,5 +359,28 @@ export function Sparkline({
       </svg>
       <span className="sr-only">{summary}</span>
     </span>
+  );
+}
+
+/* ---------- Course mark ---------- */
+
+export type CourseSlot = 1 | 2 | 3 | 4 | 5 | 6;
+
+const courseBg: Record<CourseSlot, string> = {
+  1: "bg-course-1",
+  2: "bg-course-2",
+  3: "bg-course-3",
+  4: "bg-course-4",
+  5: "bg-course-5",
+  6: "bg-course-6",
+};
+
+/** Course identity as a small mark next to its name. Never a fill behind text; the name carries meaning. */
+export function CourseDot({ slot, className }: { slot: CourseSlot; className?: string }) {
+  return (
+    <span
+      aria-hidden="true"
+      className={cx("inline-block size-2 shrink-0 rounded-full", courseBg[slot], className)}
+    />
   );
 }

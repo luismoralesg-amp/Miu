@@ -54,3 +54,17 @@ Cada entrada: fecha · decisión · por qué · cómo revertirla.
   pensum, CommandPalette, Sheet, Toast y Timeline llegan con la pantalla que los usa (E2 a E7), para diseñarlos con
   datos reales y no en abstracto.
 - **Catálogo `/dev/sistema`:** solo en desarrollo, o con `MIU_DEV_TOOLS=1` (lo activa Playwright).
+
+## 2026-10-22 · E2 · Identidad P1 en el código
+
+- **P1 · Editorial pasa a ser el sistema visual real** (ronda de diseño 3, aprobada por Luis). Lienzo cálido
+  (`#f7f3ec` / `#13110e`), reglas finas en lugar de tarjetas con sombra (`Card` usa borde de 1 px en ambos temas),
+  Fraunces para títulos y cifras (utilidad `display`) e Inter para la interfaz.
+- **Fraunces autoalojada** en `public/fonts/`, con `OFL-Fraunces.txt` al lado. Sin CDN ni Google Fonts en runtime.
+- **Colores por curso** `--course-1…6`, validados con el validador de dataviz (pares vecinos en claro y oscuro). Solo
+  como marca (`CourseDot`), nunca como fondo de texto. `tokens.test.ts` exige 3:1 de cada uno sobre `bg`, `surface` y
+  `surface-subtle`.
+- `--success-fg` claro pasa de `#15803d` a `#12703a` para mantener 4.5:1 sobre el lienzo cálido. `--border-control`
+  se recalculó para 3:1 en las tres superficies.
+- **Comisión de tarjeta:** las maquetas muestran el total con comisión, pero en código **no se aplica recargo** hasta
+  que la UFM lo decida (ver `INTEGRACIONES_PENDIENTES.md`).

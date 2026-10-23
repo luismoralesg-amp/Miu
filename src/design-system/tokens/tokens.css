@@ -1,5 +1,6 @@
 /*
- * MiU design tokens. Single source of truth for color, elevation and motion.
+ * MiU design tokens · P1 Editorial (approved in design round 3).
+ * Warm paper canvas, hairline rules instead of cards, Fraunces for display, Inter for interface.
  * Light values live on :root; dark values apply with the OS preference (unless the user picked light)
  * or when the user picked dark. Contrast pairs are checked in tokens.test.ts.
  */
@@ -7,14 +8,14 @@
 :root {
   color-scheme: light;
 
-  --bg: #f9fafb;
-  --surface: #ffffff;
-  --surface-subtle: #f3f4f6;
-  --border: #e5e7eb;
-  --border-strong: #d1d5db;
-  --border-control: #868f9e;
-  --fg: #111827;
-  --fg-muted: #5f6b7d;
+  --bg: #f7f3ec;
+  --surface: #fffdf9;
+  --surface-subtle: #efe9df;
+  --border: #e2dacd;
+  --border-strong: #cfc5b6;
+  --border-control: #80776a;
+  --fg: #1c1814;
+  --fg-muted: #655c52;
 
   /* UFM red, sampled from the shield in public/brand/logo-ufm01.png */
   --brand-red: #e22726;
@@ -30,7 +31,7 @@
   --info-fg: #0c4c91;
   --info-soft: #eaf1fb;
 
-  --success-fg: #15803d;
+  --success-fg: #12703a;
   --success-soft: #e9f7ee;
   --warning-fg: #9a4d00;
   --warning-soft: #fff4e0;
@@ -39,23 +40,31 @@
   --danger-soft: #ffeef1;
   --danger-fill: #be123c;
 
-  --shadow-card: 0 1px 2px rgb(16 24 40 / 0.04), 0 4px 16px rgb(16 24 40 / 0.04);
-  --shadow-overlay: 0 12px 32px rgb(16 24 40 / 0.12), 0 2px 6px rgb(16 24 40 / 0.06);
-  --scrim: rgb(9 9 11 / 0.4);
+  /* Course identity: validated categorical palette (dataviz), used only as marks, never behind text. */
+  --course-1: #2a78d6;
+  --course-2: #b07400;
+  --course-3: #138a61;
+  --course-4: #6250d6;
+  --course-5: #008300;
+  --course-6: #0e8fb3;
+
+  --shadow-card: none;
+  --shadow-overlay: 0 1px 2px rgb(28 24 20 / 0.06), 0 16px 40px rgb(28 24 20 / 0.14);
+  --scrim: rgb(28 24 20 / 0.4);
 }
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     color-scheme: dark;
 
-    --bg: #09090b;
-    --surface: #18181b;
-    --surface-subtle: #1f1f23;
-    --border: #27272a;
-    --border-strong: #3f3f46;
-    --border-control: #6b6b74;
-    --fg: #fafafa;
-    --fg-muted: #a1a1aa;
+    --bg: #13110e;
+    --surface: #1b1915;
+    --surface-subtle: #24211c;
+    --border: #34302a;
+    --border-strong: #4a453d;
+    --border-control: #857d70;
+    --fg: #f2ede4;
+    --fg-muted: #aaa196;
 
     --accent-fg: #ff6f66;
     --accent-soft: #3a1416;
@@ -73,8 +82,15 @@
     --danger-soft: #3a0e18;
     --danger-fill: #be123c;
 
+    --course-1: #3987e5;
+    --course-2: #c98500;
+    --course-3: #199e70;
+    --course-4: #9085e9;
+    --course-5: #2f9e2f;
+    --course-6: #1aa3c9;
+
     --shadow-card: none;
-    --shadow-overlay: 0 16px 40px rgb(0 0 0 / 0.5);
+    --shadow-overlay: 0 16px 48px rgb(0 0 0 / 0.6);
     --scrim: rgb(0 0 0 / 0.6);
   }
 }
@@ -82,14 +98,14 @@
 :root[data-theme="dark"] {
   color-scheme: dark;
 
-  --bg: #09090b;
-  --surface: #18181b;
-  --surface-subtle: #1f1f23;
-  --border: #27272a;
-  --border-strong: #3f3f46;
-  --border-control: #6b6b74;
-  --fg: #fafafa;
-  --fg-muted: #a1a1aa;
+  --bg: #13110e;
+  --surface: #1b1915;
+  --surface-subtle: #24211c;
+  --border: #34302a;
+  --border-strong: #4a453d;
+  --border-control: #857d70;
+  --fg: #f2ede4;
+  --fg-muted: #aaa196;
 
   --accent-fg: #ff6f66;
   --accent-soft: #3a1416;
@@ -107,29 +123,36 @@
   --danger-soft: #3a0e18;
   --danger-fill: #be123c;
 
+  --course-1: #3987e5;
+  --course-2: #c98500;
+  --course-3: #199e70;
+  --course-4: #9085e9;
+  --course-5: #2f9e2f;
+  --course-6: #1aa3c9;
+
   --shadow-card: none;
-  --shadow-overlay: 0 16px 40px rgb(0 0 0 / 0.5);
+  --shadow-overlay: 0 16px 48px rgb(0 0 0 / 0.6);
   --scrim: rgb(0 0 0 / 0.6);
 }
 
 @media (prefers-contrast: more) {
   :root {
-    --border: #9ca3af;
-    --border-strong: #6b7280;
-    --fg-muted: #374151;
+    --border: #a39a8c;
+    --border-strong: #6f665a;
+    --fg-muted: #3d362f;
   }
 
   :root[data-theme="dark"] {
-    --border: #71717a;
-    --border-strong: #a1a1aa;
-    --fg-muted: #d4d4d8;
+    --border: #6f685d;
+    --border-strong: #a69e91;
+    --fg-muted: #d8d1c6;
   }
 }
 
 @media (prefers-contrast: more) and (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --border: #71717a;
-    --border-strong: #a1a1aa;
-    --fg-muted: #d4d4d8;
+    --border: #6f685d;
+    --border-strong: #a69e91;
+    --fg-muted: #d8d1c6;
   }
 }

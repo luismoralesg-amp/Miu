@@ -8,12 +8,13 @@ export {
   BentoGrid,
   BentoItem,
   Card,
+  CourseDot,
   Kbd,
   ProgressRing,
   Sparkline,
   Stat,
 } from "./display";
-export type { Tone } from "./display";
+export type { CourseSlot, Tone } from "./display";
 export { SelectField, TextAreaField, TextField } from "./field";
 export { MaskedValue, maskValue } from "./masked-value";
 export { Dialog, Tooltip } from "./overlay";

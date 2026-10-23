@@ -36,10 +36,13 @@ const textPairs: Array<[string, string]> = [
   ["on-accent", "accent-to"],
   ["info-fg", "surface"],
   ["info-fg", "info-soft"],
+  ["success-fg", "bg"],
   ["success-fg", "surface"],
   ["success-fg", "success-soft"],
+  ["warning-fg", "bg"],
   ["warning-fg", "surface"],
   ["warning-fg", "warning-soft"],
+  ["danger-fg", "bg"],
   ["danger-fg", "surface"],
   ["danger-fg", "danger-soft"],
   ["on-accent", "danger-fill"],
@@ -51,6 +54,13 @@ const uiPairs: Array<[string, string]> = [
   ["focus", "surface"],
   ["border-control", "bg"],
   ["border-control", "surface"],
+  ["border-control", "surface-subtle"],
+  // Course marks (dots, rules, timeline) must be perceivable on every surface they sit on.
+  ...[1, 2, 3, 4, 5, 6].flatMap((n): Array<[string, string]> => [
+    [`course-${n}`, "bg"],
+    [`course-${n}`, "surface"],
+    [`course-${n}`, "surface-subtle"],
+  ]),
 ];
 
 describe.each([
