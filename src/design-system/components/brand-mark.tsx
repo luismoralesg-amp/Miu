@@ -58,7 +58,7 @@ export function BrandMark({
     return (
       <span className={cx("inline-flex items-center gap-2.5", className)}>
         <Shield height={30} />
-        <span className="text-title-3 font-semibold tracking-[-0.02em] text-fg">MiU</span>
+        <span className="display text-[22px] font-semibold text-fg">MiU</span>
         <span className="sr-only">, Universidad Francisco Marroquín</span>
       </span>
     );
