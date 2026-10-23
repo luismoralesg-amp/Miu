@@ -42,7 +42,7 @@ test("theme choice applies instantly and survives a reload", async ({ page }) =>
   await page.locator("label", { hasText: "Oscuro" }).click();
   await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
   const darkBg = await page.evaluate(() => getComputedStyle(document.body).backgroundColor);
-  expect(darkBg).toBe("rgb(9, 9, 11)");
+  expect(darkBg).toBe("rgb(19, 17, 14)");
 
   await page.reload();
   await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
@@ -51,7 +51,7 @@ test("theme choice applies instantly and survives a reload", async ({ page }) =>
   await page.locator("label", { hasText: "Claro" }).click();
   await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
   expect(await page.evaluate(() => getComputedStyle(document.body).backgroundColor)).toBe(
-    "rgb(249, 250, 251)",
+    "rgb(247, 243, 236)",
   );
 });
 
