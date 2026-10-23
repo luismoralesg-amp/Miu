@@ -293,16 +293,20 @@ export class MockIdentity implements IdentityPort {
       this.state.users.set(user.id, user);
     }
     const now = iso(this.now());
-    const device: Device = {
-      id: `d-${randomUUID()}`,
-      userId: user.id,
-      nombre: describeUserAgent(client.userAgent),
-      navegador: describeUserAgent(client.userAgent),
-      lugar: client.lugar,
-      credencial,
-      ultimaVez: now,
-      desde: now,
-    };
+    const known = client.deviceId ? this.state.devices.get(client.deviceId) : undefined;
+    const device: Device =
+      known && known.userId === user.id
+        ? Object.assign(known, { ultimaVez: now, lugar: client.lugar })
+        : {
+            id: `d-${randomUUID()}`,
+            userId: user.id,
+            nombre: describeUserAgent(client.userAgent),
+            navegador: describeUserAgent(client.userAgent),
+            lugar: client.lugar,
+            credencial,
+            ultimaVez: now,
+            desde: now,
+          };
     this.state.devices.set(device.id, device);
     return { user, session: this.createSession(user.id, device.id, recordar) };
   }

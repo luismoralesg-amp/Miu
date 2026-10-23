@@ -155,4 +155,20 @@ describe("MockIdentity", () => {
     const signed = await id.signInWithGoogle(client);
     expect(signed.ok && signed.value.user.correo).toBe("ana.lopez.demo@ufm.edu");
   });
+
+  it("reuses this browser's device when signing in again", async () => {
+    await id.startEmailSignIn("ana.lopez.demo@ufm.edu");
+    const first = await id.verifyCode("ana.lopez.demo@ufm.edu", await lastCode(), client, false);
+    if (!first.ok) throw new Error("sign in failed");
+    now += 60_000;
+    await id.startEmailSignIn("ana.lopez.demo@ufm.edu");
+    const again = await id.verifyCode(
+      "ana.lopez.demo@ufm.edu",
+      await lastCode(),
+      { ...client, deviceId: first.value.session.deviceId },
+      false,
+    );
+    expect(again.ok && again.value.session.deviceId).toBe(first.value.session.deviceId);
+    expect(await id.listDevices("u-ana")).toHaveLength(3);
+  });
 });

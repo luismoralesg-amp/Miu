@@ -2,7 +2,8 @@ import type { Result } from "@/lib/result";
 
 import type { Device, IdentityError, MailMessage, Role, Session, User } from "../domain/types";
 
-export type ClientInfo = { userAgent: string; lugar: string };
+/** `deviceId` is this browser's id from a long-lived cookie, so signing in again reuses its device. */
+export type ClientInfo = { userAgent: string; lugar: string; deviceId?: string | undefined };
 
 export type SignedIn = { session: Session; user: User };
 
