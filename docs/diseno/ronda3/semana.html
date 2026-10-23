@@ -19,6 +19,7 @@
         <h1 id="titulo" class="display mt-2 text-[40px] leading-[1.02] font-medium md:text-[56px]"></h1>
       </div>
       <p class="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-muted" aria-label="Leyenda de carga">
+        <span class="flex items-center gap-1.5"><span class="flex gap-0.5"><i class="h-3 w-1.5 rounded-sm bg-line"></i><i class="h-3 w-1.5 rounded-sm bg-line"></i><i class="h-3 w-1.5 rounded-sm bg-line"></i></span>Libre</span>
         <span class="flex items-center gap-1.5"><span class="flex gap-0.5"><i class="h-3 w-1.5 rounded-sm bg-ink"></i><i class="h-3 w-1.5 rounded-sm bg-line"></i><i class="h-3 w-1.5 rounded-sm bg-line"></i></span>Ligera</span>
         <span class="flex items-center gap-1.5"><span class="flex gap-0.5"><i class="h-3 w-1.5 rounded-sm bg-ink"></i><i class="h-3 w-1.5 rounded-sm bg-ink"></i><i class="h-3 w-1.5 rounded-sm bg-line"></i></span>Media</span>
         <span class="flex items-center gap-1.5"><span class="flex gap-0.5"><i class="h-3 w-1.5 rounded-sm bg-ink"></i><i class="h-3 w-1.5 rounded-sm bg-ink"></i><i class="h-3 w-1.5 rounded-sm bg-ink"></i></span>Pesada</span>
@@ -48,7 +49,7 @@
       const peso = items.reduce((s, x) => s + (x.tipo === "examen" ? 3 : x.tipo === "entrega" ? 1.5 : 1), 0);
       const [etq, barras] = nivel(peso);
       return `
-      <li class="flex flex-col gap-4 border-b border-line py-5 lg:min-h-[420px] lg:border-b-0 lg:px-4 ${n === 0 ? "bg-card" : ""} ${n < 0 ? "text-muted" : ""}">
+      <li class="flex flex-col gap-4 border-b border-line py-5 lg:min-h-[280px] lg:border-b-0 lg:px-4 ${n === 0 ? "bg-card" : ""} ${n < 0 ? "text-muted" : ""}">
         <div class="flex items-baseline justify-between gap-2 lg:flex-col lg:items-start">
           <p class="${n === 0 ? "font-semibold" : ""}"><span class="text-[15px]">${MIU.cap(MIU.DIAS[d.getDay()])}${n === 0 ? " · hoy" : ""}</span> <span class="display tnum text-[28px]">${d.getDate()}</span></p>
           <p class="flex items-center gap-2 text-sm text-muted"><span class="flex gap-0.5" aria-hidden="true">${[1, 2, 3].map((b) => `<i class="h-3 w-1.5 rounded-sm ${b <= barras ? "bg-ink" : "bg-line"}"></i>`).join("")}</span>Carga ${etq.toLowerCase()}</p>

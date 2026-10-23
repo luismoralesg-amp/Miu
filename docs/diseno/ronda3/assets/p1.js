@@ -8,27 +8,56 @@
   const P1 = {
     dot: (k, size = "size-2") => `<span aria-hidden="true" class="c-${M.curso(k).slot} bg-c ${size} inline-block shrink-0 rounded-full"></span>`,
 
-    shell(activo, nav = NAV) {
+    /** Everything MiU does that is not in the bar. Nothing from MiU is lost; ⌘K also reaches all of it. */
+    MAS: [
+      ["Académico", [["map", "Pensum y mapa de cursos"], ["history", "Historial de cursos"], ["calendar-range", "Semana", "semana.html", "movil"], ["list-plus", "Asignar y botar cursos"], ["mic", "Conferencias y su evaluación"], ["file-badge", "Documentos académicos"]]],
+      ["Comunicación y ayuda", [["messages-square", "Mensajes"], ["life-buoy", "Soporte y ayuda"]]],
+      ["Mi cuenta", [["user-round", "Información personal"], ["shield", "Privacidad"], ["monitor-smartphone", "Accesos y dispositivos"], ["folder", "Mis archivos"]]],
+      ["Servicios", [["file-text", "Solicitud de documentos"], ["graduation-cap", "Graduaciones"], ["clipboard-check", "Examen por suficiencia"], ["car", "Parqueo"], ["printer", "Impresiones de laboratorio"], ["languages", "Duolingo"]]],
+      ["Recursos", [["contact", "Directorio de personas"], ["building-2", "Directorio de oficinas"], ["calendar-days", "Eventos"], ["image", "Logotipos y fondos"], ["sparkles", "ChatGPT Edu"]]],
+      ["Google Workspace", [["mail", "UFMail", "#", "externo"], ["calendar", "Calendar", "#", "externo"], ["hard-drive", "Drive", "#", "externo"]]],
+    ],
+
+    masPanel(id = "mas-panel") {
+      return `
+        <div id="${id}" role="dialog" aria-label="Más funciones" class="fixed inset-x-0 bottom-0 z-40 max-h-[82vh] overflow-y-auto rounded-t-[24px] border border-line bg-card px-5 pt-3 pb-24 shadow-float lg:absolute lg:inset-x-auto lg:top-full lg:right-0 lg:bottom-auto lg:mt-2 lg:max-h-none lg:w-[880px] lg:rounded-[20px] lg:px-8 lg:pt-7 lg:pb-7">
+          <span aria-hidden="true" class="mx-auto mb-4 block h-1 w-10 rounded-full bg-line lg:hidden"></span>
+          <div class="grid gap-x-10 gap-y-6 lg:grid-cols-3">
+            ${P1.MAS.map(([g, items]) => `<section><h2 class="text-xs font-semibold text-muted">${g}</h2><ul class="mt-2">
+              ${items.map(([ic, t, href = "#", extra]) => `<li class="${extra === "movil" ? "lg:hidden" : ""}"><a href="${href}" class="tap -mx-2 flex min-h-11 items-center gap-3 rounded-lg px-2 text-[15px]"><i data-lucide="${ic}" class="size-[18px] text-muted"></i><span class="flex-1">${t}</span>${extra === "externo" ? '<i data-lucide="arrow-up-right" class="size-4 text-muted"></i><span class="sr-only">(se abre fuera de MiU)</span>' : ""}</a></li>`).join("")}
+            </ul></section>`).join("")}
+          </div>
+        </div>`;
+    },
+
+    shell(activo, nav = NAV, { masAbierto = false } = {}) {
+      const barraMovil = nav === NAV ? nav.filter(([k]) => k !== "semana") : nav;
       const top = document.getElementById("shell-top");
       if (top) top.innerHTML = `
-        <header class="flex h-16 items-center justify-between gap-6 border-b border-line md:h-20">
+        <header class="relative flex h-16 items-center justify-between gap-6 border-b border-line md:h-20">
           <a href="p1-editorial.html" class="flex items-center gap-3"><span class="shield" style="--h: 32px"></span><span class="display text-[22px] font-semibold">MiU</span></a>
-          <nav aria-label="Principal" class="hidden items-center gap-8 text-[15px] lg:flex">
+          <nav aria-label="Principal" class="relative hidden items-center gap-8 text-[15px] lg:flex">
             ${nav.map(([k, t, , href]) => `<a href="${href}" ${k === activo ? 'aria-current="page" class="border-b-2 border-ink py-6 font-semibold"' : 'class="py-6 text-muted hover:text-ink"'}>${t}</a>`).join("")}
+            ${nav === NAV ? `<button type="button" data-mas aria-expanded="${masAbierto}" aria-controls="mas-panel" class="flex items-center gap-1 py-6 ${masAbierto ? "font-semibold text-ink" : "text-muted hover:text-ink"}">Más<i data-lucide="chevron-down" class="size-4"></i></button>` : ""}
           </nav>
           <div class="flex items-center gap-1">
             <a href="cmdk.html" class="hidden h-11 items-center gap-2 rounded-full px-3 text-sm text-muted hover:bg-subtle md:flex"><i data-lucide="search" class="size-[18px]"></i>Buscar o hacer algo<kbd class="rounded border border-line px-1.5 text-xs">⌘K</kbd></a>
             <button aria-label="Notificaciones" class="grid size-11 place-items-center rounded-full hover:bg-subtle"><i data-lucide="bell" class="size-5"></i></button>
             <span class="ml-1 grid size-10 place-items-center rounded-full border border-line text-sm font-semibold">${M.iniciales()}</span>
           </div>
+          ${masAbierto ? P1.masPanel() : ""}
         </header>`;
       const bottom = document.getElementById("shell-bottom");
+      const items = nav === NAV ? [...barraMovil, ["mas", "Más", "layout-grid", "mas.html"]] : nav;
       if (bottom) bottom.innerHTML = `
-        <nav aria-label="Principal" class="fixed inset-x-0 bottom-0 z-30 border-t border-line bg-canvas/95 pb-5 lg:hidden">
-          <ul class="grid text-[11px] font-medium" style="grid-template-columns:repeat(${nav.length},minmax(0,1fr))">
-            ${nav.map(([k, t, ic, href]) => `<li><a href="${href}" ${k === activo ? 'aria-current="page" class="flex min-h-14 flex-col items-center justify-center gap-1 text-ink"' : 'class="flex min-h-14 flex-col items-center justify-center gap-1 text-muted"'}><i data-lucide="${ic}" class="size-6"></i>${t}</a></li>`).join("")}
+        <nav aria-label="Principal" class="fixed inset-x-0 bottom-0 z-50 border-t border-line bg-canvas/95 pb-5 lg:hidden">
+          <ul class="grid text-[11px] font-medium" style="grid-template-columns:repeat(${items.length},minmax(0,1fr))">
+            ${items.map(([k, t, ic, href]) => `<li><a href="${href}" ${k === activo || (k === "mas" && masAbierto) ? 'aria-current="page" class="flex min-h-14 flex-col items-center justify-center gap-1 text-ink"' : 'class="flex min-h-14 flex-col items-center justify-center gap-1 text-muted"'}><i data-lucide="${ic}" class="size-6"></i>${t}</a></li>`).join("")}
           </ul>
-        </nav>`;
+        </nav>
+        ${masAbierto ? '<div aria-hidden="true" class="fixed inset-0 z-30 bg-black/30 lg:hidden"></div>' : ""}`;
+      document.querySelectorAll("[data-mas]").forEach((b) => b.addEventListener("click", () => { location.href = "mas.html"; }));
+      document.addEventListener("keydown", (e) => { if (e.key === "Escape" && masAbierto) location.href = "p1-editorial.html"; });
     },
 
     aviso(H) {
@@ -88,7 +117,7 @@
     novedades: (lista) => lista.map((n) => `
       <li><a href="curso-linea-de-tiempo.html" class="tap -mx-2 flex min-h-16 items-start gap-3 rounded-lg px-2 py-3.5">
         <i data-lucide="${icono[n.tipo]}" class="mt-0.5 size-[18px] shrink-0 text-muted"></i>
-        <span class="min-w-0 flex-1"><span class="block text-[15px] ${n.nueva ? "font-semibold" : ""}">${n.texto}</span><span class="flex flex-wrap items-center gap-x-1.5 text-sm text-muted">${P1.dot(n.curso)}${M.curso(n.curso).corto} · ${n.quien} · ${M.hace(n.fecha)}</span></span>
+        <span class="min-w-0 flex-1"><span class="block text-[15px] ${n.nueva ? "font-semibold" : ""}">${n.texto}</span><span class="block text-sm text-muted"><span class="mr-1.5 inline-block align-middle">${P1.dot(n.curso)}</span>${M.curso(n.curso).corto} · ${n.quien} · ${M.hace(n.fecha)}</span></span>
         ${n.nueva ? '<span class="sr-only">Nueva</span><span aria-hidden="true" class="mt-2 size-2 shrink-0 rounded-full bg-info"></span>' : ""}</a></li>`).join(""),
 
     iconos: () => window.lucide && lucide.createIcons({ attrs: { "stroke-width": 1.75, "aria-hidden": "true" } }),

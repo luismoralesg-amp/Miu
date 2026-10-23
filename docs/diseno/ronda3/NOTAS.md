@@ -75,3 +75,13 @@ siempre va con su nombre.
 - (Supuesto) El umbral de 61 para la justificación obligatoria y las metas 71, 80 y 90 los define la UFM.
 - (Supuesto) La semana de exámenes es una propiedad del calendario académico; aquí la decide el seed.
 - (Supuesto) La foto del campus es un placeholder local; la real la provee la UFM.
+
+## Ronda 3.1 · cierre
+
+| Cambio | Detalle |
+|---|---|
+| Pagos | Se quitó "la absorbe la universidad", que era una decisión inventada. Se muestra la comisión (Q334.45) y el total con tarjeta (Q7,722.25) como costo de quien paga. (Supuesto a confirmar con la UFM: choca con "no apliques recargos"; ver `docs/INTEGRACIONES_PENDIENTES.md`) |
+| ⌘K | El foco ya no es un anillo recortado sobre el campo; toda la fila de búsqueda se marca con una regla inferior |
+| Auxiliar | La celda de justificación queda vacía; el campo solo aparece bajo el umbral |
+| Semana | La leyenda incluye "Libre"; las columnas tienen un mínimo de 280 px en lugar de 420 px |
+| Más | En escritorio, "Más" abre un panel de seis grupos bajo la barra. En móvil, la barra es Hoy, Cursos, Notas, Pagos y Más, que abre una hoja con los mismos grupos (Semana entra ahí y en "Semana completa" de Hoy). Ninguna función de MiU queda solo en ⌘K: `mas.html` |

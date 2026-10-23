@@ -9,6 +9,11 @@
 <script src="assets/setup.js"></script>
 <script src="assets/p1.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.3.3/dist/index.global.js"></script>
+<style>
+  /* The field is always focused inside the dialog: mark the whole search row instead of a clipped ring on the input. */
+  #q:focus-visible { outline: none; }
+  .busqueda:focus-within { box-shadow: inset 0 -2px 0 var(--ink); }
+</style>
 </head>
 <body>
   <div class="mx-auto max-w-[1240px] px-5 pb-10 md:px-12 md:pb-20">
@@ -21,7 +26,7 @@
 
     <div id="cmdk" class="fixed inset-0 z-50 flex items-start justify-center bg-black/40 px-3 pt-3 md:pt-[12vh]">
       <div role="dialog" aria-modal="true" aria-label="Buscar o hacer algo" class="flex max-h-[80vh] w-full max-w-[640px] flex-col overflow-hidden rounded-[20px] border border-line bg-card shadow-float">
-        <div class="flex items-center gap-3 border-b border-line px-5">
+        <div class="busqueda flex items-center gap-3 border-b border-line px-5">
           <i data-lucide="search" class="size-5 text-muted"></i>
           <input id="q" role="combobox" aria-expanded="true" aria-controls="res" aria-activedescendant="" autocomplete="off" placeholder="Busca o escribe una acción: pagar, entregar, horario…" class="h-16 flex-1 bg-transparent text-[17px] outline-none placeholder:text-muted focus-visible:outline-none" />
           <kbd class="rounded border border-line px-1.5 text-xs text-muted">Esc</kbd>
