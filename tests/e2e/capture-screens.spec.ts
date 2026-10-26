@@ -160,6 +160,7 @@ const STAGES: Record<string, Shot[]> = {
     { name: "conferencias", path: "/conferencias", as: "estudiante" },
     { name: "mis-reservas", path: "/conferencias/mis-reservas", as: "estudiante" },
     { name: "evaluacion", path: "/conferencias/historia-moneda/evaluacion", as: "estudiante" },
+    { name: "documentos", path: "/documentos", as: "estudiante" },
     {
       name: "asignacion",
       path: "/asignacion",
