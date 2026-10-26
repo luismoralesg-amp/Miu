@@ -59,11 +59,11 @@ export function HistoryView({ courses }: { courses: PastCourse[] }) {
               role="region"
               aria-label={`Cursos de ${t.periodo}`}
             >
-              <table className="w-full min-w-[520px] text-left text-[15px] tabular">
+              <table className="w-full text-left text-[15px] tabular">
                 <caption className="sr-only">Cursos de {t.periodo}</caption>
                 <thead className="text-caption text-fg-muted">
                   <tr className="border-y border-border">
-                    <th scope="col" className="w-28 py-3 pr-4 font-medium">
+                    <th scope="col" className="w-24 py-3 pr-4 font-medium sm:w-28">
                       Código
                     </th>
                     <th scope="col" className="py-3 pr-4 font-medium">
@@ -87,8 +87,8 @@ export function HistoryView({ courses }: { courses: PastCourse[] }) {
                       <th scope="row" className="py-3 pr-4 font-medium">
                         {c.nombre}
                       </th>
-                      <td className="py-3 pr-4">{c.seccion}</td>
-                      <td className="py-3 pr-4 text-right">{c.uma}</td>
+                      <td className="hidden py-3 pr-4 sm:table-cell">{c.seccion}</td>
+                      <td className="hidden py-3 pr-4 text-right sm:table-cell">{c.uma}</td>
                       <td className="py-3 text-right font-semibold">{c.nota}</td>
                     </tr>
                   ))}
