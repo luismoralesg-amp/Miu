@@ -2,6 +2,8 @@ import { defineConfig, devices } from "@playwright/test";
 
 const port = Number(process.env.E2E_PORT ?? 3100);
 const baseURL = `http://localhost:${port}`;
+/** Same build, started without MIU_DEV_TOOLS: what production looks like (tests/e2e/production.spec.ts). */
+export const PROD_PORT = port + 1;
 
 // Playwright's bundled Chromium is not downloaded yet; any local Chromium-based browser works
 // meanwhile by pointing PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH at its binary.
@@ -34,11 +36,21 @@ export default defineConfig({
       use: { ...devices["Pixel 7"], launchOptions },
     },
   ],
-  webServer: {
-    command: `npm run build && npm run start -- --port ${port}`,
-    url: `${baseURL}/api/health`,
-    reuseExistingServer: !process.env.CI,
-    env: { MIU_DEV_TOOLS: "1" },
-    timeout: 180_000,
-  },
+  // Servers start in order, so the second one reuses the build of the first.
+  webServer: [
+    {
+      command: `npm run build && npm run start -- --port ${port}`,
+      url: `${baseURL}/api/health`,
+      reuseExistingServer: !process.env.CI,
+      env: { MIU_DEV_TOOLS: "1" },
+      timeout: 180_000,
+    },
+    {
+      command: `npm run start -- --port ${PROD_PORT}`,
+      url: `http://localhost:${PROD_PORT}/api/health`,
+      reuseExistingServer: !process.env.CI,
+      env: { MIU_DEV_TOOLS: "" },
+      timeout: 60_000,
+    },
+  ],
 });

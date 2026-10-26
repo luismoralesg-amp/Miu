@@ -20,11 +20,12 @@ Formato de reporte por ítem: `→ hash · qué quedó · pruebas (U n/n, E n/n)
 - [x] **P0-1 · Verificar la base verde.** Correr `npm run check`, `npm run build` y `npm run e2e`.
   - Terminado: los tres en verde, con los conteos anotados aquí. Si algo falla, el arreglo es este mismo commit (`fix:`).
   - Pruebas: U, E, build.
-  - → (este commit) · base verde sin cambios de código · U 176/176, E 54/54 (Brave), build sin errores (13 rutas) · sin supuestos nuevos
-- [ ] **P0-2 · Cerrar pendientes de E2.** Comprobar contra PLAN §8 E2 y el reporte: login, ⌘K, avisos, dispositivos, "Más" y selector de rol solo en dev.
+  - → 1b9ede4 · base verde sin cambios de código · U 176/176, E 54/54 (Brave), build sin errores (13 rutas) · sin supuestos nuevos
+- [x] **P0-2 · Cerrar pendientes de E2.** Comprobar contra PLAN §8 E2 y el reporte: login, ⌘K, avisos, dispositivos, "Más" y selector de rol solo en dev.
   Verificar que el selector no aparece con `npm run build && npm start` sin `MIU_DEV_TOOLS`.
   - Terminado: E2E que confirma que no hay selector de rol en producción; lista de huecos de E2 vacía o convertida en ítems nuevos abajo.
   - Pruebas: E.
+  - → (este commit) · Playwright levanta un segundo `next start` (puerto 3101) sin `MIU_DEV_TOOLS`; `production.spec.ts` comprueba que no hay selector de rol, ni buzón de códigos, y que `/dev/sistema` da 404 · E 3/3 · Huecos de E2 contra PLAN §8: ninguno nuevo. Login, ⌘K, avisos, dispositivos y "Más" están cubiertos; Google y passkey siguen simulados (ya documentado en E2) y "Hoy" placeholder es P1-6 · sin supuestos nuevos
 
 ## P1 · Base de datos mock y pantallas núcleo
 
