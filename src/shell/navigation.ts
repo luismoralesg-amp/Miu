@@ -1,4 +1,5 @@
-import type { Role } from "@/modules/identity/domain/types";
+import { roleCan, type Permission } from "@/authz";
+import type { Role } from "@/modules/identity";
 
 /**
  * Every section of the app, in one place. The bar, the "Más" panel, ⌘K and the placeholder pages all
@@ -333,6 +334,38 @@ export const BAR_LABEL: Partial<Record<SectionKey, string>> = {
   libro: "Libro de notas",
   conciliacion: "Pagos",
 };
+
+/** What a role needs to open each section (checked by every page through `can()`). */
+export const SECTION_PERMISSIONS: Partial<Record<SectionKey, Permission[]>> = {
+  cursos: ["view_course"],
+  semana: ["view_academic_record"],
+  notas: ["view_academic_record"],
+  pagos: ["view_payments"],
+  pensum: ["view_academic_record"],
+  historial: ["view_academic_record"],
+  asignacion: ["set_enrollment_preferences"],
+  conferencias: ["view_academic_record"],
+  documentos: ["view_academic_record"],
+  catedra: ["grade"],
+  porCalificar: ["grade"],
+  libro: ["grade"],
+  publicar: ["publish_grades"],
+  apelaciones: ["respond_appeal"],
+  politicas: ["configure_policy"],
+  conciliacion: ["approve_payment"],
+  roles: ["manage_roles"],
+  auditoria: ["view_audit", "configure_policy"],
+};
+
+export function sectionAllowed(role: Role, key: SectionKey) {
+  return (SECTION_PERMISSIONS[key] ?? []).every((p) => roleCan(role, p));
+}
+
+export function sectionKeyByPath(path: string): SectionKey | undefined {
+  return (Object.keys(SECTIONS) as SectionKey[]).find(
+    (k) => !SECTIONS[k].externo && SECTIONS[k].path === path,
+  );
+}
 
 export function sectionByPath(path: string): Section | undefined {
   return Object.values(SECTIONS).find((s) => !s.externo && s.path === path);

@@ -3,7 +3,8 @@ import { notFound } from "next/navigation";
 import { Hammer } from "lucide-react";
 
 import { EmptyState } from "@/design-system/components";
-import { sectionByPath } from "@/shell/navigation";
+import { requireUser } from "@/modules/identity/session";
+import { SECTIONS, sectionAllowed, sectionByPath, sectionKeyByPath } from "@/shell/navigation";
 
 type Params = { params: Promise<{ seccion: string[] }> };
 
@@ -17,8 +18,10 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
  * which stage builds them; unknown paths are a real 404.
  */
 export default async function SectionPlaceholder({ params }: Params) {
-  const section = sectionByPath(`/${(await params).seccion.join("/")}`);
-  if (!section) notFound();
+  const key = sectionKeyByPath(`/${(await params).seccion.join("/")}`);
+  const { rol } = await requireUser();
+  if (!key || !sectionAllowed(rol, key)) notFound();
+  const section = SECTIONS[key];
   return (
     <div className="py-10 md:py-14">
       <h1 className="display text-[40px] leading-[1.02] font-medium md:text-[56px]">
