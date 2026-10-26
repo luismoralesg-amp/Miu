@@ -6,7 +6,15 @@ import type { Route } from "next";
 
 import { cx } from "@/lib/cx";
 
-export type RouteTab = { href: Route; label: string; count?: number };
+export type RouteTab = {
+  href: Route;
+  label: string;
+  count?: number;
+  /** Shown quieter, e.g. a subsection the teacher did not enable (the URL still works). */
+  muted?: boolean;
+  /** Override the list's matching rule for this tab (an overview tab is exact, the rest prefix). */
+  exact?: boolean;
+};
 
 /**
  * Sub-navigation where every tab is a real URL (MiU used in-page hash tabs with no deep links).
@@ -26,17 +34,24 @@ export function RouteTabs({
   className?: string;
 }) {
   const pathname = usePathname();
-  const isActive = (href: string) =>
-    exact ? pathname === href : pathname === href || pathname.startsWith(`${href}/`);
+  const isActive = (tab: RouteTab) =>
+    (tab.exact ?? exact)
+      ? pathname === tab.href
+      : pathname === tab.href || pathname.startsWith(`${tab.href}/`);
 
   return (
     <nav
       aria-label={label}
-      className={cx("-mx-4 [scrollbar-width:none] overflow-x-auto px-4", className)}
+      className={cx(
+        "-mx-4 [scrollbar-width:none] overflow-x-auto px-4",
+        // Fade the trailing edge so a cut tab reads as "there is more to scroll".
+        "[mask-image:linear-gradient(to_right,black_calc(100%-40px),transparent)]",
+        className,
+      )}
     >
-      <ul className="flex w-max gap-1 border-b border-border">
+      <ul className="flex w-max gap-1 border-b border-border pr-10">
         {tabs.map((tab) => {
-          const active = isActive(tab.href);
+          const active = isActive(tab);
           return (
             <li key={tab.href}>
               <Link
@@ -48,9 +63,11 @@ export function RouteTabs({
                   active
                     ? "text-fg after:bg-accent-to"
                     : "text-fg-muted after:bg-transparent hover:text-fg",
+                  tab.muted && !active && "font-normal",
                 )}
               >
                 {tab.label}
+                {tab.muted && <span className="sr-only"> (no habilitada)</span>}
                 {tab.count !== undefined && (
                   <span className="rounded-sm bg-surface-subtle px-1.5 text-caption text-fg-muted tabular">
                     {tab.count}
