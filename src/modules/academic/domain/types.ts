@@ -142,6 +142,8 @@ export const Term = z.object({
   inicio: isoDate,
   fin: isoDate,
   semanas: z.number().int().positive(),
+  /** Exam week of the academic calendar, when Hoy switches to its exam layout. */
+  semanaExamenes: z.object({ desde: isoDate, hasta: isoDate }).nullable(),
 });
 export type Term = z.infer<typeof Term>;
 

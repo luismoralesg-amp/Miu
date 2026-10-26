@@ -6,7 +6,7 @@ import { cx } from "@/lib/cx";
 
 import { Spinner } from "./spinner";
 
-export type ButtonVariant = "primary" | "secondary" | "ghost" | "danger" | "on-accent";
+export type ButtonVariant = "primary" | "secondary" | "ghost" | "danger" | "on-accent" | "ink";
 export type ButtonSize = "sm" | "md" | "lg";
 
 const variantClasses: Record<ButtonVariant, string> = {
@@ -17,6 +17,8 @@ const variantClasses: Record<ButtonVariant, string> = {
   danger: "bg-danger-fill text-on-accent hover:brightness-95",
   // For actions placed on an accent-gradient surface (the featured card).
   "on-accent": "bg-white text-accent-to hover:bg-white/90",
+  // P1 Editorial: the quiet primary, ink on paper (pair with `rounded-full`).
+  ink: "bg-fg text-bg hover:opacity-90",
 };
 
 const sizeClasses: Record<ButtonSize, string> = {

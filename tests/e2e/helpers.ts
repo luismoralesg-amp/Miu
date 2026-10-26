@@ -27,3 +27,33 @@ export async function signIn(page: Page, email: string) {
   await page.getByLabel("Código de 6 dígitos").fill(code);
   await page.waitForURL((url) => url.pathname === "/");
 }
+
+/** Seeded demo accounts, one per role (src/modules/identity mock users). */
+export const DEMO = {
+  estudiante: "ana.lopez.demo@ufm.edu",
+  maestro: "jorge.castillo.demo@ufm.edu",
+  auxiliar: "carlos.mendez.demo@ufm.edu",
+  auxiliar2: "sofia.ramirez.demo@ufm.edu",
+  administrativo: "rodrigo.aju.demo@ufm.edu",
+} as const;
+
+/** Development-only fault injection: the named port answers with this error (src/lib/fault.ts). */
+export async function injectFault(page: Page, port: string, error: string) {
+  await page
+    .context()
+    .addCookies([{ name: "miu-falla", value: `${port}:${error}`, url: page.url() }]);
+}
+
+export async function clearFault(page: Page) {
+  await page.context().clearCookies({ name: "miu-falla" });
+}
+
+/** Switches the active role with the development switcher in the account menu. */
+export async function switchRole(
+  page: Page,
+  role: "estudiante" | "maestro" | "auxiliar" | "administrativo",
+) {
+  await page.getByRole("button", { name: /^Tu cuenta/ }).click();
+  await page.getByLabel("Rol (desarrollo)").selectOption(role);
+  await page.waitForLoadState("networkidle");
+}

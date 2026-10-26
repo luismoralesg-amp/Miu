@@ -83,7 +83,7 @@ export class MockAcademic implements AcademicPort {
   }
 
   async getTerm(): PortResult<Term> {
-    return parsed(Term, this.seed.term);
+    return parsed(Term, { ...this.seed.term, semanaExamenes: this.seed.policy.semanaExamenes });
   }
 
   async listCurrentEnrollments(actor: Actor): PortResult<Course[]> {

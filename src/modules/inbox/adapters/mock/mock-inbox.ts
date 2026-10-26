@@ -19,6 +19,8 @@ export type InboxSources = {
 };
 
 const DAY = 864e5;
+const withRole = (nombre: string, rol: string) =>
+  rol ? `${nombre}, ${rol.toLowerCase()}` : nombre;
 
 /**
  * Builds the inbox from the other ports on every read (a projection, not a copy), plus which notices
@@ -82,7 +84,7 @@ export class MockInbox implements InboxPort {
             id: `nota-${a.id}`,
             tipo: "aviso",
             titulo: `${a.calificacion.nota} en ${a.titulo}`,
-            detalle: `${a.curso.corto} · ${a.calificacion.por.nombre}`,
+            detalle: `${a.curso.corto} · ${withRole(a.calificacion.por.nombre, a.calificacion.por.rol)}`,
             fecha: a.calificacion.fecha,
             href: `/notas?curso=${a.curso.id}`,
             slot: a.curso.slot,
@@ -102,7 +104,7 @@ export class MockInbox implements InboxPort {
           id: `anuncio-${an.id}`,
           tipo: "aviso",
           titulo: an.titulo,
-          detalle: `${c?.corto ?? ""} · ${an.autor.nombre}`,
+          detalle: `${c?.corto ?? ""} · ${withRole(an.autor.nombre, an.autor.rol)}`,
           fecha: an.fecha,
           href: `/cursos/${an.courseId}/anuncios`,
           ...(c ? { slot: c.slot } : {}),
