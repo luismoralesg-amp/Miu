@@ -70,6 +70,14 @@ const STAGES: Record<string, Shot[]> = {
     { name: "semana", path: "/semana", as: "estudiante" },
     { name: "horario", path: "/horario", as: "estudiante" },
   ],
+  E10: [
+    { name: "por-calificar", path: "/catedra/por-calificar", as: "auxiliar" },
+    {
+      name: "lote",
+      path: "/catedra/por-calificar?seccion=pp-a&actividad=pp-actividad-6",
+      as: "auxiliar",
+    },
+  ],
   E7: [
     { name: "pagos", path: "/pagos", as: "estudiante" },
     { name: "pagar", path: "/pagos/pagar/cuota-noviembre", as: "estudiante" },
