@@ -92,7 +92,8 @@ Formato de reporte por ítem: `→ hash · qué quedó · pruebas (U n/n, E n/n)
 
 ## P2 · Resto de E3 a E12 (PLAN_FASE1 §5 y §8)
 
-- [ ] **P2-1 · E6c · Pensum.** `/pensum`: grafo con prerrequisitos al seleccionar y colores por área. Pruebas: U de prerrequisitos, E, C.
+- [x] **P2-1 · E6c · Pensum.** `/pensum`: grafo con prerrequisitos al seleccionar y colores por área. Pruebas: U de prerrequisitos, E, C.
+  - → (este commit) · columnas por semestre con el semestre actual marcado, punto de color por área con leyenda, estado de cada curso (aprobado con nota, en curso, disponible, bloqueado con candado); al seleccionar se marca toda la cadena de requisitos (borde) y lo que abre (borde punteado), se dibujan las aristas directas (SVG medido tras el layout y en cada cambio de tamaño) y se anuncia el detalle; avance de cursos y UMA arriba; lista por semestre en móvil · U 420/420 (2 nuevas; las reglas de prerrequisitos ya estaban en `curriculum.test.ts`), E 3/3 · C `docs/etapas/E6/pensum-*` (corregido: nodos apretados con código y UMA partidos) · [S] pensum de ejemplo
 - [ ] **P2-2 · E6d · Historial.** `/historial` agrupado por período, con búsqueda global. Pruebas: E, C.
 - [ ] **P2-3 · E7c · Cola de pagos del Administrativo.** Aprobar transferencias. Pruebas: U de permisos, E, C.
 - [ ] **P2-4 · E8a · Conferencias.** `/conferencias`, `/conferencias/mis-reservas`, `/conferencias/[id]/evaluacion`, con estados reservada, en espera y expirada (`ConferencePort` mock). Pruebas: U de estados, E de reservar y evaluar, C.

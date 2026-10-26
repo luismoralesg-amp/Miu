@@ -71,6 +71,18 @@ const STAGES: Record<string, Shot[]> = {
     { name: "notas", path: "/notas", as: "estudiante" },
     { name: "semana", path: "/semana", as: "estudiante" },
     { name: "horario", path: "/horario", as: "estudiante" },
+    { name: "pensum", path: "/pensum", as: "estudiante" },
+    {
+      name: "pensum-seleccion",
+      path: "/pensum",
+      as: "estudiante",
+      prepare: async (page) => {
+        await page
+          .getByRole("button", { name: /Paradigmas de Programación/ })
+          .filter({ visible: true })
+          .click();
+      },
+    },
   ],
   entrega: [
     ...(
