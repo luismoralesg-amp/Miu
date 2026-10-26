@@ -32,10 +32,11 @@ Formato de reporte por ítem: `→ hash · qué quedó · pruebas (U n/n, E n/n)
 - [x] **P1-1 · E3a · `Result`, `PortError` y la selección de adaptador.** `src/lib/result.ts`, timeout ≤ 10 s con `AbortSignal`, y `MIU_ADAPTER_<PUERTO>=mock|real` (PLAN §6).
   - Terminado: helper probado, incluido el timeout que devuelve `timeout`.
   - Pruebas: U.
-  - → (este commit) · `PortError`, `withTimeout` (≤ 10 s, cancela con `AbortSignal`), `guarded` por adaptador, `unwrap` y `selectAdapter` (`src/lib/adapters.ts`); `IdentityPort` ya se elige así · U 186/186 (10 nuevas) · sin supuestos nuevos
-- [ ] **P1-2 · E3b · Seed determinista.** `src/mock/seed/`: estudiante ficticia de Computación, 1 maestro, 2 auxiliares, 1 administrativo (PLAN §7), con cursos, colores, actividades, notas, horario y cargos. Nadie real.
+  - → cad7fd9 · `PortError`, `withTimeout` (≤ 10 s, cancela con `AbortSignal`), `guarded` por adaptador, `unwrap` y `selectAdapter` (`src/lib/adapters.ts`); `IdentityPort` ya se elige así · U 186/186 (10 nuevas) · sin supuestos nuevos
+- [x] **P1-2 · E3b · Seed determinista.** `src/mock/seed/`: estudiante ficticia de Computación, 1 maestro, 2 auxiliares, 1 administrativo (PLAN §7), con cursos, colores, actividades, notas, horario y cargos. Nadie real.
   - Terminado: el seed es igual en cada corrida (snapshot) y las fechas son relativas a HOY.
   - Pruebas: U.
+  - → (este commit) · `src/mock/seed/` con personas (Ana, Jorge, Carlos y Sofía, Rodrigo y 56 compañeros ficticios), 4 cursos y 5 secciones, 28 actividades con rúbricas, notas que reproducen los promedios de ronda 3, lote de la Actividad 6, apelaciones, cargos, pagos y cola de transferencias; `at(días, hora)` ancla todo en `HOY` (`src/lib/clock.ts`); Sofía Ramírez entra como segundo auxiliar con acceso · U 193/193 (7 nuevas, incluida la instantánea) · [S] facultades, salones y bibliografía de ejemplo; semana de exámenes del 26 al 30 de octubre
 - [ ] **P1-3 · E3c · `authz`.** `src/authz/` con `Permission`, `Scope` y la tabla `(rol, permiso, ámbito)` según la matriz de `FUNCIONES_NUEVAS_Y_PAGOS.md` §3. `close_final_grade` solo para Maestro por defecto [S].
   - Terminado: cada celda de la matriz es un caso de prueba; las rutas y acciones consultan `can()`.
   - Pruebas: U (tabla completa).

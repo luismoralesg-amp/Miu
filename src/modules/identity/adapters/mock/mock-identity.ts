@@ -49,6 +49,13 @@ export const MOCK_USERS: User[] = [
     rol: "auxiliar",
   },
   {
+    id: "u-sofia",
+    nombre: "Sofía",
+    apellido: "Ramírez",
+    correo: "sofia.ramirez.demo@ufm.edu",
+    rol: "auxiliar",
+  },
+  {
     id: "u-rodrigo",
     nombre: "Rodrigo",
     apellido: "Ajú",

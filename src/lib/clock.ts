@@ -1,11 +1,13 @@
 /**
- * The mock data lives in a fixed week of the 2026-2 semester, so "now" for academic data is fixed too
- * (override with MIU_NOW). Auth timers (codes, sessions) use the real clock.
+ * HOY: the single mock date. The seed lives in week 12 of the 2026-2 semester, so every seeded date is
+ * relative to this Thursday, 22 October 2026. Auth timers (codes, sessions) use the real clock.
  */
-export const DEMO_NOW = "2026-10-22T07:42:00-06:00";
+export const HOY_ISO = "2026-10-22T07:42:00-06:00";
+export const HOY = new Date(HOY_ISO);
 
+/** HOY, or MIU_NOW to see another moment of the same data (the night variant uses 20:15). */
 export function academicNow(): Date {
-  return new Date(process.env.MIU_NOW ?? DEMO_NOW);
+  return new Date(process.env.MIU_NOW ?? HOY_ISO);
 }
 
 const DIAS = ["domingo", "lunes", "martes", "miércoles", "jueves", "viernes", "sábado"];
