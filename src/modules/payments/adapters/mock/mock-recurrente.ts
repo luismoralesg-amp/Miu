@@ -47,6 +47,10 @@ export class MockRecurrente implements PaymentProviderPort {
     private readonly now: () => Date = academicNow,
   ) {}
 
+  async getPolicy() {
+    return ok({ ...this.policy(), bancosAch: [...POLICY.bancosAch] });
+  }
+
   async quote(monto: number, metodo: z.infer<typeof ProviderMethod>): PortResult<Quote> {
     if (!(monto > 0)) return fail("invalid", "El monto debe ser positivo");
     const all = routeByCost(monto, this.policy());

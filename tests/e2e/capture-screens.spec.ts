@@ -11,6 +11,8 @@ type Shot = {
   path: string;
   as: keyof typeof DEMO;
   prepare?: (page: Page) => Promise<void>;
+  /** Screens that change data sign in with a fresh test account, so the demo account stays intact. */
+  fresh?: boolean;
 };
 
 const STAGES: Record<string, Shot[]> = {
@@ -68,6 +70,32 @@ const STAGES: Record<string, Shot[]> = {
     { name: "semana", path: "/semana", as: "estudiante" },
     { name: "horario", path: "/horario", as: "estudiante" },
   ],
+  E7: [
+    { name: "pagos", path: "/pagos", as: "estudiante" },
+    { name: "pagar", path: "/pagos/pagar/cuota-noviembre", as: "estudiante" },
+    {
+      name: "pagar-checkout",
+      path: "/pagos/pagar/cuota-noviembre",
+      as: "estudiante",
+      fresh: true,
+      prepare: async (page) => {
+        await page.getByRole("button", { name: /^Pagar Q7,387.80/ }).click();
+        await page.waitForURL(/\/pagos\/checkout\//);
+      },
+    },
+    {
+      name: "pagar-listo",
+      path: "/pagos/pagar/cuota-noviembre",
+      as: "estudiante",
+      fresh: true,
+      prepare: async (page) => {
+        await page.getByRole("button", { name: /^Pagar Q7,387.80/ }).click();
+        await page.waitForURL(/\/pagos\/checkout\//);
+        await page.getByRole("button", { name: "Pagar Q7,387.80" }).click();
+        await page.waitForURL(/\/listo/);
+      },
+    },
+  ],
 };
 
 const stage = process.env.CAPTURE ?? "";
@@ -87,7 +115,12 @@ test.describe(`${stage || "no"} screenshots`, () => {
   test.skip(shots.length === 0, "Set CAPTURE=<stage> to take report screenshots");
   for (const shot of shots) {
     test(shot.name, async ({ page }, info) => {
-      await signInAs(page, DEMO[shot.as]);
+      await signInAs(
+        page,
+        shot.fresh
+          ? `captura.${shot.name}.${info.project.name}.${Date.now()}@ufm.edu`
+          : DEMO[shot.as],
+      );
       await page.goto(shot.path);
       await page.waitForLoadState("networkidle");
       await shot.prepare?.(page);

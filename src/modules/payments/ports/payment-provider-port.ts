@@ -7,7 +7,17 @@ import type { Checkout, ProviderMethod, Quote, WebhookResult } from "../domain/t
  * The card/ACH processor. Card data never touches MiU: the student pays on the provider's hosted
  * checkout (SAQ A) and the provider confirms through a signed webhook.
  */
+export type PaymentPolicy = {
+  porcentaje: number;
+  fijo: number;
+  pagador: "estudiante" | "universidad";
+  /** Banks offered by the ACH checkout [S]. */
+  bancosAch: string[];
+};
+
 export interface PaymentProviderPort {
+  /** Fee rule and ACH banks, so screens never hard-code them. */
+  getPolicy(): PortResult<PaymentPolicy>;
   quote(monto: number, metodo: ProviderMethod): PortResult<Quote>;
   /** Every method, cheapest first. */
   quoteAll(monto: number): PortResult<Quote[]>;

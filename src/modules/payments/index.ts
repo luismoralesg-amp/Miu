@@ -6,7 +6,7 @@ import { createRealRecurrente } from "./adapters/real/real-recurrente";
 import { createStripe } from "./adapters/real/stripe";
 import type { PaymentProviderPort } from "./ports/payment-provider-port";
 
-export type { PaymentProviderPort } from "./ports/payment-provider-port";
+export type { PaymentPolicy, PaymentProviderPort } from "./ports/payment-provider-port";
 export * from "./domain/types";
 export { fee, quote, routeByCost } from "./domain/rules";
 

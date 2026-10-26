@@ -135,14 +135,7 @@ export function SubmitForm({
           {state.error}
         </p>
       )}
-      <Button
-        type="submit"
-        variant="ink"
-        size="lg"
-        loading={pending}
-        disabled={!listo}
-        className="rounded-full"
-      >
+      <Button type="submit" variant="ink" size="lg" loading={pending} disabled={!listo} pill>
         {reemplazo ? "Reemplazar entrega" : "Entregar"}
       </Button>
       <p className="text-caption text-fg-muted">

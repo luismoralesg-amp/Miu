@@ -22,9 +22,9 @@ const variantClasses: Record<ButtonVariant, string> = {
 };
 
 const sizeClasses: Record<ButtonSize, string> = {
-  sm: "h-8 gap-1.5 rounded-sm px-3 text-label [&_svg]:size-4",
-  md: "h-10 gap-2 rounded-md px-4 text-label [&_svg]:size-4.5",
-  lg: "h-12 gap-2 rounded-md px-5 text-body [&_svg]:size-5",
+  sm: "h-8 gap-1.5 px-3 text-label [&_svg]:size-4",
+  md: "h-10 gap-2 px-4 text-label [&_svg]:size-4.5",
+  lg: "h-12 gap-2 px-5 text-body [&_svg]:size-5",
 };
 
 /**
@@ -34,10 +34,13 @@ const sizeClasses: Record<ButtonSize, string> = {
 export function buttonClasses({
   variant = "secondary",
   size = "md",
+  pill = false,
   className,
 }: {
   variant?: ButtonVariant | undefined;
   size?: ButtonSize | undefined;
+  /** P1 Editorial primary actions are pills; utility buttons keep the small radius. */
+  pill?: boolean | undefined;
   className?: string | undefined;
 } = {}) {
   return cx(
@@ -46,6 +49,7 @@ export function buttonClasses({
     "active:scale-[0.97] disabled:pointer-events-none disabled:opacity-50 aria-busy:cursor-progress",
     variantClasses[variant],
     sizeClasses[size],
+    pill ? "rounded-full" : size === "sm" ? "rounded-sm" : "rounded-md",
     className,
   );
 }
@@ -53,6 +57,7 @@ export function buttonClasses({
 type ButtonProps = ComponentProps<"button"> & {
   variant?: ButtonVariant;
   size?: ButtonSize;
+  pill?: boolean;
   /** Keeps the button's width and shows a spinner; the label stays readable to assistive tech. */
   loading?: boolean;
   icon?: ReactNode;
@@ -61,6 +66,7 @@ type ButtonProps = ComponentProps<"button"> & {
 export function Button({
   variant,
   size,
+  pill,
   loading = false,
   icon,
   className,
@@ -72,7 +78,7 @@ export function Button({
   return (
     <button
       type={type}
-      className={buttonClasses({ variant, size, className })}
+      className={buttonClasses({ variant, size, pill, className })}
       disabled={disabled || loading}
       aria-busy={loading || undefined}
       {...props}

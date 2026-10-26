@@ -120,3 +120,8 @@ Cada entrada: fecha · decisión · por qué · cómo revertirla.
   depender de `VTIMEZONE`.
 - **Metadatos en streaming:** Next 16 inserta el `<title>` de páginas con `generateMetadata` asíncrono un instante
   después del contenido; `expectAccessible` espera el título antes de correr axe.
+- **Pago en dos pasos:** paso 1 en MiU (métodos ordenados por lo que le cuestan a quien paga, con el ahorro de ACH
+  impreso); paso 2 en el checkout alojado del proveedor. El checkout de prueba (`/pagos/checkout/[id]`) se rotula como
+  simulación, no pide datos de tarjeta ni de banco y confirma con el mismo webhook firmado que mandaría Recurrente.
+  La política de comisión y los bancos ACH se leen del puerto (`getPolicy`), nunca del código de la pantalla.
+- **Botón píldora:** `Button pill` en lugar de `className="rounded-full"`, que perdía contra el radio del tamaño.

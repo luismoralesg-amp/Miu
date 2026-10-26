@@ -135,3 +135,15 @@ describe("PaymentProviderPort (mock Recurrente)", () => {
     expect(await createStripe().quoteAll(10)).toMatchObject({ error: "unavailable" });
   });
 });
+
+describe("payment policy", () => {
+  it("is read through the port, with the ACH banks [S]", async () => {
+    const { provider } = setup();
+    expect(value(await provider.getPolicy())).toMatchObject({
+      porcentaje: 4.5,
+      fijo: 2,
+      pagador: "estudiante",
+    });
+    expect(value(await provider.getPolicy()).bancosAch).toContain("BAC");
+  });
+});
