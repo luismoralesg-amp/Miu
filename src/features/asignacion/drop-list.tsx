@@ -4,7 +4,7 @@ import { CircleCheck } from "lucide-react";
 import { useState } from "react";
 
 import { Button, CourseDot, type CourseSlot } from "@/design-system/components";
-import { botarCurso } from "@/app/(app)/asignacion/actions";
+import { botarCurso, pedirCodigo } from "@/app/(app)/asignacion/actions";
 
 import { StepUp } from "./step-up";
 
@@ -53,6 +53,7 @@ export function DropList({ courses, dropped }: { courses: C[]; dropped: string[]
                   cuenta para el promedio. El cargo de este mes no cambia.
                 </p>
                 <StepUp
+                  request={pedirCodigo}
                   label={`Botar ${c.nombre}`}
                   onCancel={() => setOpen(null)}
                   onConfirm={async (codigo) => {

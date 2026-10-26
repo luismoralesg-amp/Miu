@@ -4,18 +4,24 @@ import { CircleAlert, ShieldCheck } from "lucide-react";
 import { useState, useTransition } from "react";
 
 import { Button } from "@/design-system/components";
-import { pedirCodigo } from "@/app/(app)/asignacion/actions";
 
 /**
  * Inline step-up (no pop-up): ask for a fresh code, type it, confirm. The confirm callback runs the
  * sensitive change with that code and returns an error to show, or nothing.
  */
+export type StepUpRequest = () => Promise<
+  { ok: true; codigoPrueba?: string } | { ok: false; error: string }
+>;
+
 export function StepUp({
   label,
+  request,
   onConfirm,
   onCancel,
 }: {
   label: string;
+  /** Sends the code (each module owns its step-up in the mock; IdentityPort in the real one). */
+  request: StepUpRequest;
   onConfirm: (codigo: string) => Promise<string | undefined>;
   onCancel: () => void;
 }) {
@@ -47,7 +53,7 @@ export function StepUp({
               loading={pending}
               onClick={() =>
                 start(async () => {
-                  const r = await pedirCodigo();
+                  const r = await request();
                   if (!r.ok) setError(r.error);
                   else setSent(r.codigoPrueba ? { codigoPrueba: r.codigoPrueba } : {});
                 })

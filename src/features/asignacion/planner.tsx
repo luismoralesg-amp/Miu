@@ -11,7 +11,7 @@ import {
   type OfferCourse,
   type Preference,
 } from "@/modules/enrollment";
-import { guardarPreferencias } from "@/app/(app)/asignacion/actions";
+import { guardarPreferencias, pedirCodigo } from "@/app/(app)/asignacion/actions";
 
 import { AREA_SLOT } from "../pensum/graph";
 import { StepUp } from "./step-up";
@@ -198,6 +198,7 @@ export function Planner({
         </div>
         {confirming && (
           <StepUp
+            request={pedirCodigo}
             label="Confirmar y guardar"
             onCancel={() => setConfirming(false)}
             onConfirm={async (codigo) => {
