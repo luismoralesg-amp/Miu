@@ -8,42 +8,8 @@ import { useCallback, useEffect, useId, useMemo, useRef, useState } from "react"
 import { CourseDot, Kbd } from "@/design-system/components";
 import { cx } from "@/lib/cx";
 
-import type { CommandItem } from "./data";
+import { GROUP_ORDER, filterCommands, type CommandItem } from "./commands";
 import { Icon } from "./icons";
-
-const GROUP_ORDER: CommandItem["grupo"][] = [
-  "Acciones",
-  "Cursos",
-  "Actividades",
-  "Secciones",
-  "Personas",
-];
-
-const normalize = (text: string) => text.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
-
-/** Every word of the query must appear; titles that start with the query rank first. */
-export function filterCommands(items: CommandItem[], query: string): CommandItem[] {
-  const words = normalize(query).split(/\s+/).filter(Boolean);
-  if (words.length === 0) {
-    return GROUP_ORDER.flatMap((g) =>
-      items.filter((i) => i.grupo === g).slice(0, g === "Acciones" ? 6 : 3),
-    );
-  }
-  const q = normalize(query.trim());
-  return GROUP_ORDER.flatMap((g) =>
-    items
-      .filter((i) => i.grupo === g)
-      .filter((i) => {
-        const hay = normalize(`${i.titulo} ${i.detalle} ${i.palabras ?? ""} ${i.grupo}`);
-        return words.every((w) => hay.includes(w));
-      })
-      .sort(
-        (a, b) =>
-          Number(normalize(b.titulo).startsWith(q)) - Number(normalize(a.titulo).startsWith(q)),
-      )
-      .slice(0, 8),
-  );
-}
 
 /**
  * ⌘K runs actions, not just search. Native <dialog> traps focus and returns it on close; the input is

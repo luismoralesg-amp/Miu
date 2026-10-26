@@ -64,8 +64,8 @@ test("⌘K runs an action with the keyboard only", async ({ page }, info) => {
   await expect(page.locator(`[id="${active}"]`)).toContainText("Pagar mi saldo");
   await expectNoAxeViolations(page);
   await page.keyboard.press("Enter");
-  await page.waitForURL(/\/pagos$/);
-  await expect(page.getByRole("heading", { level: 1, name: "Pagos" })).toBeVisible();
+  await page.waitForURL(/\/pagos\/pagar\/cuota-noviembre$/);
+  await expect(page.getByRole("heading", { level: 1, name: /Cuota de noviembre/ })).toBeVisible();
 
   await page.keyboard.press("ControlOrMeta+K");
   await page.keyboard.press("Escape");

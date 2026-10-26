@@ -5,20 +5,20 @@ import { academicNow } from "@/lib/clock";
 import { devToolsEnabled, requireActor } from "@/modules/identity/session";
 import { inbox } from "@/modules/inbox";
 import { AppShell } from "@/shell/app-shell";
-import { buildCommands } from "@/shell/data";
+import { loadCommands } from "@/shell/load-commands";
 
 export default async function AuthenticatedLayout({ children }: { children: React.ReactNode }) {
   const actor = await requireActor();
   const { user, rol } = actor.user;
   const theme = parseTheme((await cookies()).get(THEME_COOKIE)?.value);
-  const box = await inbox().listItems(actor);
+  const [box, commands] = await Promise.all([inbox().listItems(actor), loadCommands(actor)]);
   return (
     <AppShell
       nombre={`${user.nombre} ${user.apellido}`}
       correo={user.correo}
       rol={rol}
       theme={theme}
-      commands={buildCommands(rol)}
+      commands={commands}
       inbox={box.ok ? box.value.items : []}
       now={academicNow().toISOString()}
       devTools={devToolsEnabled()}

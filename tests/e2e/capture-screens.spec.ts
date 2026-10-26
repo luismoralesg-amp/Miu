@@ -70,6 +70,26 @@ const STAGES: Record<string, Shot[]> = {
     { name: "semana", path: "/semana", as: "estudiante" },
     { name: "horario", path: "/horario", as: "estudiante" },
   ],
+  CMDK: [
+    {
+      name: "cmdk",
+      path: "/",
+      as: "estudiante",
+      prepare: async (page) => {
+        await page.getByRole("button", { name: "Buscar o hacer algo" }).click();
+        await page.getByRole("combobox", { name: "Buscar o hacer algo" }).pressSequentially("pa");
+      },
+    },
+    {
+      name: "cmdk-auxiliar",
+      path: "/",
+      as: "auxiliar",
+      prepare: async (page) => {
+        await page.getByRole("button", { name: "Buscar o hacer algo" }).click();
+        await page.getByRole("combobox", { name: "Buscar o hacer algo" }).pressSequentially("cal");
+      },
+    },
+  ],
   E10: [
     { name: "por-calificar", path: "/catedra/por-calificar", as: "auxiliar" },
     {
@@ -137,8 +157,8 @@ test.describe(`${stage || "no"} screenshots`, () => {
       await waitForAnimations(page);
       await page.waitForTimeout(250);
       await page.screenshot({
-        path: `docs/etapas/${stage}/${shot.name}-${info.project.name}.png`,
-        fullPage: true,
+        path: `docs/etapas/${stage === "CMDK" ? "E4" : stage}/${shot.name}-${info.project.name}.png`,
+        fullPage: !shot.name.startsWith("cmdk"),
       });
     });
   }

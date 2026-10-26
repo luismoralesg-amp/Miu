@@ -16,7 +16,7 @@ import { AvatarMenu } from "./avatar-menu";
 import { CommandPalette } from "./command-palette";
 import type { InboxItem } from "@/modules/inbox";
 
-import type { CommandItem } from "./data";
+import type { CommandItem } from "./commands";
 import { Icon } from "./icons";
 import { MorePanel } from "./more-panel";
 import { BAR_LABEL, NAV, SECTIONS, type SectionKey } from "./navigation";
