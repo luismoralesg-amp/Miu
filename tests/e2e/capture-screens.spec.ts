@@ -156,6 +156,11 @@ const STAGES: Record<string, Shot[]> = {
       as: "auxiliar",
     },
   ],
+  E8: [
+    { name: "conferencias", path: "/conferencias", as: "estudiante" },
+    { name: "mis-reservas", path: "/conferencias/mis-reservas", as: "estudiante" },
+    { name: "evaluacion", path: "/conferencias/historia-moneda/evaluacion", as: "estudiante" },
+  ],
   E11: [{ name: "admin-pagos", path: "/admin/pagos", as: "administrativo" }],
   E7: [
     { name: "pagos", path: "/pagos", as: "estudiante" },

@@ -1,4 +1,5 @@
 import * as assessment from "./assessment";
+import * as conferences from "./conferences";
 import * as courses from "./courses";
 import * as curriculum from "./curriculum";
 import * as finance from "./finance";
@@ -6,6 +7,7 @@ import * as people from "./people";
 import { POLICY } from "./policy";
 
 export * from "./assessment";
+export * from "./conferences";
 export * from "./courses";
 export * from "./curriculum";
 export * from "./finance";
@@ -45,6 +47,8 @@ export function buildSeed() {
     pastCharges: finance.PAST_CHARGES,
     payments: finance.PAYMENTS,
     transferQueue: finance.TRANSFER_QUEUE,
+    conferences: conferences.CONFERENCES,
+    reservations: conferences.RESERVATIONS,
     policy: POLICY,
   });
 }

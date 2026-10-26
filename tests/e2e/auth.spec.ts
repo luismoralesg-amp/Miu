@@ -89,7 +89,7 @@ test("the Más panel reaches every function not in the bar", async ({ page }, in
   }
   await panel.getByRole("link", { name: "Conferencias" }).click();
   await expect(page).toHaveURL(/\/conferencias$/);
-  await expect(page.getByText("Esta sección se construye en la etapa E8")).toBeVisible();
+  await expect(page.getByRole("heading", { level: 1, name: "Conferencias" })).toBeVisible();
 });
 
 test("revokes another device and ends its session", async ({ page, browser }, info) => {

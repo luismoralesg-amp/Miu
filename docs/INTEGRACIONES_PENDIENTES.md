@@ -24,3 +24,4 @@ Los puertos de datos se agregan en E3; esta lista crece con cada etapa.
 | `PaymentProviderPort` (Stripe) | Vacío | Alternativa sin implementar (PLAN §6) | Si la UFM prefiere otro procesador | `MIU_ADAPTER_PAYMENTS=real` y `MIU_PAYMENTS_PROVIDER=stripe` |
 | `StoragePort` | Mock | Archivos en memoria, huella SHA-256, escaneo simulado (EICAR) y bloqueo de ejecutables | Bucket S3 compatible, antivirus (ClamAV u otro) y retención de entregas | `MIU_ADAPTER_STORAGE=real` |
 | `AuditPort` | Mock | Registro solo de agregar (calificar, publicar; luego pagos, políticas y roles), visible por rol | Retención, quién lo consulta y tabla sin permisos de UPDATE/DELETE | `MIU_ADAPTER_AUDIT=real` |
+| `ConferencePort` | Mock | Conferencias de ejemplo, reserva con lista de espera, evaluación dentro de MiU (7 días tras la charla) [S] | Catálogo real, cupos, registro de asistencia y ventana de evaluación | `MIU_ADAPTER_CONFERENCES=real` |
