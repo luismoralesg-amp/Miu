@@ -69,10 +69,13 @@ export function HistoryView({ courses }: { courses: PastCourse[] }) {
                     <th scope="col" className="py-3 pr-4 font-medium">
                       Curso
                     </th>
-                    <th scope="col" className="w-24 py-3 pr-4 font-medium">
+                    <th scope="col" className="hidden w-24 py-3 pr-4 font-medium sm:table-cell">
                       Sección
                     </th>
-                    <th scope="col" className="w-20 py-3 pr-4 text-right font-medium">
+                    <th
+                      scope="col"
+                      className="hidden w-20 py-3 pr-4 text-right font-medium sm:table-cell"
+                    >
                       UMA
                     </th>
                     <th scope="col" className="w-20 py-3 text-right font-medium">
