@@ -25,13 +25,14 @@ Formato de reporte por ítem: `→ hash · qué quedó · pruebas (U n/n, E n/n)
   Verificar que el selector no aparece con `npm run build && npm start` sin `MIU_DEV_TOOLS`.
   - Terminado: E2E que confirma que no hay selector de rol en producción; lista de huecos de E2 vacía o convertida en ítems nuevos abajo.
   - Pruebas: E.
-  - → (este commit) · Playwright levanta un segundo `next start` (puerto 3101) sin `MIU_DEV_TOOLS`; `production.spec.ts` comprueba que no hay selector de rol, ni buzón de códigos, y que `/dev/sistema` da 404 · E 3/3 · Huecos de E2 contra PLAN §8: ninguno nuevo. Login, ⌘K, avisos, dispositivos y "Más" están cubiertos; Google y passkey siguen simulados (ya documentado en E2) y "Hoy" placeholder es P1-6 · sin supuestos nuevos
+  - → 71600b0 · Playwright levanta un segundo `next start` (puerto 3101) sin `MIU_DEV_TOOLS`; `production.spec.ts` comprueba que no hay selector de rol, ni buzón de códigos, y que `/dev/sistema` da 404 · E 3/3 · Huecos de E2 contra PLAN §8: ninguno nuevo. Login, ⌘K, avisos, dispositivos y "Más" están cubiertos; Google y passkey siguen simulados (ya documentado en E2) y "Hoy" placeholder es P1-6 · sin supuestos nuevos
 
 ## P1 · Base de datos mock y pantallas núcleo
 
-- [ ] **P1-1 · E3a · `Result`, `PortError` y la selección de adaptador.** `src/lib/result.ts`, timeout ≤ 10 s con `AbortSignal`, y `MIU_ADAPTER_<PUERTO>=mock|real` (PLAN §6).
+- [x] **P1-1 · E3a · `Result`, `PortError` y la selección de adaptador.** `src/lib/result.ts`, timeout ≤ 10 s con `AbortSignal`, y `MIU_ADAPTER_<PUERTO>=mock|real` (PLAN §6).
   - Terminado: helper probado, incluido el timeout que devuelve `timeout`.
   - Pruebas: U.
+  - → (este commit) · `PortError`, `withTimeout` (≤ 10 s, cancela con `AbortSignal`), `guarded` por adaptador, `unwrap` y `selectAdapter` (`src/lib/adapters.ts`); `IdentityPort` ya se elige así · U 186/186 (10 nuevas) · sin supuestos nuevos
 - [ ] **P1-2 · E3b · Seed determinista.** `src/mock/seed/`: estudiante ficticia de Computación, 1 maestro, 2 auxiliares, 1 administrativo (PLAN §7), con cursos, colores, actividades, notas, horario y cargos. Nadie real.
   - Terminado: el seed es igual en cada corrida (snapshot) y las fechas son relativas a HOY.
   - Pruebas: U.

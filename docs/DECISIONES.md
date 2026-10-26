@@ -78,3 +78,15 @@ Cada entrada: fecha · decisión · por qué · cómo revertirla.
 - **⌘K sin animación de apertura** (atajo frecuente); los popovers usan transiciones CSS interrumpibles.
 - **Las secciones sin construir tienen URL desde ya** y dicen en qué etapa llegan; una ruta desconocida da 404 real.
 - **El selector de rol vive en el menú de cuenta** y solo con `MIU_DEV_TOOLS`.
+
+## 2026-10-25 · Cierre (backlog `BACKLOG_CIERRE.md`)
+
+- **Dos servidores en Playwright:** el de siempre (`MIU_DEV_TOOLS=1`, puerto 3100) y un `next start` sin herramientas de
+  desarrollo (3101) que reutiliza el mismo build. `production.spec.ts` prueba que ahí no hay selector de rol, buzón de
+  códigos ni `/dev/sistema`.
+- **Copias de iCloud fuera del typecheck:** el repo vive en `Documents` (iCloud) y aparecen copias `* 2.ts` en `.next/`
+  que rompen `tsc`. `tsconfig.json` excluye `**/* ?.ts(x)`. Riesgo: conviene mover el repo fuera de iCloud.
+- **Puertos con presupuesto de tiempo:** `withTimeout` (≤ 10 s, `AbortSignal` para cancelar el fetch real) y `guarded`
+  lo aplica a cada método de un adaptador. Un error lanzado se vuelve `unavailable`: ningún puerto lanza.
+- **Selección de adaptador** con `MIU_ADAPTER_<PUERTO>=mock|real`; cualquier otro valor es `mock`, para que un error de
+  escritura nunca apunte la demo a un sistema real.
