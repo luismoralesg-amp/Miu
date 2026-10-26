@@ -23,11 +23,12 @@ export default async function ComunicacionPage({ searchParams }: Props) {
   const actor = await requireActor();
   const con = (await searchParams).con;
   const now = academicNow();
+  // Open the thread first: opening marks it read, so the list below already reflects it.
+  const thread = con ? await messaging().getThread(actor, con) : null;
   const [threads, people] = await Promise.all([
     withFault("messaging", () => messaging().listThreads(actor)),
     academic().listCoursePeople(actor),
   ]);
-  const thread = con ? await messaging().getThread(actor, con) : null;
   const known = new Set(threads.ok ? threads.value.map((t) => t.personaId) : []);
   const nuevos = people.ok ? people.value.filter((p) => !known.has(p.id)) : [];
 
