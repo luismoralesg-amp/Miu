@@ -38,6 +38,15 @@ const STAGES: Record<string, Shot[]> = {
       path: "/cursos?q=castillo",
       as: "estudiante",
     },
+    { name: "curso", path: "/cursos/matematica-discreta", as: "estudiante" },
+    {
+      name: "curso-actividades",
+      path: "/cursos/paradigmas-de-programacion/actividades",
+      as: "estudiante",
+    },
+    { name: "curso-documentos", path: "/cursos/matematica-discreta/documentos", as: "estudiante" },
+    { name: "curso-vacio", path: "/cursos/etica-de-la-libertad/enlaces", as: "estudiante" },
+    { name: "curso-no-habilitado", path: "/cursos/matematica-discreta/blog", as: "estudiante" },
   ],
 };
 
