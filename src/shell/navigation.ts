@@ -398,6 +398,7 @@ export const BUILT: ReadonlySet<SectionKey> = new Set<SectionKey>([
   "historial",
   "conciliacion",
   "conferencias",
+  "asignacion",
 ]);
 
 /**

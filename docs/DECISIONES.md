@@ -125,3 +125,5 @@ Cada entrada: fecha · decisión · por qué · cómo revertirla.
   simulación, no pide datos de tarjeta ni de banco y confirma con el mismo webhook firmado que mandaría Recurrente.
   La política de comisión y los bancos ACH se leen del puerto (`getPolicy`), nunca del código de la pantalla.
 - **Botón píldora:** `Button pill` en lugar de `className="rounded-full"`, que perdía contra el radio del tamaño.
+- **Step-up en línea:** guardar preferencias y botar un curso piden un código nuevo de un solo uso (5 min) en un panel
+  dentro de la página, sin ventanas emergentes. En el real, el código o la passkey los da `IdentityPort`.

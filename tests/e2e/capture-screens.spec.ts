@@ -160,6 +160,15 @@ const STAGES: Record<string, Shot[]> = {
     { name: "conferencias", path: "/conferencias", as: "estudiante" },
     { name: "mis-reservas", path: "/conferencias/mis-reservas", as: "estudiante" },
     { name: "evaluacion", path: "/conferencias/historia-moneda/evaluacion", as: "estudiante" },
+    {
+      name: "asignacion",
+      path: "/asignacion",
+      as: "estudiante",
+      prepare: async (page) => {
+        await page.getByRole("checkbox", { name: /Redes de computadoras/ }).check();
+        await page.getByRole("checkbox", { name: /Inteligencia artificial/ }).check();
+      },
+    },
   ],
   E11: [{ name: "admin-pagos", path: "/admin/pagos", as: "administrativo" }],
   E7: [
