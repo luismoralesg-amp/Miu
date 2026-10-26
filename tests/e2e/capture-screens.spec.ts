@@ -177,6 +177,15 @@ const STAGES: Record<string, Shot[]> = {
     { name: "cuenta-accesos", path: "/cuenta/accesos", as: "estudiante" },
     { name: "cuenta-archivos", path: "/cuenta/archivos", as: "estudiante" },
     { name: "mensajes", path: "/comunicacion?con=p-jorge", as: "estudiante" },
+    {
+      name: "soporte",
+      path: "/soporte?desde=/pagos",
+      as: "estudiante",
+      prepare: async (page) => {
+        await page.getByRole("button", { name: "Abrir el chat" }).click();
+        await page.getByRole("list", { name: "Chat con Soporte" }).waitFor();
+      },
+    },
   ],
   E11: [{ name: "admin-pagos", path: "/admin/pagos", as: "administrativo" }],
   E7: [
