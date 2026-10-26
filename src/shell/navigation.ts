@@ -90,6 +90,13 @@ export const SECTIONS = {
     "E6",
     "Clases, entregas y exámenes de lunes a domingo, con la carga de cada día.",
   ),
+  horario: S(
+    "/horario",
+    "Horario",
+    "calendar-days",
+    "E6",
+    "Tus clases en un eje de horas real, para exportar o imprimir.",
+  ),
   notas: S("/notas", "Notas", "chart", "E6", "Cómo vas en cada curso y qué te falta para aprobar."),
   pagos: S("/pagos", "Pagos", "wallet", "E7", "Saldo, solvencia, formas de pago y recibos."),
   pensum: S(
@@ -310,7 +317,10 @@ export const NAV: Record<Role, Nav> = {
     barra: ["hoy", "cursos", "semana", "notas", "pagos"],
     movil: ["hoy", "cursos", "notas", "pagos"],
     mas: [
-      ["Académico", ["pensum", "historial", "semana", "asignacion", "conferencias", "documentos"]],
+      [
+        "Académico",
+        ["pensum", "historial", "semana", "horario", "asignacion", "conferencias", "documentos"],
+      ],
       AYUDA,
       CUENTA,
       [
@@ -350,6 +360,7 @@ export const BAR_LABEL: Partial<Record<SectionKey, string>> = {
 export const SECTION_PERMISSIONS: Partial<Record<SectionKey, Permission[]>> = {
   cursos: ["view_course"],
   semana: ["view_academic_record"],
+  horario: ["view_academic_record"],
   notas: ["view_academic_record"],
   pagos: ["view_payments"],
   pensum: ["view_academic_record"],

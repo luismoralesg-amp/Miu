@@ -63,7 +63,11 @@ const STAGES: Record<string, Shot[]> = {
       as: "estudiante",
     },
   ],
-  E6: [{ name: "notas", path: "/notas", as: "estudiante" }],
+  E6: [
+    { name: "notas", path: "/notas", as: "estudiante" },
+    { name: "semana", path: "/semana", as: "estudiante" },
+    { name: "horario", path: "/horario", as: "estudiante" },
+  ],
 };
 
 const stage = process.env.CAPTURE ?? "";

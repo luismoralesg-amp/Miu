@@ -289,3 +289,20 @@
     }
   }
 }
+
+/* Printing the schedule or a receipt: content only, black on white. */
+@media print {
+  header,
+  nav[aria-label="Principal"],
+  .no-print {
+    display: none !important;
+  }
+  body {
+    background: #fff !important;
+    color: #000 !important;
+  }
+  main {
+    max-width: none !important;
+    padding: 0 !important;
+  }
+}
