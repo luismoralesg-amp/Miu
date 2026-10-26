@@ -403,6 +403,7 @@ export const BUILT: ReadonlySet<SectionKey> = new Set<SectionKey>([
   "informacion",
   "privacidad",
   "archivos",
+  "comunicacion",
 ]);
 
 /**
