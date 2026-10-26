@@ -38,7 +38,7 @@ test.describe("E2 screenshots", () => {
     await page.getByRole("combobox", { name: "Buscar o hacer algo" }).pressSequentially("pa");
     await shot(page, "cmdk", p, false);
     await page.keyboard.press("Escape");
-    await page.getByRole("button", { name: /^Avisos/ }).click();
+    await page.getByRole("button", { name: /^Bandeja/ }).click();
     await shot(page, "avisos", p, false);
     await page.keyboard.press("Escape");
     await page.goto("/cuenta/dispositivos");

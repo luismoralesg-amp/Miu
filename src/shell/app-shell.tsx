@@ -14,7 +14,9 @@ import { roleLabel, roles, type Role } from "@/modules/identity/domain/types";
 import { cambiarRol } from "./actions";
 import { AvatarMenu } from "./avatar-menu";
 import { CommandPalette } from "./command-palette";
-import type { CommandItem, Notification } from "./data";
+import type { InboxItem } from "@/modules/inbox";
+
+import type { CommandItem } from "./data";
 import { Icon } from "./icons";
 import { MorePanel } from "./more-panel";
 import { BAR_LABEL, NAV, SECTIONS, type SectionKey } from "./navigation";
@@ -27,7 +29,9 @@ type Props = {
   rol: Role;
   theme: Theme;
   commands: CommandItem[];
-  notifications: Notification[];
+  /** The Bandeja's items; the bell shows them and their count. */
+  inbox: InboxItem[];
+  now: string;
   devTools: boolean;
   children: React.ReactNode;
 };
@@ -48,7 +52,8 @@ export function AppShell({
   rol,
   theme,
   commands,
-  notifications,
+  inbox,
+  now,
   devTools,
   children,
 }: Props) {
@@ -143,7 +148,7 @@ export function AppShell({
                 <Kbd>⌘K</Kbd>
               </span>
             </button>
-            <NotificationCenter items={notifications} />
+            <NotificationCenter items={inbox} now={now} />
             <AvatarMenu
               nombre={nombre}
               correo={correo}

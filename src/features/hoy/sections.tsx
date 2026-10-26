@@ -1,16 +1,5 @@
 import Link from "next/link";
-import {
-  ArrowRight,
-  BadgeCheck,
-  Check,
-  FileText,
-  Megaphone,
-  MessageSquareWarning,
-  NotebookPen,
-  PartyPopper,
-  Sunrise,
-  Wallet,
-} from "lucide-react";
+import { ArrowRight, PartyPopper, Sunrise, Wallet } from "lucide-react";
 import type { ReactNode } from "react";
 
 import { CourseDot, EmptyState, Skeleton } from "@/design-system/components";
@@ -21,6 +10,7 @@ import type { StudentActivity } from "@/modules/assessment";
 import type { InboxItem } from "@/modules/inbox";
 
 import { cap, dueLabel, route } from "../shared/format";
+import { InboxIcon } from "../shared/inbox-icon";
 import { Countdown } from "./countdown";
 import { NowLine } from "./now-line";
 import { duration, type HeroState, type Today } from "./today";
@@ -334,26 +324,14 @@ export function PendingRow({ a, now }: { a: StudentActivity; now: Date }) {
   );
 }
 
-const NEWS_ICON = {
-  nota: BadgeCheck,
-  documento: FileText,
-  anuncio: Megaphone,
-  apelacion: MessageSquareWarning,
-  entrega: NotebookPen,
-  examen: NotebookPen,
-  pago: Wallet,
-  calificar: Check,
-} as const;
-
 export function NewsRow({ n, now }: { n: InboxItem; now: Date }) {
-  const Icon = NEWS_ICON[n.icono];
   return (
     <li>
       <Link
         href={route(n.href)}
         className="-mx-2 flex min-h-16 items-start gap-3 rounded-lg px-2 py-3.5 transition-colors duration-150 hover:bg-surface-subtle"
       >
-        <Icon aria-hidden="true" className="mt-0.5 size-[18px] shrink-0 text-fg-muted" />
+        <InboxIcon kind={n.icono} className="mt-0.5 size-[18px] shrink-0 text-fg-muted" />
         <span className="min-w-0 flex-1">
           <span className="block text-[15px] font-semibold">{n.titulo}</span>
           <span className="block text-label text-fg-muted">
@@ -362,7 +340,8 @@ export function NewsRow({ n, now }: { n: InboxItem; now: Date }) {
                 <CourseDot slot={n.slot as CourseSlot} />
               </span>
             )}
-            {n.detalle} · {timeAgo(new Date(n.fecha), now)}
+            {n.detalle} ·{" "}
+            <span className="whitespace-nowrap">{timeAgo(new Date(n.fecha), now)}</span>
           </span>
         </span>
         <span className="sr-only">Nueva</span>

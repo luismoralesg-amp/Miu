@@ -23,6 +23,7 @@ export type IconName =
   | "wallet"
   | "map"
   | "history"
+  | "inbox"
   | "list-plus"
   | "mic"
   | "file-badge"
@@ -68,6 +69,13 @@ const S = (
 
 export const SECTIONS = {
   hoy: S("/", "Hoy", "sun", "E4", "Lo que tienes que hacer ahora."),
+  bandeja: S(
+    "/bandeja",
+    "Bandeja",
+    "inbox",
+    "E4",
+    "Pendientes, avisos y pagos en una sola lista; el número de la campana es su largo.",
+  ),
   cursos: S(
     "/cursos",
     "Cursos",
@@ -287,7 +295,10 @@ const CUENTA: [string, SectionKey[]] = [
   "Mi cuenta",
   ["informacion", "privacidad", "dispositivos", "archivos"],
 ];
-const AYUDA: [string, SectionKey[]] = ["Comunicación y ayuda", ["comunicacion", "soporte"]];
+const AYUDA: [string, SectionKey[]] = [
+  "Comunicación y ayuda",
+  ["bandeja", "comunicacion", "soporte"],
+];
 const RECURSOS: [string, SectionKey[]] = [
   "Recursos",
   ["directorio", "oficinas", "eventos", "marca", "chatgpt"],

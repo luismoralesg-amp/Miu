@@ -19,6 +19,17 @@ const STAGES: Record<string, Shot[]> = {
     { name: "hoy-auxiliar", path: "/", as: "auxiliar" },
     { name: "hoy-maestro", path: "/", as: "maestro" },
     { name: "hoy-administrativo", path: "/", as: "administrativo" },
+    { name: "bandeja", path: "/bandeja", as: "estudiante" },
+    { name: "bandeja-auxiliar", path: "/bandeja", as: "auxiliar" },
+    {
+      name: "campana",
+      path: "/",
+      as: "estudiante",
+      prepare: async (page) => {
+        await page.getByRole("button", { name: /^Bandeja/ }).click();
+        await page.getByRole("dialog", { name: "Bandeja" }).waitFor();
+      },
+    },
   ],
 };
 

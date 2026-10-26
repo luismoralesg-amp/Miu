@@ -4,11 +4,10 @@ import {
   hhmm,
   quetzales,
   relativeDay,
-  timeAgo,
   weekdayIso,
   weekdayName,
 } from "@/lib/clock";
-import { ASSIGNMENTS, CLASSES, COURSES, EXAMS, NEWS, PAYMENT, PEOPLE } from "@/mock/academic";
+import { ASSIGNMENTS, CLASSES, COURSES, EXAMS, PAYMENT, PEOPLE } from "@/mock/academic";
 import type { Role } from "@/modules/identity/domain/types";
 
 import { NAV, SECTIONS, type IconName, type SectionKey } from "./navigation";
@@ -24,17 +23,6 @@ export type CommandItem = {
   /** Extra words that should match (synonyms, verbs). */
   palabras?: string;
   externo?: boolean;
-};
-
-export type Notification = {
-  id: string;
-  titulo: string;
-  detalle: string;
-  cuando: string;
-  nueva: boolean;
-  href: string;
-  icono: IconName;
-  curso?: 1 | 2 | 3 | 4 | 5 | 6;
 };
 
 function sectionsFor(role: Role): SectionKey[] {
@@ -173,70 +161,4 @@ export function buildCommands(role: Role): CommandItem[] {
   }));
 
   return [...actions, ...courses, ...activities, ...sections, ...people];
-}
-
-export function buildNotifications(role: Role): Notification[] {
-  const now = academicNow();
-  if (role === "estudiante") {
-    const iconFor = { nota: "chart", documento: "file-text", anuncio: "messages" } as const;
-    const dias = daysBetween(now, new Date(PAYMENT.vence));
-    return [
-      ...NEWS.map((n) => ({
-        id: n.id,
-        titulo: n.texto,
-        detalle: `${COURSES[n.curso].corto} · ${n.quien}`,
-        cuando: timeAgo(new Date(n.fecha), now),
-        nueva: n.nueva,
-        href: SECTIONS.cursos.path,
-        icono: iconFor[n.tipo],
-        curso: COURSES[n.curso].slot,
-      })),
-      ...(dias <= 7
-        ? [
-            {
-              id: "pago",
-              titulo: `${quetzales(PAYMENT.monto)} vence en ${dias} días`,
-              detalle: PAYMENT.concepto,
-              cuando: "recordatorio",
-              nueva: false,
-              href: SECTIONS.pagos.path,
-              icono: "wallet" as const,
-            },
-          ]
-        : []),
-    ];
-  }
-  if (role === "administrativo") {
-    return [
-      {
-        id: "adm-1",
-        titulo: "4 comprobantes por revisar",
-        detalle: "Cola de conciliación",
-        cuando: "hoy",
-        nueva: true,
-        href: SECTIONS.conciliacion.path,
-        icono: "landmark",
-      },
-    ];
-  }
-  return [
-    {
-      id: "cat-1",
-      titulo: "20 entregas por calificar",
-      detalle: "Actividad 6: closures · Paradigmas A",
-      cuando: "hace 2 h",
-      nueva: true,
-      href: SECTIONS.porCalificar.path,
-      icono: "list-checks",
-    },
-    {
-      id: "cat-2",
-      titulo: "1 apelación nueva",
-      detalle: "Quiz 3 · Discreta A",
-      cuando: "ayer",
-      nueva: true,
-      href: SECTIONS.apelaciones.path,
-      icono: "message-square",
-    },
-  ];
 }
