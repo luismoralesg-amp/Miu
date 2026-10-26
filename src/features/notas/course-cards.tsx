@@ -169,7 +169,12 @@ function Card({
                 Catedrático: {c.catedratico}
                 {c.auxiliar && ` · Auxiliar: ${c.auxiliar}`}
               </p>
-              <div className="mt-3 overflow-x-auto">
+              <div
+                className="mt-3 overflow-x-auto focus-visible:outline-2"
+                tabIndex={0}
+                role="region"
+                aria-label="Tabla con desplazamiento horizontal"
+              >
                 <table className="w-full min-w-[520px] text-left text-label tabular">
                   <caption className="sr-only">Notas de {c.curso.nombre}</caption>
                   <thead className="text-caption text-fg-muted">

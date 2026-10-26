@@ -74,7 +74,12 @@ export default async function CourseSubsection({ params }: Props) {
               </span>
             </p>
           </div>
-          <div className="overflow-x-auto">
+          <div
+            className="overflow-x-auto focus-visible:outline-2"
+            tabIndex={0}
+            role="region"
+            aria-label="Tabla con desplazamiento horizontal"
+          >
             <table className="w-full min-w-[560px] text-left text-label tabular">
               <caption className="sr-only">Notas de {c.nombre}</caption>
               <thead className="text-caption text-fg-muted">

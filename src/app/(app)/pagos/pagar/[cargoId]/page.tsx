@@ -21,7 +21,7 @@ type Props = {
   searchParams: Promise<{ metodo?: string; error?: string }>;
 };
 
-const METHODS = ["ach", "tarjeta", "apple_pay", "comprobante"] as const;
+const METHODS = ["ach", "tarjeta", "apple_pay", "comprobante", "caja"] as const;
 
 /** Paying a charge in two steps: choose the method here, pay on the provider's hosted page. */
 export default async function PagarPage({ params, searchParams }: Props) {

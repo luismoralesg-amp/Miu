@@ -11,7 +11,7 @@ import type { PayState } from "@/app/(app)/pagos/actions";
 
 import { METHOD_COPY, payLabel } from "./methods";
 
-type Method = Quote["metodo"] | "comprobante";
+type Method = Quote["metodo"] | "comprobante" | "caja";
 
 /**
  * Step 1 of 2: pick how to pay. Methods come sorted by what they cost you (ACH first), and the
@@ -42,7 +42,7 @@ export function MethodForm({
       <fieldset className="md:col-span-7">
         <legend className="text-label text-fg-muted">Paso 1 de 2 · Elige cómo pagar</legend>
         <div className="mt-4 flex flex-col gap-3">
-          {[...quotes.map((q) => q.metodo), "comprobante" as const].map((m) => {
+          {[...quotes.map((q) => q.metodo), "comprobante" as const, "caja" as const].map((m) => {
             const q = quotes.find((x) => x.metodo === m);
             const active = metodo === m;
             return (
@@ -64,7 +64,11 @@ export function MethodForm({
                 />
                 <span className="min-w-0 flex-1">
                   <span className="flex flex-wrap items-center gap-2 font-semibold">
-                    {m === "comprobante" ? "Transferencia con comprobante" : METHOD_COPY[m].titulo}
+                    {m === "comprobante"
+                      ? "Transferencia con comprobante"
+                      : m === "caja"
+                        ? "Pago en caja"
+                        : METHOD_COPY[m].titulo}
                     {q && q.ahorro > 0 && (
                       <span className="rounded-full bg-success-soft px-2 py-0.5 text-caption font-semibold text-success-fg">
                         Ahorras {quetzales(q.ahorro)}
@@ -74,7 +78,9 @@ export function MethodForm({
                   <span className="block text-label text-fg-muted">
                     {m === "comprobante"
                       ? `Pagas en tu banco con la referencia ${referencia} y subes el comprobante. Revisión de 1 a 2 días hábiles.`
-                      : METHOD_COPY[m].detalle}
+                      : m === "caja"
+                        ? "En persona, con efectivo o tarjeta, en el Edificio Académico."
+                        : METHOD_COPY[m].detalle}
                   </span>
                 </span>
                 {q && (
@@ -94,7 +100,23 @@ export function MethodForm({
       </fieldset>
 
       <div className="flex flex-col gap-4 md:col-span-5">
-        {metodo === "comprobante" ? (
+        {metodo === "caja" ? (
+          <section
+            aria-labelledby={`${id}-caja`}
+            className="flex flex-col gap-3 rounded-[20px] border border-border p-6"
+          >
+            <h2 id={`${id}-caja`} className="font-semibold">
+              Pago en caja
+            </h2>
+            <p className="text-[15px]">
+              Edificio Académico, de lunes a viernes de 07:00 a 17:00. Presenta esta referencia:
+            </p>
+            <p className="display text-[28px] tabular">{referencia}</p>
+            <p className="text-label text-fg-muted">
+              El pago aparece en tu historial el mismo día.
+            </p>
+          </section>
+        ) : metodo === "comprobante" ? (
           <form
             action={submitUpload}
             className="flex flex-col gap-4 rounded-[20px] border border-border p-6"
