@@ -254,3 +254,38 @@
     animation: none;
   }
 }
+
+/* "Not graded yet" in grade bars: a directional hatch, so it reads without color (dataviz texture). */
+@utility hatch {
+  background-image: repeating-linear-gradient(
+    135deg,
+    var(--border-strong) 0 1.5px,
+    transparent 1.5px 5px
+  );
+}
+
+/* Expandable card: rows grow from 0fr to 1fr (interruptible CSS transition), content fades in. */
+@layer components {
+  .expandable {
+    display: grid;
+    grid-template-rows: 0fr;
+    opacity: 0;
+    transition:
+      grid-template-rows 200ms var(--ease-out),
+      opacity 150ms ease;
+  }
+  .expandable > div {
+    overflow: hidden;
+  }
+  [aria-expanded="true"] + .expandable {
+    grid-template-rows: 1fr;
+    opacity: 1;
+    transition-duration: 280ms, 200ms;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .expandable,
+    [aria-expanded="true"] + .expandable {
+      transition: opacity 150ms ease;
+    }
+  }
+}
