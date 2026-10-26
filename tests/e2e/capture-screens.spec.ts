@@ -47,6 +47,21 @@ const STAGES: Record<string, Shot[]> = {
     { name: "curso-documentos", path: "/cursos/matematica-discreta/documentos", as: "estudiante" },
     { name: "curso-vacio", path: "/cursos/etica-de-la-libertad/enlaces", as: "estudiante" },
     { name: "curso-no-habilitado", path: "/cursos/matematica-discreta/blog", as: "estudiante" },
+    {
+      name: "actividad",
+      path: "/cursos/paradigmas-de-programacion/actividades/pp-ejercicio-llaves",
+      as: "estudiante",
+    },
+    {
+      name: "actividad-recibo",
+      path: "/cursos/matematica-discreta/actividades/md-tarea-4",
+      as: "estudiante",
+    },
+    {
+      name: "actividad-calificada",
+      path: "/cursos/matematica-discreta/actividades/md-quiz-3",
+      as: "estudiante",
+    },
   ],
 };
 

@@ -6,6 +6,8 @@ import { waitForAnimations } from "./helpers";
 /** WCAG 2.2 AA with axe, after entrance animations settle. Also fails on CSP violations logged. */
 export async function expectAccessible(page: Page) {
   await waitForAnimations(page);
+  // Next streams async metadata: the <title> can land a moment after the content.
+  await expect.poll(() => page.title()).not.toBe("");
   const results = await new AxeBuilder({ page })
     .withTags(["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"])
     .analyze();

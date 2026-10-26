@@ -111,3 +111,12 @@ Cada entrada: fecha · decisión · por qué · cómo revertirla.
   veces. En el mock, la página de checkout local firma el mismo evento y lo manda por el mismo manejador.
 - **Transferencias con comprobante:** van a una cola compartida del Administrativo; aprobar liquida el pago de la
   sesión de la estudiante que lo envió. Rechazar exige un motivo.
+- **Entregas:** el archivo pasa por `StoragePort` (guardar, huella SHA-256 sobre los bytes exactos y escaneo; el mock
+  detecta el archivo de prueba EICAR y bloquea ejecutables) y solo entonces se registra la entrega con esa huella. El
+  recibo (`MIU-E-` + 8 primeros caracteres de la huella) queda en la actividad y se puede copiar. Límite de 10 MB:
+  `experimental.serverActions.bodySizeLimit = "11mb"`. En producción la subida sería directa a S3 con URL firmada.
+- **ICS en UTC:** `src/lib/ics.ts` escribe horas en UTC, CRLF y líneas plegadas a 75 octetos, con alarma (24 h antes
+  de una entrega, 1 h antes de un examen) y `RRULE` semanal para el horario. Así lo lee cualquier calendario sin
+  depender de `VTIMEZONE`.
+- **Metadatos en streaming:** Next 16 inserta el `<title>` de páginas con `generateMetadata` asíncrono un instante
+  después del contenido; `expectAccessible` espera el título antes de correr axe.
