@@ -116,3 +116,14 @@ describe("scope", () => {
     expect(can(estudiante, "approve_payment")).toBe(false);
   });
 });
+
+describe("payments queue", () => {
+  it("only the Administrativo approves or refunds; nobody else, in any scope", () => {
+    for (const subject of [maestro, auxiliar, estudiante]) {
+      expect(can(subject, "approve_payment", {})).toBe(false);
+      expect(can(subject, "refund_payment", { ownerId: subject.personId })).toBe(false);
+    }
+    expect(can(admin, "approve_payment", {})).toBe(true);
+    expect(can(admin, "refund_payment", {})).toBe(true);
+  });
+});
