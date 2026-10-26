@@ -72,6 +72,7 @@ const STAGES: Record<string, Shot[]> = {
     { name: "semana", path: "/semana", as: "estudiante" },
     { name: "horario", path: "/horario", as: "estudiante" },
     { name: "pensum", path: "/pensum", as: "estudiante" },
+    { name: "historial", path: "/historial", as: "estudiante" },
     {
       name: "pensum-seleccion",
       path: "/pensum",
