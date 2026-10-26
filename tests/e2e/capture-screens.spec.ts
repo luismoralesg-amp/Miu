@@ -8,6 +8,8 @@ import { DEMO, waitForAnimations } from "./helpers";
  */
 type Shot = {
   name: string;
+  /** Delivery screenshots go to docs/entrega/capturas/<carpeta>/. */
+  carpeta?: string;
   path: string;
   as: keyof typeof DEMO;
   prepare?: (page: Page) => Promise<void>;
@@ -69,6 +71,49 @@ const STAGES: Record<string, Shot[]> = {
     { name: "notas", path: "/notas", as: "estudiante" },
     { name: "semana", path: "/semana", as: "estudiante" },
     { name: "horario", path: "/horario", as: "estudiante" },
+  ],
+  entrega: [
+    ...(
+      [
+        ["hoy", "/"],
+        ["bandeja", "/bandeja"],
+        ["cursos", "/cursos"],
+        ["curso", "/cursos/matematica-discreta"],
+        ["actividad", "/cursos/paradigmas-de-programacion/actividades/pp-ejercicio-llaves"],
+        ["semana", "/semana"],
+        ["horario", "/horario"],
+        ["notas", "/notas"],
+        ["pagos", "/pagos"],
+        ["pagar", "/pagos/pagar/cuota-noviembre"],
+        ["estado-de-cuenta", "/pagos/estado-de-cuenta"],
+      ] as const
+    ).map(([name, path]) => ({ name, path, as: "estudiante" as const, carpeta: "estudiante" })),
+    ...(
+      [
+        ["hoy", "/"],
+        ["por-calificar", "/catedra/por-calificar"],
+        ["lote", "/catedra/por-calificar?seccion=md-a&actividad=md-tarea-4"],
+      ] as const
+    ).map(([name, path]) => ({ name, path, as: "maestro" as const, carpeta: "maestro" })),
+    ...(
+      [
+        ["hoy", "/"],
+        ["por-calificar", "/catedra/por-calificar"],
+        ["lote", "/catedra/por-calificar?seccion=pp-a&actividad=pp-actividad-6"],
+        ["bandeja", "/bandeja"],
+      ] as const
+    ).map(([name, path]) => ({ name, path, as: "auxiliar" as const, carpeta: "auxiliar" })),
+    ...(
+      [
+        ["hoy", "/"],
+        ["bandeja", "/bandeja"],
+      ] as const
+    ).map(([name, path]) => ({
+      name,
+      path,
+      as: "administrativo" as const,
+      carpeta: "administrativo",
+    })),
   ],
   CMDK: [
     {
@@ -144,7 +189,7 @@ async function signInAs(page: Page, email: string) {
 test.describe(`${stage || "no"} screenshots`, () => {
   test.skip(shots.length === 0, "Set CAPTURE=<stage> to take report screenshots");
   for (const shot of shots) {
-    test(shot.name, async ({ page }, info) => {
+    test(`${shot.carpeta ? `${shot.carpeta}/` : ""}${shot.name}`, async ({ page }, info) => {
       await signInAs(
         page,
         shot.fresh
@@ -157,7 +202,9 @@ test.describe(`${stage || "no"} screenshots`, () => {
       await waitForAnimations(page);
       await page.waitForTimeout(250);
       await page.screenshot({
-        path: `docs/etapas/${stage === "CMDK" ? "E4" : stage}/${shot.name}-${info.project.name}.png`,
+        path: shot.carpeta
+          ? `docs/entrega/capturas/${shot.carpeta}/${shot.name}-${info.project.name}.png`
+          : `docs/etapas/${stage === "CMDK" ? "E4" : stage}/${shot.name}-${info.project.name}.png`,
         fullPage: !shot.name.startsWith("cmdk"),
       });
     });

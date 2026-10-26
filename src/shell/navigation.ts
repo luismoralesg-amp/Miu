@@ -383,9 +383,32 @@ export function sectionAllowed(role: Role, key: SectionKey) {
   return (SECTION_PERMISSIONS[key] ?? []).every((p) => roleCan(role, p));
 }
 
+/** Sections whose screens are built: an unknown path under them is a real 404, not "coming soon". */
+export const BUILT: ReadonlySet<SectionKey> = new Set<SectionKey>([
+  "hoy",
+  "bandeja",
+  "cursos",
+  "semana",
+  "horario",
+  "notas",
+  "pagos",
+  "dispositivos",
+  "porCalificar",
+]);
+
+/**
+ * The section a path belongs to: exact match, or the longest section that prefixes it, so a deep
+ * link into a screen still being built (/catedra/secciones/md-a) lands on its section, not a 404.
+ */
 export function sectionKeyByPath(path: string): SectionKey | undefined {
-  return (Object.keys(SECTIONS) as SectionKey[]).find(
-    (k) => !SECTIONS[k].externo && SECTIONS[k].path === path,
+  const keys = (Object.keys(SECTIONS) as SectionKey[]).filter((k) => !SECTIONS[k].externo);
+  return (
+    keys.find((k) => SECTIONS[k].path === path) ??
+    keys
+      .filter(
+        (k) => !BUILT.has(k) && SECTIONS[k].path !== "/" && path.startsWith(`${SECTIONS[k].path}/`),
+      )
+      .sort((a, b) => SECTIONS[b].path.length - SECTIONS[a].path.length)[0]
   );
 }
 

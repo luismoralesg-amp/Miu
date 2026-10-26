@@ -18,3 +18,14 @@ describe("navigation and authorization agree", () => {
     expect(sectionAllowed("maestro", "pagos")).toBe(false);
   });
 });
+
+describe("deep links into sections still being built", () => {
+  it("land on the closest section instead of a 404", async () => {
+    const { sectionKeyByPath } = await import("./navigation");
+    expect(sectionKeyByPath("/catedra/secciones/md-a")).toBe("catedra");
+    expect(sectionKeyByPath("/catedra/libro/pp-a")).toBe("libro");
+    expect(sectionKeyByPath("/admin/pagos")).toBe("conciliacion");
+    expect(sectionKeyByPath("/no-existe")).toBeUndefined();
+    expect(sectionKeyByPath("/pagos/no-existe")).toBeUndefined();
+  });
+});
