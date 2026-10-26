@@ -1,0 +1,116 @@
+# Backlog de cierre · MiU Nuevo (Fase 1, front end con mocks)
+
+- Creado: 2026-10-25 · Fuente: `docs/PLAN_FASE1.md` §5 y §8, `docs/etapas/E2/REPORTE.md`, `docs/diseno/ronda3/`.
+- Estado al crear: rama `Master`, árbol limpio, 18 commits por delante de `origin/Master`, último `a61a4ff`.
+  E0, E1, ronda 3.1 y E2 están commiteados; el reporte de E2 dice 176/176 unitarias y 54/54 E2E.
+  `src/modules/` solo tiene `identity`; no existe `src/authz/`.
+- Cómo se usa: el agente toma el **primer `[ ]`** de arriba hacia abajo. Un ítem = un commit convencional.
+  Al terminarlo: `[x]`, hash corto y una línea de reporte. Si se bloquea: `[!]`, motivo, y sigue con el siguiente.
+- Pruebas: **U** = Vitest, **E** = Playwright (claro, oscuro, móvil y axe), **C** = captura en `docs/etapas/<E>/` con revisión impeccable.
+  En todo ítem además: `npm run check` verde.
+- `[S]` = supuesto que no consta en los documentos. Se usa el valor mock y se anota en `INTEGRACIONES_PENDIENTES.md`.
+- Diseño: P1 Editorial (Fraunces, lienzo cálido, reglas finas, punto de color por curso). Fecha mock única: constante HOY (jueves 22-oct-2026).
+
+Formato de reporte por ítem: `→ hash · qué quedó · pruebas (U n/n, E n/n) · supuestos nuevos`.
+
+---
+
+## P0 · Verificar y cerrar E2
+
+- [x] **P0-1 · Verificar la base verde.** Correr `npm run check`, `npm run build` y `npm run e2e`.
+  - Terminado: los tres en verde, con los conteos anotados aquí. Si algo falla, el arreglo es este mismo commit (`fix:`).
+  - Pruebas: U, E, build.
+  - → (este commit) · base verde sin cambios de código · U 176/176, E 54/54 (Brave), build sin errores (13 rutas) · sin supuestos nuevos
+- [ ] **P0-2 · Cerrar pendientes de E2.** Comprobar contra PLAN §8 E2 y el reporte: login, ⌘K, avisos, dispositivos, "Más" y selector de rol solo en dev.
+  Verificar que el selector no aparece con `npm run build && npm start` sin `MIU_DEV_TOOLS`.
+  - Terminado: E2E que confirma que no hay selector de rol en producción; lista de huecos de E2 vacía o convertida en ítems nuevos abajo.
+  - Pruebas: E.
+
+## P1 · Base de datos mock y pantallas núcleo
+
+- [ ] **P1-1 · E3a · `Result`, `PortError` y la selección de adaptador.** `src/lib/result.ts`, timeout ≤ 10 s con `AbortSignal`, y `MIU_ADAPTER_<PUERTO>=mock|real` (PLAN §6).
+  - Terminado: helper probado, incluido el timeout que devuelve `timeout`.
+  - Pruebas: U.
+- [ ] **P1-2 · E3b · Seed determinista.** `src/mock/seed/`: estudiante ficticia de Computación, 1 maestro, 2 auxiliares, 1 administrativo (PLAN §7), con cursos, colores, actividades, notas, horario y cargos. Nadie real.
+  - Terminado: el seed es igual en cada corrida (snapshot) y las fechas son relativas a HOY.
+  - Pruebas: U.
+- [ ] **P1-3 · E3c · `authz`.** `src/authz/` con `Permission`, `Scope` y la tabla `(rol, permiso, ámbito)` según la matriz de `FUNCIONES_NUEVAS_Y_PAGOS.md` §3. `close_final_grade` solo para Maestro por defecto [S].
+  - Terminado: cada celda de la matriz es un caso de prueba; las rutas y acciones consultan `can()`.
+  - Pruebas: U (tabla completa).
+- [ ] **P1-4 · E3d · Puertos académicos con mock.** `AcademicPort`, `AssessmentPort`, `CurriculumPort` e `InboxPort`, cada uno con adaptador mock y real vacío (el real devuelve `unavailable`).
+  - Terminado: contratos con zod; la regla ESLint `no-restricted-imports` impide importar el dominio de otro módulo.
+  - Pruebas: U por método.
+- [ ] **P1-5 · E3e · Puertos financieros con mock.** `LedgerPort`/`SolvencyPort` y `PaymentProviderPort` (`quote`, `createCheckout`, `handleWebhook` con firma e idempotencia). Recurrente queda en mock; Stripe vacío.
+  - Terminado: `quote` devuelve ACH sin comisión y tarjeta o Apple Pay a 4.5% + Q2 como costo del pagador [S, pendiente de la UFM]; el webhook repetido no duplica el cargo.
+  - Pruebas: U.
+- [ ] **P1-6 · E4a · Hoy.** `/` con datos reales del seed según `docs/diseno/ronda3` (p1, hoy-noche, hoy-examenes): lo urgente primero y el punto de color por curso.
+  - Terminado: sin placeholder; hay estados de carga, vacío, error y timeout (`AsyncBoundary`).
+  - Pruebas: U de la consulta "urgente primero", E, C (claro, oscuro y móvil).
+- [ ] **P1-7 · E4b · Bandeja.** `/bandeja` con pendientes, avisos y pagos.
+  - Terminado: el badge y la lista salen del mismo read model.
+  - Pruebas: U y E de que el badge es igual al número de ítems de la lista; C.
+- [ ] **P1-8 · E5a · Cursos.** `/cursos`: tabla con búsqueda y orden, agrupada por facultad y período.
+  - Pruebas: U del filtro, E de búsqueda, C.
+- [ ] **P1-9 · E5b · Curso con línea de tiempo.** `/cursos/[cursoId]` según `curso-linea-de-tiempo.html`: próxima actividad, nota actual y último anuncio.
+  - Pruebas: E, C.
+- [ ] **P1-10 · E5c · Subsecciones del curso.** Cada subsección de PLAN §5 tiene su URL. El estado vacío distingue "sin contenido" de "no habilitado".
+  - Pruebas: E que recorre las URLs; C de una subsección con contenido y de una vacía.
+- [ ] **P1-11 · E5d · Actividad y entrega.** `/cursos/[cursoId]/actividades/[actividadId]` con la rúbrica visible antes de entregar, recibo con hash y un `.ics` (`StoragePort` mock).
+  - Terminado: se puede entregar y aparece el recibo.
+  - Pruebas: U del hash, E "ver y entregar tarea" (PLAN §8 E5), C.
+- [ ] **P1-12 · E6a · Notas.** `/notas` con todas las notas del período y el perfil académico (promedio y tendencia). Usa la tarjeta expandible de ronda 3. Umbral 61 y metas 71/80/90 [S].
+  - Pruebas: U del cálculo del promedio, E "consultar notas" (PLAN §8 E6), C.
+- [ ] **P1-13 · E6b · Horario y Semana.** `/horario` con eje temporal real y clase actual destacada; vista Semana según `semana.html` (leyenda "libre" coherente, sin hueco al pie); exportar a ICS e imprimir.
+  - Pruebas: U del generador ICS, E, C.
+- [ ] **P1-14 · E7a · Pagos: ver y pagar.** `/pagos`, `/pagos/pagar/[cargoId]`: pago en 2 pasos, ACH primero con el ahorro visible. Con tarjeta: comisión como costo del pagador (ejemplo de la maqueta: Q334.45, total Q7,722.25). Checkout y webhook de Recurrente en mock. Bancos ACH [S].
+  - Pruebas: U del ruteo por costo, E "pagar y consultar" (PLAN §8 E7), C.
+- [ ] **P1-15 · E7b · Recibos y estado de cuenta.** `/pagos/recibos`, `/pagos/estado-de-cuenta` con fechas por defecto del período; transferencia con comprobante y pago presencial.
+  - Pruebas: E, C.
+- [ ] **P1-16 · E10a · Auxiliar: calificar por lote.** `/catedra/por-calificar` según `auxiliar-lote.html`. La justificación se exige solo bajo el umbral (61 [S]); cada calificación queda en auditoría (`AuditPort` mock).
+  - Terminado: el Auxiliar solo ve sus secciones (authz).
+  - Pruebas: U de la regla de justificación, E de calificar un lote como Auxiliar, C.
+- [ ] **P1-17 · ⌘K conectado a datos.** El buscador encuentra cursos, actividades, cargos y personas del seed, filtrado por rol; sus acciones llevan a las pantallas reales.
+  - Pruebas: U del índice por rol, E solo con teclado (abrir un curso y pagar un cargo), C.
+
+## P2 · Resto de E3 a E12 (PLAN_FASE1 §5 y §8)
+
+- [ ] **P2-1 · E6c · Pensum.** `/pensum`: grafo con prerrequisitos al seleccionar y colores por área. Pruebas: U de prerrequisitos, E, C.
+- [ ] **P2-2 · E6d · Historial.** `/historial` agrupado por período, con búsqueda global. Pruebas: E, C.
+- [ ] **P2-3 · E7c · Cola de pagos del Administrativo.** Aprobar transferencias. Pruebas: U de permisos, E, C.
+- [ ] **P2-4 · E8a · Conferencias.** `/conferencias`, `/conferencias/mis-reservas`, `/conferencias/[id]/evaluacion`, con estados reservada, en espera y expirada (`ConferencePort` mock). Pruebas: U de estados, E de reservar y evaluar, C.
+- [ ] **P2-5 · E8b · Asignación.** `/asignacion`: ventana de preferencias, resolución por lote, step-up y nada de pop-ups (`EnrollmentPort` mock). Pruebas: U, E, C.
+- [ ] **P2-6 · E8c · Documentos.** `/documentos` con búsqueda y rango del período (`DocumentsPort` mock). Pruebas: E, C.
+- [ ] **P2-7 · E9a · Cuenta.** `/cuenta/{informacion,privacidad,accesos,archivos}`: CUI y fecha enmascarados (`MaskedField`) y edición con step-up. Pruebas: U de la máscara, E, C.
+- [ ] **P2-8 · E9b · Comunicación.** `/comunicacion`: mensajes dentro de la app (`MessagingPort`/`Fce2Port` mock). Pruebas: E de enviar un mensaje, C.
+- [ ] **P2-9 · E9c · Soporte.** `/soporte`: FAQ y chat con contexto prellenado (`SupportChatPort` mock). Pruebas: E, C.
+- [ ] **P2-10 · E9d · Servicios y recursos.** `/servicios`, `/recursos/{directorio,oficinas,eventos,marca,chatgpt-edu}`; los enlaces externos van marcados. El directorio pide al menos 3 caracteres (`DirectoryPort`). Pruebas: U, E, C.
+- [ ] **P2-11 · E10b · Cátedra del Maestro.** `/catedra`, `/catedra/secciones/[seccionId]`, `/catedra/libro/[seccionId]`. Pruebas: E con el rol Maestro, C.
+- [ ] **P2-12 · E10c · Publicar y cerrar.** `/catedra/publicar`, `/catedra/cierre`. `close_final_grade` solo para el Maestro [S]. Pruebas: U de permisos, E, C.
+- [ ] **P2-13 · E10d · Apelaciones, auditoría y estadísticas de cátedra.** Pruebas: E, C.
+- [ ] **P2-14 · E11a · Administración: políticas y roles.** `/admin/{politicas,roles}`, con políticas configurables (umbral, comisiones). Pruebas: U, E, C.
+- [ ] **P2-15 · E11b · Administración: pagos, conciliación, caja y reembolsos.** Pruebas: U de conciliación, E, C.
+- [ ] **P2-16 · E11c · Administración: auditoría, apelaciones y estadísticas.** Pruebas: E, C.
+- [ ] **P2-17 · E12a · PWA.** Manifest y service worker propio, sin CDN. Pruebas: E de que el manifest y el SW están registrados.
+- [ ] **P2-18 · E12b · Rendimiento.** Medir LCP e INP en Hoy, Cursos y Pagos con el build de producción. Terminado: los valores quedan en el reporte (las metas son [S] si el plan no las fija). Pruebas: medición en Playwright.
+- [ ] **P2-19 · E12c · Accesibilidad.** axe en todas las rutas y un recorrido solo con teclado de los flujos núcleo. Terminado: 0 violaciones AA. Pruebas: E.
+
+## P3 · Entrega (formato [S]: repo local y demo con `npm run dev`; sin push ni deploy)
+
+- [ ] **P3-1 · Capturas por rol.** `docs/entrega/capturas/<rol>/<pantalla>-{light,dark,mobile}.png` para Estudiante, Maestro, Auxiliar y Administrativo, generadas con un script (`CAPTURE=entrega`). Terminado: impeccable revisó cada captura.
+- [ ] **P3-2 · README de la demo.** `README.md`: requisitos (Node 24.22.1 con nvm), `npm i`, `npm run dev`, cómo cambiar de rol (`MIU_DEV_TOOLS`), usuarios mock, qué es mock y qué es real, `npm run check` y `npm run e2e`. Prueba: seguir el README desde un clon limpio en una carpeta temporal y comprobar que funciona.
+- [ ] **P3-3 · DECISIONES e INTEGRACIONES_PENDIENTES al día.** Una fila por puerto en INTEGRACIONES (PLAN §6) y todos los `[S]` de este backlog. Prueba: revisión con grep de que cada puerto en `src/modules/*/ports` tiene su fila.
+- [ ] **P3-4 · Reporte de cierre.** `docs/etapas/E12/REPORTE.md` (máximo 40 líneas): qué está hecho, pruebas totales, métricas, supuestos, riesgos e ítems `[!]`. Prueba: `npm run check`, `npm run build` y `npm run e2e` verdes en la misma corrida.
+
+---
+
+## Supuestos `[S]` de este backlog
+1. Formato de entrega: repo local, demo con `npm run dev`, capturas por rol y docs. No está confirmado por Luis.
+2. Umbral 61 y metas 71/80/90 (vienen de la ronda 3, sin validar con la UFM).
+3. Comisión de tarjeta como costo del pagador (pendiente de la UFM).
+4. Lista de bancos ACH de Recurrente.
+5. `close_final_grade` solo para el Maestro por defecto (PLAN §7).
+6. Semana de exámenes y foto del campus (ronda 3).
+7. Metas de LCP e INP, si el plan no las fija.
+
+## Bloqueos `[!]`
+(ninguno todavía)
