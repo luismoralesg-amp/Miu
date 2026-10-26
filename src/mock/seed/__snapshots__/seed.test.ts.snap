@@ -139,11 +139,37 @@ exports[`seed > is the same on every build 1`] = `
       "atrasadaPermitida": false,
       "courseId": "matematica-discreta",
       "descripcion": "",
+      "fecha": "2026-10-21T23:59:00-06:00",
+      "formato": "Archivo PDF",
+      "id": "md-tarea-4",
+      "modo": "archivo",
+      "peso": 5,
+      "rubrica": [
+        [
+          "Planteamiento",
+          40,
+        ],
+        [
+          "Solución",
+          40,
+        ],
+        [
+          "Verificación",
+          20,
+        ],
+      ],
+      "tipo": "tarea",
+      "titulo": "Tarea 4: recurrencias",
+    },
+    {
+      "atrasadaPermitida": false,
+      "courseId": "matematica-discreta",
+      "descripcion": "",
       "fecha": "2026-12-01T23:59:00-06:00",
       "formato": "Repositorio",
       "id": "md-proyecto-final",
       "modo": "repositorio",
-      "peso": 15,
+      "peso": 10,
       "rubrica": [
         [
           "Según el enunciado",
@@ -1061,7 +1087,7 @@ exports[`seed > is the same on every build 1`] = `
     ],
     [
       "2025-1",
-      82.1,
+      82.2,
     ],
     [
       "2025-2",
@@ -1238,6 +1264,128 @@ exports[`seed > is the same on every build 1`] = `
       "vence": "2026-10-20",
     },
   ],
+  "pastEnrollments": [
+    {
+      "codigo": "MAT-101",
+      "nota": 78,
+      "periodo": "2024-2",
+      "seccion": "A",
+    },
+    {
+      "codigo": "CC-101",
+      "nota": 84,
+      "periodo": "2024-2",
+      "seccion": "A",
+    },
+    {
+      "codigo": "MAT-102",
+      "nota": 80,
+      "periodo": "2024-2",
+      "seccion": "A",
+    },
+    {
+      "codigo": "HUM-101",
+      "nota": 85,
+      "periodo": "2024-2",
+      "seccion": "A",
+    },
+    {
+      "codigo": "CC-102",
+      "nota": 76,
+      "periodo": "2024-2",
+      "seccion": "A",
+    },
+    {
+      "codigo": "MAT-201",
+      "nota": 80,
+      "periodo": "2025-1",
+      "seccion": "B",
+    },
+    {
+      "codigo": "CC-201",
+      "nota": 84,
+      "periodo": "2025-1",
+      "seccion": "B",
+    },
+    {
+      "codigo": "MAT-202",
+      "nota": 79,
+      "periodo": "2025-1",
+      "seccion": "B",
+    },
+    {
+      "codigo": "HUM-201",
+      "nota": 88,
+      "periodo": "2025-1",
+      "seccion": "B",
+    },
+    {
+      "codigo": "CC-202",
+      "nota": 80,
+      "periodo": "2025-1",
+      "seccion": "B",
+    },
+    {
+      "codigo": "CC-301",
+      "nota": 85,
+      "periodo": "2025-2",
+      "seccion": "A",
+    },
+    {
+      "codigo": "MAT-301",
+      "nota": 81,
+      "periodo": "2025-2",
+      "seccion": "A",
+    },
+    {
+      "codigo": "CC-302",
+      "nota": 84,
+      "periodo": "2025-2",
+      "seccion": "A",
+    },
+    {
+      "codigo": "HUM-301",
+      "nota": 86,
+      "periodo": "2025-2",
+      "seccion": "A",
+    },
+    {
+      "codigo": "MAT-302",
+      "nota": 79,
+      "periodo": "2025-2",
+      "seccion": "A",
+    },
+    {
+      "codigo": "CC-401",
+      "nota": 86,
+      "periodo": "2026-1",
+      "seccion": "A",
+    },
+    {
+      "codigo": "CC-402",
+      "nota": 82,
+      "periodo": "2026-1",
+      "seccion": "A",
+    },
+    {
+      "codigo": "FIS-401",
+      "nota": 80,
+      "periodo": "2026-1",
+      "seccion": "A",
+    },
+    {
+      "codigo": "HUM-401",
+      "nota": 88,
+      "periodo": "2026-1",
+      "seccion": "A",
+    },
+    {
+      "codigo": "CC-403",
+      "nota": 83,
+      "periodo": "2026-1",
+      "seccion": "A",
+    },
+  ],
   "payments": [
     {
       "chargeId": "multa-biblioteca",
@@ -1288,6 +1436,403 @@ exports[`seed > is the same on every build 1`] = `
       "studentId": "p-ana",
     },
   ],
+  "pensum": [
+    {
+      "area": "matematica",
+      "codigo": "MAT-101",
+      "nombre": "Cálculo I",
+      "prerrequisitos": [],
+      "semestre": 1,
+      "uma": 4,
+    },
+    {
+      "area": "programacion",
+      "codigo": "CC-101",
+      "nombre": "Introducción a la programación",
+      "prerrequisitos": [],
+      "semestre": 1,
+      "uma": 4,
+    },
+    {
+      "area": "matematica",
+      "codigo": "MAT-102",
+      "nombre": "Lógica matemática",
+      "prerrequisitos": [],
+      "semestre": 1,
+      "uma": 4,
+    },
+    {
+      "area": "humanidades",
+      "codigo": "HUM-101",
+      "nombre": "Escritura académica",
+      "prerrequisitos": [],
+      "semestre": 1,
+      "uma": 3,
+    },
+    {
+      "area": "sistemas",
+      "codigo": "CC-102",
+      "nombre": "Introducción a la computación",
+      "prerrequisitos": [],
+      "semestre": 1,
+      "uma": 4,
+    },
+    {
+      "area": "matematica",
+      "codigo": "MAT-201",
+      "nombre": "Cálculo II",
+      "prerrequisitos": [
+        "MAT-101",
+      ],
+      "semestre": 2,
+      "uma": 4,
+    },
+    {
+      "area": "programacion",
+      "codigo": "CC-201",
+      "nombre": "Programación orientada a objetos",
+      "prerrequisitos": [
+        "CC-101",
+      ],
+      "semestre": 2,
+      "uma": 4,
+    },
+    {
+      "area": "matematica",
+      "codigo": "MAT-202",
+      "nombre": "Álgebra lineal",
+      "prerrequisitos": [
+        "MAT-101",
+      ],
+      "semestre": 2,
+      "uma": 4,
+    },
+    {
+      "area": "humanidades",
+      "codigo": "HUM-201",
+      "nombre": "Filosofía",
+      "prerrequisitos": [],
+      "semestre": 2,
+      "uma": 3,
+    },
+    {
+      "area": "sistemas",
+      "codigo": "CC-202",
+      "nombre": "Arquitectura de computadoras",
+      "prerrequisitos": [
+        "CC-102",
+      ],
+      "semestre": 2,
+      "uma": 4,
+    },
+    {
+      "area": "programacion",
+      "codigo": "CC-301",
+      "nombre": "Estructuras de datos",
+      "prerrequisitos": [
+        "CC-201",
+      ],
+      "semestre": 3,
+      "uma": 4,
+    },
+    {
+      "area": "matematica",
+      "codigo": "MAT-301",
+      "nombre": "Probabilidad y estadística",
+      "prerrequisitos": [
+        "MAT-201",
+      ],
+      "semestre": 3,
+      "uma": 4,
+    },
+    {
+      "area": "sistemas",
+      "codigo": "CC-302",
+      "nombre": "Sistemas digitales",
+      "prerrequisitos": [
+        "CC-202",
+      ],
+      "semestre": 3,
+      "uma": 4,
+    },
+    {
+      "area": "humanidades",
+      "codigo": "HUM-301",
+      "nombre": "Proceso económico",
+      "prerrequisitos": [],
+      "semestre": 3,
+      "uma": 3,
+    },
+    {
+      "area": "matematica",
+      "codigo": "MAT-302",
+      "nombre": "Ecuaciones diferenciales",
+      "prerrequisitos": [
+        "MAT-201",
+      ],
+      "semestre": 3,
+      "uma": 4,
+    },
+    {
+      "area": "programacion",
+      "codigo": "CC-401",
+      "nombre": "Algoritmos",
+      "prerrequisitos": [
+        "CC-301",
+      ],
+      "semestre": 4,
+      "uma": 4,
+    },
+    {
+      "area": "sistemas",
+      "codigo": "CC-402",
+      "nombre": "Sistemas operativos",
+      "prerrequisitos": [
+        "CC-302",
+        "CC-301",
+      ],
+      "semestre": 4,
+      "uma": 4,
+    },
+    {
+      "area": "matematica",
+      "codigo": "FIS-401",
+      "nombre": "Física",
+      "prerrequisitos": [
+        "MAT-201",
+      ],
+      "semestre": 4,
+      "uma": 4,
+    },
+    {
+      "area": "humanidades",
+      "codigo": "HUM-401",
+      "nombre": "Teoría del orden social",
+      "prerrequisitos": [
+        "HUM-301",
+      ],
+      "semestre": 4,
+      "uma": 3,
+    },
+    {
+      "area": "programacion",
+      "codigo": "CC-403",
+      "nombre": "Ingeniería de software I",
+      "prerrequisitos": [
+        "CC-301",
+      ],
+      "semestre": 4,
+      "uma": 4,
+    },
+    {
+      "area": "matematica",
+      "codigo": "MAT-501",
+      "cursoActual": "matematica-discreta",
+      "nombre": "Matemática Discreta",
+      "prerrequisitos": [
+        "MAT-102",
+        "MAT-202",
+      ],
+      "semestre": 5,
+      "uma": 4,
+    },
+    {
+      "area": "programacion",
+      "codigo": "CC-501",
+      "cursoActual": "paradigmas-de-programacion",
+      "nombre": "Paradigmas de Programación",
+      "prerrequisitos": [
+        "CC-301",
+      ],
+      "semestre": 5,
+      "uma": 4,
+    },
+    {
+      "area": "humanidades",
+      "codigo": "HUM-501",
+      "cursoActual": "etica-de-la-libertad",
+      "nombre": "Ética de la Libertad",
+      "prerrequisitos": [
+        "HUM-201",
+      ],
+      "semestre": 5,
+      "uma": 3,
+    },
+    {
+      "area": "sistemas",
+      "codigo": "CC-502",
+      "cursoActual": "bases-de-datos-1",
+      "nombre": "Bases de Datos I",
+      "prerrequisitos": [
+        "CC-301",
+      ],
+      "semestre": 5,
+      "uma": 4,
+    },
+    {
+      "area": "sistemas",
+      "codigo": "CC-503",
+      "nombre": "Redes de computadoras",
+      "prerrequisitos": [
+        "CC-402",
+      ],
+      "semestre": 5,
+      "uma": 4,
+    },
+    {
+      "area": "sistemas",
+      "codigo": "CC-601",
+      "nombre": "Bases de Datos II",
+      "prerrequisitos": [
+        "CC-502",
+      ],
+      "semestre": 6,
+      "uma": 4,
+    },
+    {
+      "area": "programacion",
+      "codigo": "CC-602",
+      "nombre": "Compiladores",
+      "prerrequisitos": [
+        "CC-501",
+        "MAT-501",
+      ],
+      "semestre": 6,
+      "uma": 4,
+    },
+    {
+      "area": "matematica",
+      "codigo": "CC-603",
+      "nombre": "Teoría de la computación",
+      "prerrequisitos": [
+        "MAT-501",
+      ],
+      "semestre": 6,
+      "uma": 4,
+    },
+    {
+      "area": "programacion",
+      "codigo": "CC-604",
+      "nombre": "Ingeniería de software II",
+      "prerrequisitos": [
+        "CC-403",
+      ],
+      "semestre": 6,
+      "uma": 4,
+    },
+    {
+      "area": "matematica",
+      "codigo": "MAT-601",
+      "nombre": "Análisis numérico",
+      "prerrequisitos": [
+        "MAT-202",
+        "MAT-302",
+      ],
+      "semestre": 6,
+      "uma": 4,
+    },
+    {
+      "area": "programacion",
+      "codigo": "CC-701",
+      "nombre": "Inteligencia artificial",
+      "prerrequisitos": [
+        "CC-401",
+        "MAT-301",
+      ],
+      "semestre": 7,
+      "uma": 4,
+    },
+    {
+      "area": "programacion",
+      "codigo": "CC-702",
+      "nombre": "Computación gráfica",
+      "prerrequisitos": [
+        "MAT-202",
+        "CC-401",
+      ],
+      "semestre": 7,
+      "uma": 4,
+    },
+    {
+      "area": "sistemas",
+      "codigo": "CC-703",
+      "nombre": "Seguridad informática",
+      "prerrequisitos": [
+        "CC-503",
+      ],
+      "semestre": 7,
+      "uma": 4,
+    },
+    {
+      "area": "electiva",
+      "codigo": "ELE-701",
+      "nombre": "Electiva I",
+      "prerrequisitos": [],
+      "semestre": 7,
+      "uma": 4,
+    },
+    {
+      "area": "sistemas",
+      "codigo": "CC-704",
+      "nombre": "Sistemas distribuidos",
+      "prerrequisitos": [
+        "CC-402",
+        "CC-503",
+      ],
+      "semestre": 7,
+      "uma": 4,
+    },
+    {
+      "area": "programacion",
+      "codigo": "CC-801",
+      "nombre": "Aprendizaje automático",
+      "prerrequisitos": [
+        "CC-701",
+      ],
+      "semestre": 8,
+      "uma": 4,
+    },
+    {
+      "area": "programacion",
+      "codigo": "CC-802",
+      "nombre": "Proyecto de graduación",
+      "prerrequisitos": [
+        "CC-604",
+      ],
+      "semestre": 8,
+      "uma": 4,
+    },
+    {
+      "area": "electiva",
+      "codigo": "ELE-801",
+      "nombre": "Electiva II",
+      "prerrequisitos": [
+        "ELE-701",
+      ],
+      "semestre": 8,
+      "uma": 4,
+    },
+    {
+      "area": "humanidades",
+      "codigo": "HUM-801",
+      "nombre": "Ética profesional",
+      "prerrequisitos": [
+        "HUM-501",
+      ],
+      "semestre": 8,
+      "uma": 3,
+    },
+    {
+      "area": "humanidades",
+      "codigo": "HUM-802",
+      "nombre": "Emprendimiento",
+      "prerrequisitos": [
+        "HUM-301",
+      ],
+      "semestre": 8,
+      "uma": 3,
+    },
+  ],
   "people": [
     {
       "apellido": "López",
@@ -1303,6 +1848,7 @@ exports[`seed > is the same on every build 1`] = `
     },
     {
       "apellido": "Castillo",
+      "cargo": "Catedrático",
       "correo": "jorge.castillo.demo@ufm.edu",
       "id": "p-jorge",
       "nombre": "Jorge",
@@ -1311,6 +1857,7 @@ exports[`seed > is the same on every build 1`] = `
     },
     {
       "apellido": "Molina",
+      "cargo": "Catedrático",
       "correo": "andres.molina.demo@ufm.edu",
       "id": "p-andres",
       "nombre": "Andrés",
@@ -1318,6 +1865,7 @@ exports[`seed > is the same on every build 1`] = `
     },
     {
       "apellido": "Herrera",
+      "cargo": "Catedrática",
       "correo": "lucia.herrera.demo@ufm.edu",
       "id": "p-lucia",
       "nombre": "Lucía",
@@ -1325,6 +1873,7 @@ exports[`seed > is the same on every build 1`] = `
     },
     {
       "apellido": "Juárez",
+      "cargo": "Catedrática",
       "correo": "marta.juarez.demo@ufm.edu",
       "id": "p-marta",
       "nombre": "Marta",
@@ -1332,6 +1881,7 @@ exports[`seed > is the same on every build 1`] = `
     },
     {
       "apellido": "Méndez",
+      "cargo": "Auxiliar",
       "correo": "carlos.mendez.demo@ufm.edu",
       "id": "p-carlos",
       "nombre": "Carlos",
@@ -1340,6 +1890,7 @@ exports[`seed > is the same on every build 1`] = `
     },
     {
       "apellido": "Ramírez",
+      "cargo": "Auxiliar",
       "correo": "sofia.ramirez.demo@ufm.edu",
       "id": "p-sofia",
       "nombre": "Sofía",
@@ -1348,6 +1899,7 @@ exports[`seed > is the same on every build 1`] = `
     },
     {
       "apellido": "Paz",
+      "cargo": "Auxiliar",
       "correo": "diego.paz.demo@ufm.edu",
       "id": "p-diego",
       "nombre": "Diego",
@@ -1355,6 +1907,7 @@ exports[`seed > is the same on every build 1`] = `
     },
     {
       "apellido": "Ajú",
+      "cargo": "Finanzas estudiantiles",
       "correo": "rodrigo.aju.demo@ufm.edu",
       "id": "p-rodrigo",
       "nombre": "Rodrigo",
@@ -1363,6 +1916,7 @@ exports[`seed > is the same on every build 1`] = `
     },
     {
       "apellido": "Sic",
+      "cargo": "Finanzas estudiantiles",
       "correo": "paola.sic.demo@ufm.edu",
       "id": "p-paola",
       "nombre": "Paola",
@@ -2077,6 +2631,13 @@ exports[`seed > is the same on every build 1`] = `
     "userId": "u-ana",
   },
   "submissions": [
+    {
+      "activityId": "md-tarea-4",
+      "archivo": "recurrencias.pdf",
+      "fecha": "2026-10-21T22:05:00-06:00",
+      "hash": "c41e9a07d2b58f63e1a0c97d4b2f8e65a3d10c7b9e42f58a06d3c1b7e9f20a84",
+      "studentId": "p-ana",
+    },
     {
       "activityId": "pp-actividad-6",
       "archivo": "closures.zip",

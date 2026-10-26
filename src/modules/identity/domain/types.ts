@@ -62,3 +62,9 @@ export type IdentityError =
   | "sesion_invalida"
   | "no_encontrado"
   | "no_configurado";
+
+/**
+ * Who is acting on a port: the signed-in user, the academic person behind them and the active role.
+ * Mutable mock state is kept per `userId`, so two test sessions never see each other's changes.
+ */
+export type Actor = { userId: string; personId: string; role: Role; nombre: string };

@@ -1,0 +1,256 @@
+import { describe, expect, it } from "vitest";
+
+import { at } from "@/mock/seed";
+import { admin, auxiliar, maestro, student, value } from "@/test/actors";
+
+import { MockAssessment } from "./adapters/mock/mock-assessment";
+import { createRealAssessment } from "./adapters/real/real-assessment";
+import {
+  currentGrade,
+  hasJustification,
+  needsJustification,
+  neededFor,
+  projectedFinal,
+  termAverage,
+  weighted,
+} from "./domain/rules";
+
+const HASH = "a".repeat(64);
+const fresh = (now = new Date(at(0, "07:42"))) => new MockAssessment(undefined, () => now);
+
+describe("grading rules", () => {
+  it("weights and current grade (Discreta: 46.6 over 60 → 77.7)", () => {
+    const { evaluado, obtenido } = weighted([
+      { peso: 10, nota: 78 },
+      { peso: 15, nota: 80 },
+      { peso: 20, nota: 72 },
+      { peso: 10, nota: 79 },
+      { peso: 5, nota: 90 },
+    ]);
+    expect([evaluado, obtenido]).toEqual([60, 46.6]);
+    expect(currentGrade(evaluado, obtenido)).toBe(77.7);
+    expect(currentGrade(0, 0)).toBe(0);
+  });
+
+  it("term average is the plain mean of the course grades", () => {
+    expect(termAverage([77.7, 91, 87, 84])).toBe(84.9);
+    expect(termAverage([])).toBe(0);
+  });
+
+  it("what is needed for each target", () => {
+    expect(neededFor(71, 60, 46.6)).toBe(61);
+    expect(neededFor(80, 60, 46.6)).toBe(84);
+    expect(neededFor(90, 60, 46.6)).toBe(109);
+    expect(neededFor(71, 60, 80)).toBe(0);
+    expect(neededFor(71, 100, 60)).toBe(Infinity);
+    expect(projectedFinal(60, 46.6, 75)).toBe(77);
+  });
+
+  it("justification only under the threshold, and it must say something", () => {
+    expect(needsJustification(60, 61)).toBe(true);
+    expect(needsJustification(61, 61)).toBe(false);
+    expect(hasJustification("  corto ")).toBe(false);
+    expect(hasJustification("Sin pruebas y no compila.")).toBe(true);
+  });
+});
+
+describe("AssessmentPort (mock) · student", () => {
+  it("listActivities: status per activity", async () => {
+    const list = value(await fresh().listActivities(student()));
+    const status = Object.fromEntries(list.map((a) => [a.id, a.estado]));
+    expect(status).toMatchObject({
+      "md-quiz-3": "calificada",
+      "pp-actividad-6": "entregada",
+      "pp-ejercicio-llaves": "pendiente",
+      "md-parcial-2": "programada",
+      "el-control-lectura": "calificada",
+    });
+    expect(list.every((a, i) => i === 0 || list[i - 1]!.fecha <= a.fecha)).toBe(true);
+    expect(value(await fresh().listActivities(maestro()))).toEqual([]);
+  });
+
+  it("getActivity: rubric before submitting; not_found and forbidden", async () => {
+    const a = value(await fresh().getActivity(student(), "pp-ejercicio-llaves"));
+    expect(a.rubrica.map((r) => r.criterio)).toEqual([
+      "Correctitud",
+      "Pruebas",
+      "Estilo y claridad",
+    ]);
+    expect(await fresh().getActivity(student(), "nada")).toMatchObject({ error: "not_found" });
+    expect(await fresh().getActivity(maestro(), "pp-ejercicio-llaves")).toMatchObject({
+      error: "forbidden",
+    });
+  });
+
+  it("submit: returns a receipt and only that session sees it", async () => {
+    const port = fresh();
+    const ana = student();
+    const other = student();
+    const receipt = value(
+      await port.submit(ana, "pp-ejercicio-llaves", {
+        archivo: "llaves.zip",
+        tamanoBytes: 2048,
+        hash: HASH,
+      }),
+    );
+    expect(receipt).toMatchObject({ recibo: "MIU-E-AAAAAAAA", hash: HASH, atrasada: false });
+    expect(value(await port.getActivity(ana, "pp-ejercicio-llaves")).estado).toBe("entregada");
+    expect(value(await port.getActivity(other, "pp-ejercicio-llaves")).estado).toBe("pendiente");
+  });
+
+  it("submit: rejects a bad hash, a closed deadline and in-person work", async () => {
+    const input = { archivo: "x.zip", tamanoBytes: 10, hash: HASH };
+    expect(
+      await fresh().submit(student(), "pp-ejercicio-llaves", { ...input, hash: "123" }),
+    ).toMatchObject({
+      error: "invalid",
+    });
+    const late = fresh(new Date(at(2, "09:00")));
+    expect(await late.submit(student(), "pp-ejercicio-llaves", input)).toMatchObject({
+      error: "invalid",
+      detail: "La fecha límite ya pasó",
+    });
+    expect(await fresh().submit(student(), "md-parcial-2", input)).toMatchObject({
+      error: "invalid",
+    });
+    expect(await fresh().submit(maestro(), "pp-ejercicio-llaves", input)).toMatchObject({
+      error: "forbidden",
+    });
+  });
+
+  it("getGradebook: the ronda 3 averages and history", async () => {
+    const book = value(await fresh().getGradebook(student()));
+    expect(book.cursos.map((c) => [c.curso.corto, c.evaluado, c.actual])).toEqual([
+      ["Discreta", 60, 77.7],
+      ["Paradigmas", 55, 91],
+      ["Ética", 50, 87],
+      ["Bases de Datos", 45, 84],
+    ]);
+    expect(book.promedio).toBe(84.9);
+    expect(book.historial.at(-1)).toEqual({ periodo: "2026-1", promedio: 83.8 });
+    expect(book.metas).toEqual([71, 80, 90]);
+    expect(book.cursos[1]!.nuevas).toBe(1);
+  });
+
+  it("createAppeal: only over a published grade, with a real reason", async () => {
+    const port = fresh();
+    const ana = student();
+    expect(
+      await port.createAppeal(ana, { activityId: "md-quiz-3", motivo: "corto" }),
+    ).toMatchObject({
+      error: "invalid",
+    });
+    expect(
+      await port.createAppeal(ana, {
+        activityId: "pp-ejercicio-llaves",
+        motivo: "Quiero que revisen esta actividad por favor.",
+      }),
+    ).toMatchObject({ error: "invalid" });
+    const ap = value(
+      await port.createAppeal(ana, {
+        activityId: "md-quiz-3",
+        motivo: "En la pregunta 4 mi demostración es correcta por contrapositiva.",
+      }),
+    );
+    expect(ap).toMatchObject({ estado: "nueva", nota: 90 });
+    expect(value(await port.listAppeals(ana)).map((a) => a.id)).toEqual([ap.id]);
+  });
+});
+
+describe("AssessmentPort (mock) · teaching", () => {
+  it("listGradingQueue: each role sees its own sections", async () => {
+    const carlos = value(await fresh().listGradingQueue(auxiliar()));
+    expect(carlos.map((q) => [q.sectionId, q.activityId, q.entregadas, q.calificadas])).toEqual([
+      ["md-b", "md-tarea-4", 22, 0],
+      ["pp-a", "pp-actividad-6", 24, 4],
+    ]);
+    const jorge = value(await fresh().listGradingQueue(maestro()));
+    expect(jorge.map((q) => q.sectionId)).toEqual(["md-a", "md-b"]);
+    expect(value(await fresh().listGradingQueue(student()))).toEqual([]);
+  });
+
+  it("listBatch: the whole section with masked carnés", async () => {
+    const batch = value(await fresh().listBatch(auxiliar(), "pp-a", "pp-actividad-6"));
+    expect(batch.entradas).toHaveLength(24);
+    expect(batch.umbral).toBe(61);
+    expect(batch.entradas.find((e) => e.nombre === "Daniel Estrada")).toMatchObject({
+      nota: 55,
+      justificacion: "Sin pruebas y dos funciones no compilan.",
+    });
+    expect(batch.entradas.find((e) => e.nombre === "Gabriela Hernández")!.atrasada).toBe(true);
+  });
+
+  it("gradeSubmission: justification required under 61; other sections are forbidden", async () => {
+    const port = fresh();
+    const carlos = auxiliar();
+    const base = { sectionId: "pp-a", activityId: "pp-actividad-6", studentId: "p-s004" };
+    expect(await port.gradeSubmission(carlos, { ...base, nota: 50 })).toMatchObject({
+      error: "invalid",
+      detail: "Bajo 61 la justificación es obligatoria",
+    });
+    expect(
+      value(
+        await port.gradeSubmission(carlos, {
+          ...base,
+          nota: 50,
+          justificacion: "No implementa el contador.",
+        }),
+      ),
+    ).toMatchObject({ estado: "guardada", nota: 50 });
+    expect(value(await port.gradeSubmission(carlos, { ...base, nota: 85 }))).not.toHaveProperty(
+      "justificacion",
+    );
+    expect(await port.gradeSubmission(auxiliar("p-sofia"), { ...base, nota: 85 })).toMatchObject({
+      error: "forbidden",
+    });
+    expect(await port.gradeSubmission(carlos, { ...base, nota: 101 })).toMatchObject({
+      error: "invalid",
+    });
+  });
+
+  it("publishGrades: publishes every saved grade once", async () => {
+    const port = fresh();
+    const carlos = auxiliar();
+    await port.gradeSubmission(carlos, {
+      sectionId: "pp-a",
+      activityId: "pp-actividad-6",
+      studentId: "p-s004",
+      nota: 90,
+    });
+    expect(value(await port.publishGrades(carlos, "pp-a", "pp-actividad-6"))).toEqual({
+      publicadas: 5,
+    });
+    expect(value(await port.publishGrades(carlos, "pp-a", "pp-actividad-6"))).toEqual({
+      publicadas: 0,
+    });
+  });
+
+  it("closeFinalGrade: only the Maestro, once, and grading stops after it", async () => {
+    const port = fresh();
+    const jorge = maestro();
+    expect(await port.closeFinalGrade(auxiliar(), "md-b")).toMatchObject({ error: "forbidden" });
+    expect(value(await port.closeFinalGrade(jorge, "md-b"))).toMatchObject({ cerrada: true });
+    expect(value(await port.isClosed(jorge, "md-b"))).toBe(true);
+    expect(await port.closeFinalGrade(jorge, "md-b")).toMatchObject({ error: "invalid" });
+    expect(
+      await port.gradeSubmission(jorge, {
+        sectionId: "md-b",
+        activityId: "md-tarea-4",
+        studentId: "p-s100",
+        nota: 80,
+      }),
+    ).toMatchObject({ error: "invalid" });
+  });
+
+  it("listAppeals: by section for teachers, escalated ones for the Administrativo", async () => {
+    expect(value(await fresh().listAppeals(maestro())).map((a) => a.id)).toEqual(["ap-1"]);
+    expect(value(await fresh().listAppeals(auxiliar())).map((a) => a.id)).toEqual(["ap-2"]);
+    expect(value(await fresh().listAppeals(admin())).map((a) => a.estado)).toEqual(["escalada"]);
+  });
+
+  it("the real adapter answers unavailable", async () => {
+    expect(await createRealAssessment().getGradebook(student())).toMatchObject({
+      error: "unavailable",
+    });
+  });
+});

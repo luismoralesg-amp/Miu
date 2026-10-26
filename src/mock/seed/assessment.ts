@@ -86,7 +86,14 @@ export const ACTIVITIES: SeedActivity[] = [
     modo: "en_linea",
     descripcion: "Diez preguntas sobre recorridos, árboles generadores y coloración. Un intento.",
   }),
-  A("md-proyecto-final", MD, "proyecto", "Proyecto final", 15, at(40, "23:59"), {
+  A("md-tarea-4", MD, "tarea", "Tarea 4: recurrencias", 5, at(-1, "23:59"), {
+    rubrica: [
+      ["Planteamiento", 40],
+      ["Solución", 40],
+      ["Verificación", 20],
+    ],
+  }),
+  A("md-proyecto-final", MD, "proyecto", "Proyecto final", 10, at(40, "23:59"), {
     formato: "Repositorio",
     modo: "repositorio",
   }),
@@ -241,12 +248,20 @@ export type SeedSubmission = {
   studentId: string;
   fecha: string;
   archivo: string;
+  tamanoBytes?: number;
   /** SHA-256 of the file, shown on the receipt. */
   hash: string;
 };
 
 /** The demo student's submissions still waiting for a grade. */
 export const STUDENT_SUBMISSIONS: SeedSubmission[] = [
+  {
+    activityId: "md-tarea-4",
+    studentId: "p-ana",
+    fecha: at(-1, "22:05"),
+    archivo: "recurrencias.pdf",
+    hash: "c41e9a07d2b58f63e1a0c97d4b2f8e65a3d10c7b9e42f58a06d3c1b7e9f20a84",
+  },
   {
     activityId: "pp-actividad-6",
     studentId: "p-ana",
@@ -261,14 +276,6 @@ export const STUDENT_SUBMISSIONS: SeedSubmission[] = [
     archivo: "modelo-er.pdf",
     hash: "3b7d0e5c9a14f2e86c1d7b30a5e9f4c2d8a16b7e03f5c9d24e1a8b6c07d3f95e",
   },
-];
-
-/** Semester averages before this one (the trend on Notas). */
-export const GRADE_HISTORY: Array<[term: string, promedio: number]> = [
-  ["2024-2", 80.6],
-  ["2025-1", 82.1],
-  ["2025-2", 83.0],
-  ["2026-1", 83.8],
 ];
 
 /**
@@ -308,7 +315,7 @@ export const BATCH_PP_A6: SeedBatchEntry[] = PP_A.estudianteIds
     const graded = GRADED[studentId];
     const fecha =
       studentId === "p-ana"
-        ? STUDENT_SUBMISSIONS[0]!.fecha
+        ? STUDENT_SUBMISSIONS.find((x) => x.activityId === "pp-actividad-6")!.fecha
         : (FIXED_TIMES[studentId] ??
           at(
             -2,

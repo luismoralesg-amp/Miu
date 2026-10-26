@@ -1,8 +1,9 @@
 import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
 
+import { actorFor } from "./actor";
 import { describeUserAgent } from "./domain/rules";
-import type { Role } from "./domain/types";
+import type { Actor, Role } from "./domain/types";
 import { identity, type ClientInfo, type SignedIn } from "./index";
 
 export const SESSION_COOKIE = "miu-sesion";
@@ -75,6 +76,12 @@ export async function requireUser(): Promise<CurrentUser> {
   const user = await currentUser();
   if (!user) redirect("/login");
   return user;
+}
+
+/** The signed-in user as an actor on the data ports (redirects to /login without a session). */
+export async function requireActor(): Promise<Actor & { user: CurrentUser }> {
+  const user = await requireUser();
+  return { ...actorFor(user.user, user.rol), user };
 }
 
 export async function endSession() {

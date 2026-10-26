@@ -90,3 +90,15 @@ Cada entrada: fecha · decisión · por qué · cómo revertirla.
   lo aplica a cada método de un adaptador. Un error lanzado se vuelve `unavailable`: ningún puerto lanza.
 - **Selección de adaptador** con `MIU_ADAPTER_<PUERTO>=mock|real`; cualquier otro valor es `mock`, para que un error de
   escritura nunca apunte la demo a un sistema real.
+- **Actor por sesión:** cada llamada a un puerto recibe `Actor` (`userId`, `personId`, rol). En el mock, una cuenta
+  sembrada actúa como su persona; cualquier otra (pruebas E2E, selector de rol) actúa como la persona sembrada de ese
+  rol. El estado que cambia (entregas, calificaciones, lecturas) vive **por `userId`**, así las sesiones E2E en
+  paralelo no se pisan. Las notas que publican las cuentas sembradas del personal sí se comparten, para que la demo
+  fluya del Auxiliar a la estudiante.
+- **Puertos académicos:** `AcademicPort`, `AssessmentPort`, `CurriculumPort` e `InboxPort` con contratos zod
+  (`parsed()` convierte una ruptura de contrato en `invalid`). El `real` de cada uno es `notConnected()`: responde
+  `unavailable` con el nombre del sistema que falta.
+- **La bandeja es una proyección**, no una copia: `listItems` y `count` corren la misma consulta sobre los otros
+  puertos, así que entregar o leer se refleja al instante y el badge no puede discrepar de la lista.
+- **Límites entre módulos con ESLint:** fuera de un módulo nadie importa sus `adapters`; dentro de `src/modules/`,
+  nadie importa `domain`, `ports` ni `adapters` de otro módulo (las pruebas sí, para armar escenarios).

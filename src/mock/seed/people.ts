@@ -10,6 +10,8 @@ export type SeedPerson = {
   userId?: string;
   correo: string;
   tipo: "estudiante" | "catedratico" | "auxiliar" | "administrativo";
+  /** Title shown next to the name, written in the seed (never inferred from the name). */
+  cargo?: string;
   carne?: string;
 };
 
@@ -21,6 +23,7 @@ export const STAFF: SeedPerson[] = [
     userId: "u-jorge",
     correo: "jorge.castillo.demo@ufm.edu",
     tipo: "catedratico",
+    cargo: "Catedrático",
   },
   {
     id: "p-andres",
@@ -28,6 +31,7 @@ export const STAFF: SeedPerson[] = [
     apellido: "Molina",
     correo: "andres.molina.demo@ufm.edu",
     tipo: "catedratico",
+    cargo: "Catedrático",
   },
   {
     id: "p-lucia",
@@ -35,6 +39,7 @@ export const STAFF: SeedPerson[] = [
     apellido: "Herrera",
     correo: "lucia.herrera.demo@ufm.edu",
     tipo: "catedratico",
+    cargo: "Catedrática",
   },
   {
     id: "p-marta",
@@ -42,6 +47,7 @@ export const STAFF: SeedPerson[] = [
     apellido: "Juárez",
     correo: "marta.juarez.demo@ufm.edu",
     tipo: "catedratico",
+    cargo: "Catedrática",
   },
   {
     id: "p-carlos",
@@ -50,6 +56,7 @@ export const STAFF: SeedPerson[] = [
     userId: "u-carlos",
     correo: "carlos.mendez.demo@ufm.edu",
     tipo: "auxiliar",
+    cargo: "Auxiliar",
   },
   {
     id: "p-sofia",
@@ -58,6 +65,7 @@ export const STAFF: SeedPerson[] = [
     userId: "u-sofia",
     correo: "sofia.ramirez.demo@ufm.edu",
     tipo: "auxiliar",
+    cargo: "Auxiliar",
   },
   {
     id: "p-diego",
@@ -65,6 +73,7 @@ export const STAFF: SeedPerson[] = [
     apellido: "Paz",
     correo: "diego.paz.demo@ufm.edu",
     tipo: "auxiliar",
+    cargo: "Auxiliar",
   },
   {
     id: "p-rodrigo",
@@ -73,6 +82,7 @@ export const STAFF: SeedPerson[] = [
     userId: "u-rodrigo",
     correo: "rodrigo.aju.demo@ufm.edu",
     tipo: "administrativo",
+    cargo: "Finanzas estudiantiles",
   },
   {
     id: "p-paola",
@@ -80,6 +90,7 @@ export const STAFF: SeedPerson[] = [
     apellido: "Sic",
     correo: "paola.sic.demo@ufm.edu",
     tipo: "administrativo",
+    cargo: "Finanzas estudiantiles",
   },
 ];
 

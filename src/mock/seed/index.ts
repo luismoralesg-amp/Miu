@@ -1,11 +1,13 @@
 import * as assessment from "./assessment";
 import * as courses from "./courses";
+import * as curriculum from "./curriculum";
 import * as finance from "./finance";
 import * as people from "./people";
 import { POLICY } from "./policy";
 
 export * from "./assessment";
 export * from "./courses";
+export * from "./curriculum";
 export * from "./finance";
 export * from "./people";
 export { POLICY } from "./policy";
@@ -34,7 +36,9 @@ export function buildSeed() {
     activities: assessment.ACTIVITIES,
     grades: assessment.STUDENT_GRADES,
     submissions: assessment.STUDENT_SUBMISSIONS,
-    gradeHistory: assessment.GRADE_HISTORY,
+    gradeHistory: curriculum.GRADE_HISTORY,
+    pensum: curriculum.PENSUM,
+    pastEnrollments: curriculum.PAST_ENROLLMENTS,
     batchPpA6: assessment.BATCH_PP_A6,
     appeals: assessment.APPEALS,
     charges: finance.CHARGES,
