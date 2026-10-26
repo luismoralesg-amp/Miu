@@ -56,9 +56,10 @@ Formato de reporte por ítem: `→ hash · qué quedó · pruebas (U n/n, E n/n)
 - [x] **P1-7 · E4b · Bandeja.** `/bandeja` con pendientes, avisos y pagos.
   - Terminado: el badge y la lista salen del mismo read model.
   - Pruebas: U y E de que el badge es igual al número de ítems de la lista; C.
-  - → (este commit) · `/bandeja` con pagos, por hacer y avisos, filtros como enlaces y "marcar como leído" en formularios sin JavaScript; la campana del shell lee la misma bandeja (se retiró la lista de avisos aparte) y "Bandeja" entra en "Más"; un mapa único de íconos para Hoy, Bandeja y campana; reporte `docs/etapas/E4/REPORTE.md` · U 386/386, E 9 nuevas (3 por proyecto) · C `docs/etapas/E4/bandeja*`, `campana-*` · sin supuestos nuevos
-- [ ] **P1-8 · E5a · Cursos.** `/cursos`: tabla con búsqueda y orden, agrupada por facultad y período.
+  - → 21fe474 · `/bandeja` con pagos, por hacer y avisos, filtros como enlaces y "marcar como leído" en formularios sin JavaScript; la campana del shell lee la misma bandeja (se retiró la lista de avisos aparte) y "Bandeja" entra en "Más"; un mapa único de íconos para Hoy, Bandeja y campana; reporte `docs/etapas/E4/REPORTE.md` · U 386/386, E 9 nuevas (3 por proyecto) · C `docs/etapas/E4/bandeja*`, `campana-*` · sin supuestos nuevos
+- [x] **P1-8 · E5a · Cursos.** `/cursos`: tabla con búsqueda y orden, agrupada por facultad y período.
   - Pruebas: U del filtro, E de búsqueda, C.
+  - → (este commit) · tabla con nota actual (sobre lo evaluado) y próxima entrega; búsqueda sin tildes ni mayúsculas, "sección B" como filtro de sección; orden por nombre, nota, próxima entrega o créditos; búsqueda y orden en la URL (`?q=`, `?orden=`); filas enteras clicables; lista en móvil; estado vacío con "Limpiar búsqueda"; `requirePermission("view_course")` · U 390/390 (4 nuevas), E 3/3 · C `docs/etapas/E5/cursos*` (corregido: columnas desalineadas entre grupos, título de grupo partido en móvil) · sin supuestos nuevos
 - [ ] **P1-9 · E5b · Curso con línea de tiempo.** `/cursos/[cursoId]` según `curso-linea-de-tiempo.html`: próxima actividad, nota actual y último anuncio.
   - Pruebas: E, C.
 - [ ] **P1-10 · E5c · Subsecciones del curso.** Cada subsección de PLAN §5 tiene su URL. El estado vacío distingue "sin contenido" de "no habilitado".

@@ -22,7 +22,7 @@ Fecha: 2026-10-25 · Datos: seed determinista (HOY = jueves 22-oct-2026, 07:42) 
 
 `hoy`, `hoy-noche`, `hoy-examenes`, `hoy-auxiliar`, `hoy-maestro`, `hoy-administrativo`, `bandeja`,
 `bandeja-auxiliar` y `campana`, en `-light`, `-dark` y `-mobile`. Se regeneran con
-`CAPTURE=E4 npm run e2e -- capture-screens --workers=2`; las variantes de noche y exámenes, con `MIU_NOW`.
+`CAPTURE=E4 npm run e2e -- capture-screens --workers=1`; las variantes de noche y exámenes, con `MIU_NOW`.
 
 ## Pruebas
 

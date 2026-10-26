@@ -3,7 +3,7 @@ import { test, type Page } from "@playwright/test";
 import { DEMO, waitForAnimations } from "./helpers";
 
 /**
- * Report screenshots per stage: `CAPTURE=E4 npm run e2e -- capture-screens --workers=1`.
+ * Report screenshots per stage: `CAPTURE=E4 npm run e2e -- capture-screens --workers=1` (una sola cuenta demo por rol: el código tiene 30 s de espera entre envíos).
  * Each screen is taken in the three projects (light, dark, mobile) as `<name>-<project>.png`.
  */
 type Shot = {
@@ -29,6 +29,14 @@ const STAGES: Record<string, Shot[]> = {
         await page.getByRole("button", { name: /^Bandeja/ }).click();
         await page.getByRole("dialog", { name: "Bandeja" }).waitFor();
       },
+    },
+  ],
+  E5: [
+    { name: "cursos", path: "/cursos", as: "estudiante" },
+    {
+      name: "cursos-busqueda",
+      path: "/cursos?q=castillo",
+      as: "estudiante",
     },
   ],
 };
