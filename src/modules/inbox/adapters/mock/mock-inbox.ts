@@ -1,8 +1,9 @@
-import { academicNow } from "@/lib/clock";
+import { academicNow, quetzales } from "@/lib/clock";
 import { parsed } from "@/lib/contract";
 import { ok, type PortError, type PortResult, type Result } from "@/lib/result";
 import { academic, type AcademicPort } from "@/modules/academic";
 import { assessment, type AssessmentPort } from "@/modules/assessment";
+import { ledger, methodLabel, type LedgerPort } from "@/modules/finance";
 import type { Actor } from "@/modules/identity";
 
 import { sortInbox, summarize } from "../../domain/rules";
@@ -12,6 +13,7 @@ import type { InboxPort } from "../../ports/inbox-port";
 export type InboxSources = {
   academic: () => AcademicPort;
   assessment: () => AssessmentPort;
+  ledger?: () => LedgerPort;
   /** Extra items (payments, the transfer queue) contributed by other modules. */
   extra?: (actor: Actor) => Promise<Result<InboxItem[], PortError>>;
 };
@@ -26,7 +28,7 @@ export class MockInbox implements InboxPort {
   private readonly read = new Map<string, Set<string>>();
 
   constructor(
-    private readonly sources: InboxSources = { academic, assessment },
+    private readonly sources: InboxSources = { academic, assessment, ledger },
     private readonly now: () => Date = academicNow,
   ) {}
 
@@ -159,6 +161,44 @@ export class MockInbox implements InboxPort {
           slot: ap.curso.slot,
           urgente: false,
           icono: "apelacion",
+        });
+    }
+
+    if (this.sources.ledger && actor.role === "estudiante") {
+      const charges = await this.sources.ledger().listCharges(actor);
+      if (!charges.ok) return charges;
+      for (const c of charges.value.filter((x) => x.estado === "pendiente"))
+        items.push({
+          id: `pago-${c.id}`,
+          tipo: "pago",
+          titulo: c.concepto,
+          detalle: `${quetzales(c.monto)} · ${
+            c.diasParaVencer < 0
+              ? `vencida hace ${-c.diasParaVencer} días`
+              : c.diasParaVencer === 0
+                ? "vence hoy"
+                : `vence en ${c.diasParaVencer} ${c.diasParaVencer === 1 ? "día" : "días"}`
+          } · sin comisión con ${methodLabel.ach}`,
+          fecha: `${c.vence}T23:59:00-06:00`,
+          href: `/pagos/pagar/${c.id}`,
+          urgente: c.diasParaVencer <= 1,
+          icono: "pago",
+        });
+    }
+
+    if (this.sources.ledger && actor.role === "administrativo") {
+      const queue = await this.sources.ledger().listTransferQueue(actor);
+      if (!queue.ok) return queue;
+      for (const t of queue.value.filter((x) => x.estado === "pendiente"))
+        items.push({
+          id: `comprobante-${t.id}`,
+          tipo: "pago",
+          titulo: `Comprobante de ${t.alumno}`,
+          detalle: `${t.concepto} · ${t.banco}`,
+          fecha: t.fecha,
+          href: `/admin/pagos?transferencia=${t.id}`,
+          urgente: false,
+          icono: "pago",
         });
     }
 

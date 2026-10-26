@@ -102,3 +102,12 @@ Cada entrada: fecha · decisión · por qué · cómo revertirla.
   puertos, así que entregar o leer se refleja al instante y el badge no puede discrepar de la lista.
 - **Límites entre módulos con ESLint:** fuera de un módulo nadie importa sus `adapters`; dentro de `src/modules/`,
   nadie importa `domain`, `ports` ni `adapters` de otro módulo (las pruebas sí, para armar escenarios).
+- **Comisión de tarjeta como costo del pagador [S, pendiente de la UFM]:** reemplaza la nota de E2 ("no se aplica
+  recargo"). Por indicación del cierre, `quote` suma 4.5% + Q2 al total con tarjeta o Apple Pay y ACH va sin comisión.
+  Es una política (`POLICY.comisionTarjeta.pagador`): si la UFM decide absorberla, se cambia a `universidad` y el total
+  vuelve a ser el monto del cargo, sin tocar código.
+- **Webhook de Recurrente:** `POST /api/webhooks/recurrente` verifica `x-recurrente-signature` (HMAC-SHA256 del cuerpo
+  crudo, comparación en tiempo constante) antes de leer el JSON; un evento repetido responde 200 sin liquidar dos
+  veces. En el mock, la página de checkout local firma el mismo evento y lo manda por el mismo manejador.
+- **Transferencias con comprobante:** van a una cola compartida del Administrativo; aprobar liquida el pago de la
+  sesión de la estudiante que lo envió. Rechazar exige un motivo.
