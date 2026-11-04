@@ -15,6 +15,7 @@ import {
   Checkout,
   ProviderMethod,
   Quote,
+  Settlement,
   WebhookEvent,
   WebhookResult,
   type FeePolicy,
@@ -142,6 +143,31 @@ export class MockRecurrente implements PaymentProviderPort {
       duplicado: false,
       reciboId: receipt.value.id,
     });
+  }
+
+  /**
+   * The statement mirrors MiU's own provider payments, plus one event MiU has no receipt for [S]: the
+   * kind of gap reconciliation exists to find.
+   */
+  async listSettlements(actor: Actor) {
+    if (actor.role !== "administrativo") return fail("forbidden");
+    const payments = await this.ledgerPort().listPayments(actor);
+    if (!payments.ok) return payments;
+    const rows = payments.value
+      .filter((p) => p.metodo === "ach" || p.metodo === "tarjeta" || p.metodo === "apple_pay")
+      .map((p) => ({
+        referencia: p.id,
+        metodo: p.metodo as z.infer<typeof ProviderMethod>,
+        total: p.total,
+        fecha: p.fecha,
+      }));
+    rows.push({
+      referencia: "evt_sin_recibo_4821",
+      metodo: "tarjeta",
+      total: 1500,
+      fecha: "2026-10-20T15:10:00-06:00",
+    });
+    return parsed(z.array(Settlement), rows);
   }
 
   async refund(actor: Actor, reciboId: string, monto: number) {

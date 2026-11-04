@@ -3,12 +3,15 @@ import { z } from "zod";
 import { academicNow, daysBetween } from "@/lib/clock";
 import { parsed } from "@/lib/contract";
 import { fail, type PortResult } from "@/lib/result";
-import { buildSeed, type Seed, type SeedPayment, type SeedTransfer } from "@/mock/seed";
+import { buildSeed, fullName, type Seed, type SeedPayment, type SeedTransfer } from "@/mock/seed";
 import type { Actor } from "@/modules/identity";
 
 import { cents, isSolventFrom, runningStatement } from "../../domain/rules";
 import {
+  AdminPayment,
   Balance,
+  CashAccount,
+  CashInput,
   Charge,
   QueuedTransfer,
   Receipt,
@@ -19,7 +22,11 @@ import {
 } from "../../domain/types";
 import type { LedgerPort, SolvencyPort } from "../../ports/ledger-port";
 
-type Payment = SeedPayment & { numero: string };
+type Payment = SeedPayment & {
+  numero: string;
+  aprobadoPor?: string;
+  motivoReembolso?: string;
+};
 type Workspace = { payments: Payment[]; queue: SeedTransfer[] };
 type StudentTransfer = SeedTransfer & { userId: string; paymentId: string };
 
@@ -33,7 +40,10 @@ const numero = (i: number) => `R-26-${String(4100 + i).padStart(6, "0")}`;
 export class MockLedger implements LedgerPort, SolvencyPort {
   private readonly workspaces = new Map<string, Workspace>();
   private readonly submitted: StudentTransfer[] = [];
-  private readonly seedReviews = new Map<string, "pagado" | "rechazado">();
+  private readonly seedReviews = new Map<string, { estado: "pagado" | "rechazado"; por: string }>();
+  /** Cash payments and refunds by the seeded Administrativo reach every workspace, like reviews. */
+  private readonly seedCash: Payment[] = [];
+  private readonly seedRefunds = new Map<string, string>();
   private counter = 0;
 
   constructor(
@@ -50,9 +60,19 @@ export class MockLedger implements LedgerPort, SolvencyPort {
       };
       this.workspaces.set(userId, ws);
     }
+    for (const cash of this.seedCash)
+      if (!ws.payments.some((p) => p.id === cash.id)) ws.payments.push({ ...cash });
     for (const p of ws.payments) {
       const reviewed = this.seedReviews.get(p.id);
-      if (reviewed && p.estado === "revision") p.estado = reviewed;
+      if (reviewed && p.estado === "revision") {
+        p.estado = reviewed.estado;
+        p.aprobadoPor = reviewed.por;
+      }
+      const motivo = this.seedRefunds.get(p.id);
+      if (motivo && p.estado === "pagado") {
+        p.estado = "reembolsado";
+        p.motivoReembolso = motivo;
+      }
     }
     return ws;
   }
@@ -309,14 +329,112 @@ export class MockLedger implements LedgerPort, SolvencyPort {
     const result = decision.aprobar ? ("pagado" as const) : ("rechazado" as const);
     if (student) {
       const p = this.ws(student.userId).payments.find((x) => x.id === student.paymentId);
-      if (p) p.estado = result;
+      if (p) {
+        p.estado = result;
+        p.aprobadoPor = actor.personId;
+      }
     } else if (own?.paymentId && this.isSeedStaff(actor)) {
-      this.seedReviews.set(own.paymentId, result);
+      this.seedReviews.set(own.paymentId, { estado: result, por: actor.personId });
     }
     return parsed(QueuedTransfer, {
       ...t,
       revisadoPor: actor.nombre,
       ...(decision.motivo ? { motivo: decision.motivo } : {}),
     });
+  }
+
+  private onlyAdmin(actor: Actor) {
+    return actor.role === "administrativo" ? null : fail("forbidden");
+  }
+
+  private studentName() {
+    const p = this.seed.people.find((x) => x.id === this.seed.student.id)!;
+    return fullName(p);
+  }
+
+  private toAdminPayment(actor: Actor, p: Payment) {
+    const own = p.aprobadoPor === actor.personId;
+    const reembolsable = p.estado === "pagado" && !own;
+    return {
+      ...this.toReceipt(p),
+      alumno: this.studentName(),
+      carne: this.seed.student.carne ?? "",
+      ...(p.aprobadoPor ? { aprobadoPor: p.aprobadoPor } : {}),
+      reembolsable,
+      ...(p.estado === "pagado" && own
+        ? { motivoBloqueo: "Tú lo aprobaste: otra persona debe reembolsarlo" }
+        : {}),
+      ...(p.motivoReembolso ? { motivoReembolso: p.motivoReembolso } : {}),
+    };
+  }
+
+  async listPayments(actor: Actor) {
+    const denied = this.onlyAdmin(actor);
+    if (denied) return denied;
+    return parsed(
+      z.array(AdminPayment),
+      this.ws(actor.userId)
+        .payments.filter((p) => p.estado === "pagado" || p.estado === "reembolsado")
+        .sort((a, b) => b.fecha.localeCompare(a.fecha))
+        .map((p) => this.toAdminPayment(actor, p)),
+    );
+  }
+
+  async findCashAccount(actor: Actor, carne: string) {
+    const denied = this.onlyAdmin(actor);
+    if (denied) return denied;
+    if (carne.trim() !== this.seed.student.carne)
+      return fail("not_found", "No encontramos ese carné");
+    return parsed(CashAccount, {
+      alumno: this.studentName(),
+      carne: this.seed.student.carne ?? "",
+      pendientes: this.charges(actor).filter((c) => c.estado === "pendiente"),
+    });
+  }
+
+  async registerCashPayment(actor: Actor, input: CashInput) {
+    const denied = this.onlyAdmin(actor);
+    if (denied) return denied;
+    const body = CashInput.safeParse(input);
+    if (!body.success) return fail("invalid", body.error.issues[0]?.message);
+    if (body.data.carne !== this.seed.student.carne)
+      return fail("not_found", "No encontramos ese carné");
+    const charge = this.charges(actor).find((c) => c.id === body.data.chargeId);
+    if (!charge) return fail("not_found");
+    if (charge.estado !== "pendiente") return fail("invalid", "Este cargo ya no está pendiente");
+    const p: Payment = {
+      id: `pg-caja-${++this.counter}`,
+      numero: numero(this.seed.payments.length + this.counter),
+      studentId: this.seed.student.id,
+      chargeId: charge.id,
+      concepto: charge.concepto,
+      monto: charge.monto,
+      metodo: "presencial",
+      detalleMetodo: `Pago en caja · atendió ${actor.nombre}`,
+      fecha: this.now().toISOString(),
+      estado: "pagado",
+      comision: 0,
+      aprobadoPor: actor.personId,
+    };
+    this.ws(actor.userId).payments.push(p);
+    if (this.isSeedStaff(actor)) this.seedCash.push({ ...p });
+    return parsed(Receipt, this.toReceipt(p));
+  }
+
+  async refundPayment(actor: Actor, paymentId: string, motivo: string) {
+    const denied = this.onlyAdmin(actor);
+    if (denied) return denied;
+    if (motivo.trim().length < 10)
+      return fail("invalid", "Explica el motivo en al menos 10 caracteres");
+    const p = this.ws(actor.userId).payments.find((x) => x.id === paymentId);
+    if (!p) return fail("not_found");
+    if (p.estado === "reembolsado") return fail("invalid", "Este pago ya se reembolsó");
+    if (p.estado !== "pagado") return fail("invalid", "Solo se reembolsa un pago confirmado");
+    if (p.aprobadoPor === actor.personId)
+      return fail("forbidden", "Otra persona debe reembolsar un pago que tú aprobaste");
+    p.estado = "reembolsado";
+    p.motivoReembolso = motivo.trim();
+    if (this.isSeedStaff(actor)) this.seedRefunds.set(p.id, motivo.trim());
+    return parsed(AdminPayment, this.toAdminPayment(actor, p));
   }
 }

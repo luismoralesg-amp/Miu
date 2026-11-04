@@ -21,3 +21,28 @@ export function runningStatement(
 export function isSolventFrom(charges: Array<{ estado: string; diasParaVencer: number }>) {
   return !charges.some((c) => c.estado === "pendiente" && c.diasParaVencer < 0);
 }
+
+export type SettlementRow = { referencia: string; total: number; fecha: string };
+
+/**
+ * Matches what MiU recorded against what the provider settled, by reference: the same payment on
+ * both sides (even with a different amount, which is flagged), only in MiU, or only at the provider.
+ */
+export function reconcile<A extends SettlementRow, B extends SettlementRow>(
+  miu: A[],
+  proveedor: B[],
+) {
+  const byRef = new Map(proveedor.map((r) => [r.referencia, r]));
+  const conciliados: Array<{ miu: A; proveedor: B }> = [];
+  const diferencias: Array<{ miu: A; proveedor: B }> = [];
+  const soloMiu: A[] = [];
+  for (const row of miu) {
+    const other = byRef.get(row.referencia);
+    if (!other) soloMiu.push(row);
+    else if (cents(row.total) === cents(other.total))
+      conciliados.push({ miu: row, proveedor: other });
+    else diferencias.push({ miu: row, proveedor: other });
+    byRef.delete(row.referencia);
+  }
+  return { conciliados, diferencias, soloMiu, soloProveedor: [...byRef.values()] };
+}

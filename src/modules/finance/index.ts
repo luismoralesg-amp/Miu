@@ -7,7 +7,8 @@ import type { LedgerPort, SolvencyPort } from "./ports/ledger-port";
 
 export type { LedgerPort, SolvencyPort } from "./ports/ledger-port";
 export * from "./domain/types";
-export { cents, isSolventFrom, runningStatement } from "./domain/rules";
+export { cents, isSolventFrom, reconcile, runningStatement } from "./domain/rules";
+export type { SettlementRow } from "./domain/rules";
 
 /** MIU_ADAPTER_LEDGER=mock|real. One adapter answers both the ledger and solvency. */
 export function ledger(): LedgerPort & SolvencyPort {

@@ -147,3 +147,14 @@ describe("payment policy", () => {
     expect(value(await provider.getPolicy()).bancosAch).toContain("BAC");
   });
 });
+
+describe("settlement statement", () => {
+  it("lists the provider's payments, plus one MiU has no receipt for; only the Administrativo", async () => {
+    const { provider } = setup();
+    expect(await provider.listSettlements(student())).toMatchObject({ error: "forbidden" });
+    const rows = value(await provider.listSettlements(admin()));
+    expect(rows.some((r) => r.referencia === "pg-octubre")).toBe(true);
+    expect(rows.some((r) => r.referencia === "evt_sin_recibo_4821")).toBe(true);
+    expect(rows.every((r) => r.metodo !== ("presencial" as string))).toBe(true);
+  });
+});

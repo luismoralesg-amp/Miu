@@ -107,3 +107,27 @@ export type SettledPayment = {
   fecha: string;
   referenciaProveedor: string;
 };
+
+/** A payment as the Administrativo sees it: whose, how, and whether this person may refund it. */
+export const AdminPayment = Receipt.extend({
+  alumno: z.string(),
+  carne: z.string(),
+  /** Whoever approved or took the payment (a person id); a refund needs someone else. */
+  aprobadoPor: z.string().optional(),
+  /** Refundable by the signed-in person: paid, and not approved by themselves. */
+  reembolsable: z.boolean(),
+  motivoBloqueo: z.string().optional(),
+  motivoReembolso: z.string().optional(),
+});
+export type AdminPayment = z.infer<typeof AdminPayment>;
+
+/** A student account found at the cashier by carné, with what they can pay now. */
+export const CashAccount = z.object({
+  alumno: z.string(),
+  carne: z.string(),
+  pendientes: z.array(Charge),
+});
+export type CashAccount = z.infer<typeof CashAccount>;
+
+export const CashInput = z.object({ carne: z.string().trim().min(4), chargeId: z.string() });
+export type CashInput = z.infer<typeof CashInput>;

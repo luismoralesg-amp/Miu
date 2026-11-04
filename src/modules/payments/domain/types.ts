@@ -59,3 +59,12 @@ export const WebhookResult = z.object({
   reciboId: z.string().optional(),
 });
 export type WebhookResult = z.infer<typeof WebhookResult>;
+
+/** One line of the provider's settlement statement, by the reference MiU also records. */
+export const Settlement = z.object({
+  referencia: z.string(),
+  metodo: ProviderMethod,
+  total: z.number(),
+  fecha: z.string(),
+});
+export type Settlement = z.infer<typeof Settlement>;

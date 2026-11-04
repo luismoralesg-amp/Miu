@@ -1,7 +1,7 @@
 import type { PortResult } from "@/lib/result";
 import type { Actor } from "@/modules/identity";
 
-import type { Checkout, ProviderMethod, Quote, WebhookResult } from "../domain/types";
+import type { Checkout, ProviderMethod, Quote, Settlement, WebhookResult } from "../domain/types";
 
 /**
  * The card/ACH processor. Card data never touches MiU: the student pays on the provider's hosted
@@ -28,6 +28,8 @@ export interface PaymentProviderPort {
   getCheckout(actor: Actor, checkoutId: string): PortResult<Checkout>;
   /** Verifies the signature; a repeated event is acknowledged but never applied twice. */
   handleWebhook(rawBody: string, signature: string | null): PortResult<WebhookResult>;
+  /** Administrativo: what the provider says it settled, to reconcile against MiU's receipts. */
+  listSettlements(actor: Actor): PortResult<Settlement[]>;
   refund(
     actor: Actor,
     reciboId: string,

@@ -2,7 +2,10 @@ import type { PortResult } from "@/lib/result";
 import type { Actor } from "@/modules/identity";
 
 import type {
+  AdminPayment,
   Balance,
+  CashAccount,
+  CashInput,
   Charge,
   QueuedTransfer,
   Receipt,
@@ -29,6 +32,14 @@ export interface LedgerPort {
     transferId: string,
     decision: { aprobar: boolean; motivo?: string },
   ): PortResult<QueuedTransfer>;
+  /** Administrativo: payments taken and refunded, with whether the actor may refund each one. */
+  listPayments(actor: Actor): PortResult<AdminPayment[]>;
+  /** Cashier: finds a student by carné and what they can pay. */
+  findCashAccount(actor: Actor, carne: string): PortResult<CashAccount>;
+  /** Cashier: records a payment taken in person; settles the charge. */
+  registerCashPayment(actor: Actor, input: CashInput): PortResult<Receipt>;
+  /** Marks a paid payment as refunded. Never by the person who approved or took it. */
+  refundPayment(actor: Actor, paymentId: string, motivo: string): PortResult<AdminPayment>;
 }
 
 /** Solvency is a separate question other systems ask (enrollment, documents). */

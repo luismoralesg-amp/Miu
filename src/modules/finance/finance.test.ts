@@ -5,7 +5,7 @@ import { admin, student, value } from "@/test/actors";
 
 import { MockLedger } from "./adapters/mock/mock-ledger";
 import { createRealLedger } from "./adapters/real/real-ledger";
-import { isSolventFrom, runningStatement } from "./domain/rules";
+import { isSolventFrom, reconcile, runningStatement } from "./domain/rules";
 
 const fresh = (now = new Date(at(0, "07:42"))) => new MockLedger(undefined, () => now);
 
@@ -22,6 +22,101 @@ describe("ledger rules", () => {
     expect(isSolventFrom([{ estado: "pendiente", diasParaVencer: 6 }])).toBe(true);
     expect(isSolventFrom([{ estado: "en_revision", diasParaVencer: -3 }])).toBe(true);
     expect(isSolventFrom([{ estado: "pendiente", diasParaVencer: -1 }])).toBe(false);
+  });
+});
+
+describe("reconcile", () => {
+  const row = (referencia: string, total: number) => ({ referencia, total, fecha: "2026-10-01" });
+
+  it("splits matched, different, only in MiU and only at the provider", () => {
+    const r = reconcile(
+      [row("a", 100), row("b", 200), row("c", 300)],
+      [row("a", 100), row("b", 199.99), row("d", 50)],
+    );
+    expect(r.conciliados.map((x) => x.miu.referencia)).toEqual(["a"]);
+    expect(r.diferencias.map((x) => x.miu.referencia)).toEqual(["b"]);
+    expect(r.soloMiu.map((x) => x.referencia)).toEqual(["c"]);
+    expect(r.soloProveedor.map((x) => x.referencia)).toEqual(["d"]);
+  });
+
+  it("compares to the cent", () => {
+    const r = reconcile([row("a", 0.1 + 0.2)], [row("a", 0.3)]);
+    expect(r.conciliados).toHaveLength(1);
+  });
+
+  it("empty on both sides is empty", () => {
+    expect(reconcile([], [])).toEqual({
+      conciliados: [],
+      diferencias: [],
+      soloMiu: [],
+      soloProveedor: [],
+    });
+  });
+});
+
+describe("cashier and refunds (Administrativo)", () => {
+  it("only the Administrativo reaches payments, the cashier and refunds", async () => {
+    const port = fresh();
+    expect(await port.listPayments(student())).toMatchObject({ error: "forbidden" });
+    expect(await port.findCashAccount(student(), "2024-0187")).toMatchObject({
+      error: "forbidden",
+    });
+    expect(
+      await port.registerCashPayment(student(), {
+        carne: "2024-0187",
+        chargeId: "cuota-noviembre",
+      }),
+    ).toMatchObject({ error: "forbidden" });
+    expect(await port.refundPayment(student(), "pg-octubre", "Motivo suficiente")).toMatchObject({
+      error: "forbidden",
+    });
+  });
+
+  it("cash: finds the carné, takes the payment once, and the charge is paid", async () => {
+    const port = fresh();
+    const rodrigo = admin();
+    expect(await port.findCashAccount(rodrigo, "9999-0000")).toMatchObject({ error: "not_found" });
+    const account = value(await port.findCashAccount(rodrigo, "2024-0187"));
+    expect(account.pendientes.map((c) => c.id)).toContain("cuota-noviembre");
+    const receipt = value(
+      await port.registerCashPayment(rodrigo, { carne: "2024-0187", chargeId: "cuota-noviembre" }),
+    );
+    expect(receipt).toMatchObject({ metodo: "presencial", estado: "pagado", comision: 0 });
+    expect(
+      await port.registerCashPayment(rodrigo, { carne: "2024-0187", chargeId: "cuota-noviembre" }),
+    ).toMatchObject({ error: "invalid" });
+    const mine = value(await port.listPayments(rodrigo)).find((p) => p.id === receipt.id)!;
+    expect(mine).toMatchObject({ reembolsable: false, aprobadoPor: "p-rodrigo" });
+    expect(mine.motivoBloqueo).toMatch(/otra persona/i);
+  });
+
+  it("refund: a reason is required, never by who took the payment, and once", async () => {
+    const port = fresh();
+    const rodrigo = admin();
+    const taken = value(
+      await port.registerCashPayment(rodrigo, { carne: "2024-0187", chargeId: "cuota-noviembre" }),
+    );
+    // Rodrigo took it: someone else must refund it.
+    expect(await port.refundPayment(rodrigo, taken.id, "El cobro fue por error")).toMatchObject({
+      error: "forbidden",
+    });
+    // A payment nobody here approved (seed history) can be refunded, with a reason.
+    expect(await port.refundPayment(rodrigo, "pg-octubre", "corto")).toMatchObject({
+      error: "invalid",
+    });
+    const refunded = value(
+      await port.refundPayment(rodrigo, "pg-octubre", "Cobro duplicado confirmado con el banco"),
+    );
+    expect(refunded).toMatchObject({ estado: "reembolsado", reembolsable: false });
+    expect(
+      await port.refundPayment(rodrigo, "pg-octubre", "Cobro duplicado otra vez"),
+    ).toMatchObject({
+      error: "invalid",
+    });
+    // The student's receipt says refunded, and the charge is open again.
+    expect(
+      value(await port.listReceipts(student())).find((r) => r.id === "pg-octubre"),
+    ).toBeTruthy();
   });
 });
 

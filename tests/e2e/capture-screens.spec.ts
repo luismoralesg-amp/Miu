@@ -222,6 +222,9 @@ const STAGES: Record<string, Shot[]> = {
     { name: "politicas", path: "/admin/politicas", as: "administrativo" },
     { name: "roles", path: "/admin/roles", as: "administrativo" },
     { name: "admin-pagos", path: "/admin/pagos", as: "administrativo" },
+    { name: "caja", path: "/admin/pagos/caja?carne=2024-0187", as: "administrativo" },
+    { name: "conciliacion", path: "/admin/pagos/conciliacion", as: "administrativo" },
+    { name: "reembolsos", path: "/admin/pagos/reembolsos", as: "administrativo" },
   ],
   E7: [
     { name: "pagos", path: "/pagos", as: "estudiante" },

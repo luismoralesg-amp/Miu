@@ -3,6 +3,7 @@ import { PartyPopper } from "lucide-react";
 
 import { EmptyState, PortProblem } from "@/design-system/components";
 import { requirePermission } from "@/authz/server";
+import { PagosTabs } from "@/features/admin/pagos-tabs";
 import { TransferRow } from "@/features/admin/transfer-row";
 import { plural } from "@/features/shared/format";
 import { academicNow, quetzales, timeAgo } from "@/lib/clock";
@@ -37,6 +38,7 @@ export default async function AdminPagosPage({ searchParams }: Props) {
           Pagos y conciliación
         </h1>
       </section>
+      <PagosTabs />
       {!queue.ok ? (
         <PortProblem error={queue.error} what="la cola" className="border-y border-border" />
       ) : (
@@ -86,8 +88,8 @@ export default async function AdminPagosPage({ searchParams }: Props) {
             </section>
           )}
           <p className="mt-6 text-caption text-fg-muted">
-            Cada aprobación o rechazo queda en la auditoría con tu nombre. Los reembolsos piden una
-            segunda persona.
+            Cada aprobación o rechazo queda en la auditoría con tu nombre. Un reembolso nunca lo
+            hace quien aprobó el pago.
           </p>
         </>
       )}

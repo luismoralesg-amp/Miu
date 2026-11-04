@@ -12,3 +12,5 @@
 - Siguiente ítem: P2-14 · E11a · Administración: políticas y roles.
 - 2026-11-04 · P2-14 hecho: módulo `policy` y `/admin/{politicas,roles}`. Lo que se aprendió: React 19 reinicia los campos no controlados después de un submit, incluso uno rechazado; los de este formulario son controlados. La política de las cuentas de prueba es por cuenta (Pagos no recibe actor, así que solo lee la compartida).
 - Siguiente ítem: P2-15 · E11b · Administración: pagos, conciliación, caja y reembolsos.
+- 2026-11-04 · P2-15 hecho: caja, conciliación y reembolsos. Lo que se aprendió: si una acción cambia lo que lista la página (el cargo deja de estar pendiente), la fila con su aviso desaparece al revalidar; en la caja no se revalida.
+- Siguiente ítem: P2-16 · E11c · Administración: auditoría, apelaciones y estadísticas.
