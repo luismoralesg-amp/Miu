@@ -4,6 +4,11 @@ const port = Number(process.env.E2E_PORT ?? 3100);
 const baseURL = `http://localhost:${port}`;
 /** Same build, started without MIU_DEV_TOOLS: what production looks like (tests/e2e/production.spec.ts). */
 export const PROD_PORT = port + 1;
+/**
+ * A third server for tests/e2e/serverless.spec.ts: they call /api/dev/cold-start, which forgets every
+ * mock adapter's memory, and that must not reach the flows other tests run on the main server.
+ */
+export const COLD_PORT = port + 2;
 
 // Playwright's bundled Chromium is not downloaded yet; any local Chromium-based browser works
 // meanwhile by pointing PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH at its binary.
@@ -50,6 +55,13 @@ export default defineConfig({
       url: `http://localhost:${PROD_PORT}/api/health`,
       reuseExistingServer: !process.env.CI,
       env: { MIU_DEV_TOOLS: "" },
+      timeout: 60_000,
+    },
+    {
+      command: `npm run start -- --port ${COLD_PORT}`,
+      url: `http://localhost:${COLD_PORT}/api/health`,
+      reuseExistingServer: !process.env.CI,
+      env: { MIU_DEV_TOOLS: "1" },
       timeout: 60_000,
     },
   ],

@@ -164,3 +164,19 @@ Cada entrada: fecha · decisión · por qué · cómo revertirla.
 - **Accesibilidad:** el recorrido con axe sale de la tabla `NAV` que usa la app, así que una sección nueva queda cubierta
   sola; el recorrido con teclado exigió quitar `focus-visible:outline-none` de las filas de Cursos.
 
+## 2026-11-04 · Demo sin estado compartido (Vercel)
+
+- **Síntoma:** en Vercel, Notas, Pagos y las descargas decían «Inicia sesión» aunque se hubiera entrado. La sesión, el código de
+  entrada y el rol activo vivían en el `Map` de una instancia (`MockIdentity`); la siguiente petición caía en otra instancia
+  que no los conocía. En local, un solo proceso lo escondía.
+- **Cookie firmada:** `Session.id` del mock es ahora un token `payload.firma` (HMAC-SHA256 con `MIU_SESSION_SECRET`, `src/lib/demo-token.ts`)
+  con usuario, dispositivo, vencimiento y rol; cualquier instancia lo verifica y reconstruye la sesión. El rol cambia emitiendo
+  una cookie nueva (`setActiveRole` devuelve el id que hay que guardar). Un usuario nuevo recibe un id derivado de su correo, no uno al azar.
+- **Códigos derivados:** el código de entrada, el enlace mágico y los códigos de verificación de Cuenta y Asignación se derivan
+  del secreto, el destinatario y una ventana de tiempo; valen hasta dos ventanas. Siguen siendo de un solo uso y con tope de
+  intentos, pero esos contadores son de la instancia (lo que un chequeo sin estado no puede saber).
+- **Lo que no se resolvió:** los cambios que hace la demo siguen en memoria de la instancia; un almacén externo sería una
+  dependencia nueva y no se agregó. Revocar un dispositivo no alcanza a otras instancias.
+- **Prueba:** `/api/dev/cold-start` (404 sin `MIU_DEV_TOOLS`) vacía los registros de los mocks; `serverless.spec.ts` lo llama en
+  medio de cada flujo.
+

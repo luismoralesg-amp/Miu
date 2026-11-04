@@ -1,4 +1,4 @@
-import type { Page } from "@playwright/test";
+import { expect, type Page } from "@playwright/test";
 
 /** Waits for entrance animations to finish so checks see the settled page (looping ones are ignored). */
 export async function waitForAnimations(page: Page) {
@@ -48,12 +48,19 @@ export async function clearFault(page: Page) {
   await page.context().clearCookies({ name: "miu-falla" });
 }
 
-/** Switches the active role with the development switcher in the account menu. */
+/**
+ * Switches the active role with the development switcher in the account menu. The role travels in
+ * the session cookie, so this waits for the browser to receive the new one before going on.
+ */
 export async function switchRole(
   page: Page,
   role: "estudiante" | "maestro" | "auxiliar" | "administrativo",
 ) {
+  const session = async () =>
+    (await page.context().cookies()).find((c) => c.name === "miu-sesion")?.value;
+  const before = await session();
   await page.getByRole("button", { name: /^Tu cuenta/ }).click();
   await page.getByLabel("Rol (desarrollo)").selectOption(role);
+  await expect.poll(session).not.toBe(before);
   await page.waitForLoadState("networkidle");
 }

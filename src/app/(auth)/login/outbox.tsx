@@ -7,7 +7,7 @@ import { devToolsEnabled } from "@/modules/identity/session";
  */
 export async function DevOutbox({ correo }: { correo: string | null }) {
   if (!devToolsEnabled() || !correo) return null;
-  const mensaje = (await identity().outbox()).find((m) => m.para === correo);
+  const mensaje = (await identity().outbox(correo)).find((m) => m.para === correo);
   if (!mensaje) return null;
   return (
     <aside

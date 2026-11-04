@@ -5,6 +5,7 @@ import {
   CODE_TTL_MS,
   MAX_ATTEMPTS,
   RESEND_COOLDOWN_MS,
+  SESSION_TTL_MS,
   acceptGoogleClaims,
   describeUserAgent,
   maskEmail,
@@ -170,5 +171,106 @@ describe("MockIdentity", () => {
     );
     expect(again.ok && again.value.session.deviceId).toBe(first.value.session.deviceId);
     expect(await id.listDevices("u-ana")).toHaveLength(3);
+  });
+});
+
+/** Serverless: each request may land on a new instance, so a second `MockIdentity` stands for it. */
+describe("MockIdentity across server instances", () => {
+  const now = () => Date.parse("2026-10-22T13:42:00Z");
+  const correo = "ana.lopez.demo@ufm.edu";
+
+  it("a session opened on one instance is valid on another, with the same user and role", async () => {
+    const a = new MockIdentity(now);
+    await a.startEmailSignIn(correo);
+    const code = (await a.outbox())[0]!.codigo;
+    const signed = await a.verifyCode(correo, code, client, false);
+    if (!signed.ok) throw new Error("sign-in failed");
+
+    const b = new MockIdentity(now);
+    const seen = await b.getSession(signed.value.session.id);
+    expect(seen).toMatchObject({ ok: true, value: { user: { id: "u-ana", correo } } });
+    // The device of that session is known to the new instance too.
+    expect((await b.listDevices("u-ana")).some((d) => d.id === signed.value.session.deviceId)).toBe(
+      true,
+    );
+
+    const switched = await b.setActiveRole(signed.value.session.id, "maestro");
+    if (!switched.ok) throw new Error("role switch failed");
+    const c = new MockIdentity(now);
+    expect(await c.getSession(switched.value.id)).toMatchObject({
+      ok: true,
+      value: { session: { rolActivo: "maestro" } },
+    });
+    // The old cookie keeps the old role: the role is in the cookie, not in any memory.
+    expect((await c.getSession(signed.value.session.id)) as object).not.toMatchObject({
+      value: { session: { rolActivo: "maestro" } },
+    });
+  });
+
+  it("refuses a forged, tampered, expired or foreign cookie", async () => {
+    const a = new MockIdentity(now);
+    await a.startEmailSignIn(correo);
+    const signed = await a.verifyCode(correo, (await a.outbox())[0]!.codigo, client, false);
+    if (!signed.ok) throw new Error("sign-in failed");
+    const [body, sig] = signed.value.session.id.split(".");
+    const claims = JSON.parse(Buffer.from(body!, "base64url").toString());
+    const forged = Buffer.from(
+      JSON.stringify({ ...claims, uid: "u-rodrigo", c: "rodrigo.aju.demo@ufm.edu" }),
+    ).toString("base64url");
+    const b = new MockIdentity(now);
+    for (const bad of [`${forged}.${sig}`, "nada", `${body}.AAAA`, "x.y.z"])
+      expect(await b.getSession(bad)).toMatchObject({ ok: false, error: "sesion_invalida" });
+    const later = new MockIdentity(() => now() + SESSION_TTL_MS + 1);
+    expect(await later.getSession(signed.value.session.id)).toMatchObject({ ok: false });
+  });
+
+  it("a code and a magic link sent by one instance work on another, once each", async () => {
+    const a = new MockIdentity(now);
+    await a.startEmailSignIn(correo);
+    const sent = (await a.outbox())[0]!;
+    const token = new URL(sent.enlace, "http://x").searchParams.get("token")!;
+
+    const b = new MockIdentity(now);
+    // The page shows what was sent even though this instance never sent it.
+    expect((await b.outbox(correo))[0]).toMatchObject({ codigo: sent.codigo });
+    expect((await b.verifyCode(correo, sent.codigo, client, false)).ok).toBe(true);
+    expect(await b.verifyCode(correo, sent.codigo, client, false)).toMatchObject({ ok: false });
+    expect(await b.verifyCode(correo, "000000", client, false)).toMatchObject({ ok: false });
+
+    const c = new MockIdentity(now);
+    expect(await c.peekMagicLink(token)).toMatchObject({ ok: true, value: { correo } });
+    expect((await c.consumeMagicLink(token, client, false)).ok).toBe(true);
+    expect(await c.consumeMagicLink(token, client, false)).toMatchObject({ ok: false });
+    expect(await c.peekMagicLink("no-es-un-enlace")).toMatchObject({ ok: false });
+  });
+
+  it("locks a derived code after five wrong tries, and ends a signed-out session on that instance", async () => {
+    const b = new MockIdentity(now);
+    for (let i = 0; i < MAX_ATTEMPTS - 1; i++) await b.verifyCode(correo, "000000", client, false);
+    expect(await b.verifyCode(correo, "000000", client, false)).toMatchObject({
+      error: "bloqueado",
+    });
+
+    const a = new MockIdentity(now);
+    await a.startEmailSignIn("ana.nueva@ufm.edu");
+    const signed = await a.verifyCode(
+      "ana.nueva@ufm.edu",
+      (await a.outbox())[0]!.codigo,
+      client,
+      false,
+    );
+    if (!signed.ok) throw new Error("sign-in failed");
+    // A new address becomes the same student every time, on any instance.
+    const again = new MockIdentity(now);
+    await again.startEmailSignIn("ana.nueva@ufm.edu");
+    const second = await again.verifyCode(
+      "ana.nueva@ufm.edu",
+      (await again.outbox())[0]!.codigo,
+      client,
+      false,
+    );
+    expect(second.ok && second.value.user.id).toBe(signed.value.user.id);
+    await a.signOut(signed.value.session.id);
+    expect(await a.getSession(signed.value.session.id)).toMatchObject({ ok: false });
   });
 });

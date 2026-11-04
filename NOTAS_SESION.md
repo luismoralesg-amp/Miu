@@ -29,3 +29,4 @@
 - 2026-11-04 · P3-3 hecho: 18 puertos con su fila; [S] y decisiones al día.
 - Siguiente ítem: P3-4 · Reporte de cierre (docs/etapas/E12/REPORTE.md, máximo 40 líneas) con check, build y e2e completos en la misma corrida.
 - 2026-11-04 · P3-4 hecho: reporte de cierre y una sola pasada verde (check 477, build, e2e 254 + 31 omitidas). Backlog completo, sin bloqueos. Falta solo lo que depende de la UFM y de Luis (ver REPORTE.md): adaptadores reales, confirmar los [S], push y deploy.
+- 2026-11-04 · Demo en Vercel: la sesión pasó a una cookie firmada (MIU_SESSION_SECRET) y los códigos se derivan; ver DECISIONES.md y README (variables de entorno). Prueba: serverless.spec.ts con /api/dev/cold-start en su propio servidor (puerto 3102).

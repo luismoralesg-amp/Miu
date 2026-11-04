@@ -88,6 +88,32 @@ Supuestos sin confirmar con la UFM (marcados `[S]` en los documentos): umbral de
 comisión de tarjeta (4.5% + Q2) como costo de quien paga, bancos del checkout ACH, cierre de nota final solo del
 Maestro (o el Auxiliar al que el Administrativo se lo otorgue) y semana de exámenes del 26 al 30 de octubre.
 
+## La demo en Vercel (serverless)
+
+Vercel atiende cada petición desde una instancia que puede ser nueva, así que la demo no depende de la memoria del
+servidor: la sesión viaja en una cookie firmada (HMAC-SHA256), el código de entrada, el enlace y los códigos de
+verificación se derivan del secreto, y todo lo demás sale del seed determinista de cada petición.
+
+Variables de entorno (Project → Settings → Environment Variables, en Production y Preview):
+
+| Variable                    | Valor                                                          | Para qué                                                                                                                                                                                       |
+| --------------------------- | -------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `MIU_SESSION_SECRET`        | una cadena larga y aleatoria, p. ej. `openssl rand -base64 32` | **Obligatoria en la práctica.** Firma la cookie de sesión y deriva los códigos. Sin ella se usa un secreto incluido en el código: la demo funciona, pero cualquiera podría fabricar una sesión |
+| `MIU_DEV_TOOLS`             | `1`                                                            | Muestra el código de entrada en pantalla (no hay correo real) y el selector de rol. Sin ella no hay forma de entrar con correo; el botón de Google del mock sí entra como Ana                  |
+| `RECURRENTE_WEBHOOK_SECRET` | opcional                                                       | Secreto del webhook simulado de Recurrente; sin ella usa uno de demostración                                                                                                                   |
+| `MIU_NOW`                   | opcional                                                       | Otro momento de los mismos datos (`2026-10-22T20:15:00-06:00` para la noche)                                                                                                                   |
+
+No hace falta nada más: `NODE_ENV`, el HTTPS y la cookie `secure` los resuelve Vercel. Todos los adaptadores son `mock` por defecto.
+
+**Qué persiste y qué no:** la sesión, el rol activo y los códigos sobreviven a cualquier instancia. Lo que la demo _cambia_
+(entregar una tarea, calificar, pagar, reembolsar, cambiar una política) vive en la memoria de la instancia que lo atendió:
+se ve mientras esa instancia siga viva y puede reiniciarse. Para que persista entre instancias haría falta un almacén
+externo (por ejemplo Upstash Redis o Vercel KV), que no está agregado. Revocar un dispositivo o cerrar sesión funciona en
+la instancia que lo atiende; en otra, la cookie anterior seguiría valiendo hasta que venza.
+
+Se prueba con `next build && next start` y `npm run e2e -- serverless`: `POST /api/dev/cold-start` (solo con
+`MIU_DEV_TOOLS=1`) olvida la memoria de los mocks, como una instancia nueva, y los flujos tienen que seguir funcionando.
+
 ## App instalable
 
 En el build de producción (`npm run build && npm start`) MiU se puede instalar y, sin conexión, muestra una página propia.

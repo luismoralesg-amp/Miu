@@ -46,8 +46,14 @@ export interface IdentityPort {
   ): Promise<Result<{ sesionesCerradas: number }, IdentityError>>;
   registerPasskey(userId: string, deviceId: string): Promise<Result<Device, IdentityError>>;
 
-  /** Development only: role switcher. */
+  /**
+   * Development only: role switcher. The answer carries the session id to store from now on: in the
+   * mock the role travels inside the signed cookie, so the old id keeps the old role.
+   */
   setActiveRole(sessionId: string, role: Role): Promise<Result<Session, IdentityError>>;
-  /** Development only: the mock outbox, so codes and links can be read without real email. */
-  outbox(): Promise<MailMessage[]>;
+  /**
+   * Development only: the mock outbox, so codes and links can be read without real email. With the
+   * address waiting for its code, the mock answers even when another server instance sent it.
+   */
+  outbox(correo?: string): Promise<MailMessage[]>;
 }

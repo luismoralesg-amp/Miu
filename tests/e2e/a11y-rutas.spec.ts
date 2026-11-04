@@ -62,6 +62,8 @@ for (const role of ["estudiante", "maestro", "auxiliar", "administrativo"] as co
         continue;
       }
       try {
+        // Under load, the first screen after sign-in can still be settling.
+        await page.waitForLoadState("networkidle");
         await expectAccessible(page);
       } catch (e) {
         failures.push(`${path}: ${(e as Error).message.split("\n").slice(0, 6).join(" ")}`);

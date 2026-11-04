@@ -1,9 +1,8 @@
-import { randomInt } from "node:crypto";
-
 import { z } from "zod";
 
 import { academicNow } from "@/lib/clock";
 import { parsed } from "@/lib/contract";
+import { acceptsDemoCode, demoCode } from "@/lib/demo-token";
 import { fail, ok, type PortResult } from "@/lib/result";
 import { at, buildSeed, type Seed } from "@/mock/seed";
 import type { Actor } from "@/modules/identity";
@@ -42,6 +41,9 @@ type Workspace = {
  * sections each on fixed schedules. Saving and dropping need a fresh one-time code (step-up).
  */
 export class MockEnrollment implements EnrollmentPort {
+  /** Codes already used on this instance: a derived code must stay single-use. */
+  private readonly spent = new Set<string>();
+
   private readonly ws = new Map<string, Workspace>();
 
   constructor(
@@ -107,9 +109,18 @@ export class MockEnrollment implements EnrollmentPort {
 
   private verify(actor: Actor, codigo: string) {
     const c = this.w(actor).code;
-    if (!c || c.expira < this.clock()) return fail("invalid", "El código venció; pide uno nuevo");
-    if (c.value !== codigo.trim()) return fail("invalid", "El código no coincide");
+    const given = codigo.trim();
+    const key = `${actor.userId}:${given}`;
+    if (this.spent.has(key)) return fail("invalid", "El código venció; pide uno nuevo");
+    // Asked on another server instance (serverless): the code is derived, so check it again.
+    const derived =
+      !c && acceptsDemoCode("stepup-enrollment", actor.userId, given, this.clock(), STEP_UP_MS);
+    if (!derived) {
+      if (!c || c.expira < this.clock()) return fail("invalid", "El código venció; pide uno nuevo");
+      if (c.value !== given) return fail("invalid", "El código no coincide");
+    }
     delete this.w(actor).code;
+    this.spent.add(key);
     return null;
   }
 
@@ -131,7 +142,13 @@ export class MockEnrollment implements EnrollmentPort {
   async requestStepUp(actor: Actor) {
     const denied = this.only(actor);
     if (denied) return denied;
-    const value = String(randomInt(0, 1_000_000)).padStart(6, "0");
+    const value = demoCode(
+      "stepup-enrollment",
+      actor.userId,
+      Math.floor(this.clock() / STEP_UP_MS),
+    );
+    // Asking again re-issues the same derived code, so it becomes usable once more.
+    this.spent.delete(`${actor.userId}:${value}`);
     const expira = this.clock() + STEP_UP_MS;
     this.w(actor).code = { value, expira };
     return ok({ expira: new Date(expira).toISOString(), codigoPrueba: value });
