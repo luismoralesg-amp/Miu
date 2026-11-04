@@ -1,0 +1,15 @@
+{
+  "condiciones": "móvil, CPU 4× más lenta, 4G (1.6 Mbps, 150 ms), build de producción",
+  "Hoy": {
+    "lcp": 260,
+    "inp": 96
+  },
+  "Cursos": {
+    "lcp": 372,
+    "inp": 96
+  },
+  "Pagos": {
+    "lcp": 284,
+    "inp": 56
+  }
+}
