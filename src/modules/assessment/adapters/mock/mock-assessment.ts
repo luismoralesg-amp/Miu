@@ -15,6 +15,7 @@ import {
 import type { Actor } from "@/modules/identity";
 
 import {
+  closeReadiness,
   currentGrade,
   hasJustification,
   isLate,
@@ -514,6 +515,7 @@ export class MockAssessment implements AssessmentPort {
     const batch = this.findBatch(actor, sectionId, activityId);
     if (!batch.ok) return batch;
     const found = batch.value;
+    if (this.ws(actor).closed.has(sectionId)) return fail("invalid", "La nota final ya se cerró");
     const fecha = this.now().toISOString();
     let publicadas = 0;
     for (const e of this.entries(actor, found.section, found.activity)) {
@@ -535,6 +537,10 @@ export class MockAssessment implements AssessmentPort {
     if (!this.teachingSections(actor).some((s) => s.id === sectionId)) return fail("forbidden");
     const ws = this.ws(actor);
     if (ws.closed.has(sectionId)) return fail("invalid", "Ya está cerrada");
+    const book = await this.getSectionGradebook(actor, sectionId);
+    if (!book.ok) return book;
+    if (!closeReadiness(book.value.actividades).listo)
+      return fail("invalid", "Aún hay actividades por calificar o publicar");
     const fecha = this.now().toISOString();
     ws.closed.set(sectionId, fecha);
     return parsed(z.object({ cerrada: z.literal(true), fecha: z.string() }), {

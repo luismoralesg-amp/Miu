@@ -46,3 +46,20 @@ export function hasJustification(text: string | undefined) {
 export function isLate(entregado: string, limite: string) {
   return Date.parse(entregado) > Date.parse(limite);
 }
+
+type ClosableActivity = {
+  titulo: string;
+  estado: "programada" | "por_calificar" | "sin_publicar" | "publicada";
+};
+
+/**
+ * Whether a section's final grade can be closed [S]: nothing may be left to grade or publish. Activities
+ * that haven't happened yet don't block, but the person closing has to confirm they won't count.
+ */
+export function closeReadiness<T extends ClosableActivity>(actividades: T[]) {
+  const bloqueos = actividades.filter(
+    (a) => a.estado === "por_calificar" || a.estado === "sin_publicar",
+  );
+  const programadas = actividades.filter((a) => a.estado === "programada");
+  return { listo: bloqueos.length === 0, bloqueos, programadas };
+}

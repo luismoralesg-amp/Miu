@@ -6,6 +6,7 @@ import { admin, auxiliar, maestro, student, value } from "@/test/actors";
 import { MockAssessment } from "./adapters/mock/mock-assessment";
 import { createRealAssessment } from "./adapters/real/real-assessment";
 import {
+  closeReadiness,
   currentGrade,
   hasJustification,
   needsJustification,
@@ -19,6 +20,23 @@ const HASH = "a".repeat(64);
 const fresh = (now = new Date(at(0, "07:42"))) => new MockAssessment(undefined, () => now);
 
 describe("grading rules", () => {
+  it("the final grade closes when nothing is left to grade or publish", () => {
+    const a = (estado: "programada" | "por_calificar" | "sin_publicar" | "publicada") => ({
+      titulo: estado,
+      estado,
+    });
+    expect(closeReadiness([a("publicada"), a("programada")])).toMatchObject({
+      listo: true,
+      bloqueos: [],
+      programadas: [{ titulo: "programada" }],
+    });
+    expect(closeReadiness([a("publicada"), a("sin_publicar"), a("por_calificar")])).toMatchObject({
+      listo: false,
+    });
+    expect(closeReadiness([a("sin_publicar")]).bloqueos).toHaveLength(1);
+    expect(closeReadiness([])).toMatchObject({ listo: true });
+  });
+
   it("weights and current grade (Discreta: 46.6 over 60 → 77.7)", () => {
     const { evaluado, obtenido } = weighted([
       { peso: 10, nota: 78 },
@@ -280,13 +298,45 @@ describe("AssessmentPort (mock) · teaching", () => {
     });
   });
 
-  it("closeFinalGrade: only the Maestro, once, and grading stops after it", async () => {
+  /** Grades every pending activity of a section and publishes it, so the final grade can close. */
+  async function gradeEverything(port: MockAssessment, jorge: ReturnType<typeof maestro>) {
+    const queue = value(await port.listGradingQueue(jorge)).filter((q) => q.sectionId === "md-b");
+    for (const q of queue) {
+      const batch = value(await port.listBatch(jorge, "md-b", q.activityId));
+      for (const e of batch.entradas)
+        value(
+          await port.gradeSubmission(jorge, {
+            sectionId: "md-b",
+            activityId: q.activityId,
+            studentId: e.studentId,
+            nota: 80,
+          }),
+        );
+      value(await port.publishGrades(jorge, "md-b", q.activityId));
+    }
+  }
+
+  it("closeFinalGrade: only the Maestro, only with nothing left to grade, once", async () => {
     const port = fresh();
     const jorge = maestro();
     expect(await port.closeFinalGrade(auxiliar(), "md-b")).toMatchObject({ error: "forbidden" });
+    // Tarea 4 is still waiting for grades: the final grade can't close yet.
+    expect(await port.closeFinalGrade(jorge, "md-b")).toMatchObject({
+      error: "invalid",
+      detail: "Aún hay actividades por calificar o publicar",
+    });
+    await gradeEverything(port, jorge);
     expect(value(await port.closeFinalGrade(jorge, "md-b"))).toMatchObject({ cerrada: true });
     expect(value(await port.isClosed(jorge, "md-b"))).toBe(true);
+    expect(value(await port.getSectionGradebook(jorge, "md-b")).cerrada).toBe(true);
     expect(await port.closeFinalGrade(jorge, "md-b")).toMatchObject({ error: "invalid" });
+  });
+
+  it("after the close, grading and publishing both stop", async () => {
+    const port = fresh();
+    const jorge = maestro();
+    await gradeEverything(port, jorge);
+    value(await port.closeFinalGrade(jorge, "md-b"));
     expect(
       await port.gradeSubmission(jorge, {
         sectionId: "md-b",
@@ -295,6 +345,9 @@ describe("AssessmentPort (mock) · teaching", () => {
         nota: 80,
       }),
     ).toMatchObject({ error: "invalid" });
+    expect(await port.publishGrades(jorge, "md-b", "md-tarea-4")).toMatchObject({
+      error: "invalid",
+    });
   });
 
   it("listAppeals: by section for teachers, escalated ones for the Administrativo", async () => {

@@ -1,10 +1,16 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { SearchX } from "lucide-react";
+import { Lock, SearchX } from "lucide-react";
 
 import { requirePermission } from "@/authz/server";
-import { CourseDot, EmptyState, PortProblem, type CourseSlot } from "@/design-system/components";
+import {
+  Badge,
+  CourseDot,
+  EmptyState,
+  PortProblem,
+  type CourseSlot,
+} from "@/design-system/components";
 import { RouteTabs } from "@/design-system/components/route-tabs";
 import { STATUS } from "@/features/catedra/teaching";
 import { plural, route, shortDate } from "@/features/shared/format";
@@ -62,6 +68,13 @@ export default async function LibroPage({ params, searchParams }: Props) {
         <h1 className="mt-2 display text-[40px] leading-[1.02] font-medium md:text-[64px]">
           Libro de notas
         </h1>
+        {book.ok && book.value.cerrada && (
+          <p className="mt-3">
+            <Badge tone="success" icon={<Lock aria-hidden="true" />}>
+              Nota final cerrada
+            </Badge>
+          </p>
+        )}
       </section>
       {sections.value.length > 1 && (
         <RouteTabs

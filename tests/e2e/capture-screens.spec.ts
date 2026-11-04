@@ -152,6 +152,8 @@ const STAGES: Record<string, Shot[]> = {
     { name: "catedra", path: "/catedra", as: "maestro" },
     { name: "seccion", path: "/catedra/secciones/md-a", as: "maestro" },
     { name: "libro", path: "/catedra/libro/md-a", as: "maestro" },
+    { name: "publicar", path: "/catedra/publicar", as: "auxiliar" },
+    { name: "cierre", path: "/catedra/cierre", as: "maestro" },
     { name: "por-calificar", path: "/catedra/por-calificar", as: "auxiliar" },
     {
       name: "lote",

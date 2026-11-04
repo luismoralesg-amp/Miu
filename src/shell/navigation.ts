@@ -48,6 +48,7 @@ export type IconName =
   | "drive"
   | "users"
   | "list-checks"
+  | "lock"
   | "send"
   | "message-square"
   | "scale"
@@ -268,6 +269,13 @@ export const SECTIONS = {
     "E10",
     "Revisión y publicación con resumen.",
   ),
+  cierre: S(
+    "/catedra/cierre",
+    "Cerrar nota final",
+    "lock",
+    "E10",
+    "Cierre de la nota final de cada sección.",
+  ),
   apelaciones: S(
     "/catedra/apelaciones",
     "Apelaciones",
@@ -334,7 +342,7 @@ export const NAV: Record<Role, Nav> = {
   maestro: {
     barra: ["hoy", "catedra", "porCalificar", "libro", "apelaciones"],
     movil: ["hoy", "catedra", "porCalificar", "libro"],
-    mas: [["Cátedra", ["publicar", "apelaciones"]], AYUDA, CUENTA, RECURSOS, GOOGLE],
+    mas: [["Cátedra", ["publicar", "cierre", "apelaciones"]], AYUDA, CUENTA, RECURSOS, GOOGLE],
   },
   auxiliar: {
     barra: ["hoy", "catedra", "porCalificar", "publicar", "apelaciones"],
@@ -372,6 +380,7 @@ export const SECTION_PERMISSIONS: Partial<Record<SectionKey, Permission[]>> = {
   porCalificar: ["grade"],
   libro: ["grade"],
   publicar: ["publish_grades"],
+  cierre: ["close_final_grade"],
   apelaciones: ["respond_appeal"],
   politicas: ["configure_policy"],
   conciliacion: ["approve_payment"],
@@ -396,6 +405,8 @@ export const BUILT: ReadonlySet<SectionKey> = new Set<SectionKey>([
   "catedra",
   "porCalificar",
   "libro",
+  "publicar",
+  "cierre",
   "pensum",
   "historial",
   "conciliacion",

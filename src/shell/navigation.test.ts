@@ -23,9 +23,9 @@ describe("deep links into sections still being built", () => {
   it("land on the closest section instead of a 404", async () => {
     const { sectionKeyByPath } = await import("./navigation");
     expect(sectionKeyByPath("/catedra/apelaciones/ap-1")).toBe("apelaciones");
-    expect(sectionKeyByPath("/catedra/publicar/md-a")).toBe("publicar");
     // Built sections answer their own deep links; an unknown one is a real 404.
     expect(sectionKeyByPath("/catedra/no-existe")).toBeUndefined();
+    expect(sectionKeyByPath("/catedra/publicar/md-a")).toBeUndefined();
     expect(sectionKeyByPath("/admin/pagos")).toBe("conciliacion");
     expect(sectionKeyByPath("/no-existe")).toBeUndefined();
     expect(sectionKeyByPath("/pagos/no-existe")).toBeUndefined();
