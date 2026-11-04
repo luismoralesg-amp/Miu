@@ -133,3 +133,34 @@ Cada entrada: fecha · decisión · por qué · cómo revertirla.
 - **Next.js 16.4.2 → 16.4.5** (y `eslint-config-next` a la par), con la aprobación de Luis: es la versión de seguridad de
   noviembre. Sigue con versión exacta; el lockfile solo cambia los paquetes de Next. `npm audit` mantiene 15 avisos
   moderados de `minimatch`, que entra por ESLint (solo desarrollo, no llega al build).
+
+## 2026-11-04 · Cátedra, administración y app instalable
+
+- **Cerrar la nota final** (`closeReadiness`, `src/modules/assessment/domain/rules.ts`): solo se cierra sin actividades por
+  calificar ni por publicar; lo que aún no ocurre no bloquea, pero quien cierra confirma que no contará. Ya cerrada, el
+  puerto rechaza calificar y publicar. Es un supuesto [S] hasta que la UFM confirme el reglamento.
+- **Publicar con revisión:** `/catedra/publicar` usa la misma acción (y la misma auditoría) que el lote; el formulario
+  funciona sin JavaScript.
+- **Apelaciones:** responder, escalar o resolver (mantener o cambiar la nota). Cambiar la nota se registra y audita, pero en
+  el mock no recalcula el libro. Las apelaciones de las cuentas demo son compartidas, para que una escalada llegue al
+  Administrativo; las de cuentas de prueba son propias. El Administrativo sigue viendo las que resolvió.
+- **Políticas** (`PolicyPort`): umbral, tres metas y comisión de tarjeta, validados con zod y aplicados de inmediato. La
+  política de las cuentas demo es compartida (es institucional); la de cada cuenta de prueba es propia, y Pagos, que no
+  recibe actor, solo lee la compartida. El Administrativo puede otorgar a un Auxiliar cerrar la nota final de una sección
+  (`close_final_grade` por sección, que `subjectFor` convierte en `grants`).
+- **Reembolsos:** «aprobar y reembolsar requieren dos personas» se aplica como que quien aprobó o cobró un pago no puede
+  reembolsarlo; exige motivo escrito y, si fue con tarjeta o ACH, también se pide al proveedor.
+- **Conciliación:** `reconcile` compara por referencia y al centavo; el extracto de Recurrente del mock refleja los pagos
+  de MiU más un evento sin recibo, para mostrar una diferencia.
+- **Rutas del Administrativo que reutilizan un permiso del Maestro** (apelaciones, estadísticas) piden además
+  `configure_policy`; sin eso el Maestro entraría por el permiso compartido.
+- **Service worker propio** (`public/sw.js`): guarda solo archivos estáticos y una página sin conexión; nunca páginas ni
+  respuestas de la API, porque llevan datos personales y un dispositivo compartido no debe poder leerlas después. Solo se
+  registra en producción. Los íconos se renderizan del escudo opaco de `logo-ufm01.png`; `escudo*.png` son marcas de agua.
+- **Formularios con estado:** un componente que muestra su confirmación debe seguir montado tras `revalidatePath` (una sola
+  lista, sin mover la fila entre grupos; sin revalidar cuando la fila deja de ser parte de la lista, como en la caja); los
+  campos que un rechazo no debe borrar son controlados (React 19 reinicia los demás); y los botones que cambian de
+  `button` a `submit` en la misma posición llevan `key`, o el clic termina enviando el formulario.
+- **Accesibilidad:** el recorrido con axe sale de la tabla `NAV` que usa la app, así que una sección nueva queda cubierta
+  sola; el recorrido con teclado exigió quitar `focus-visible:outline-none` de las filas de Cursos.
+

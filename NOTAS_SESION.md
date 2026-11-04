@@ -26,3 +26,5 @@
 - Siguiente ítem: P3-2 · README de la demo (probar desde un clon limpio).
 - 2026-11-04 · P3-2 hecho: README al día y probado desde un clon limpio (npm ci --offline desde la caché). No usar `pkill` amplio: el clasificador lo bloquea; detener solo el PID propio.
 - Siguiente ítem: P3-3 · DECISIONES e INTEGRACIONES_PENDIENTES al día.
+- 2026-11-04 · P3-3 hecho: 18 puertos con su fila; [S] y decisiones al día.
+- Siguiente ítem: P3-4 · Reporte de cierre (docs/etapas/E12/REPORTE.md, máximo 40 líneas) con check, build y e2e completos en la misma corrida.

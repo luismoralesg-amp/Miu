@@ -19,7 +19,7 @@ Los puertos de datos se agregan en E3; esta lista crece con cada etapa.
 | `AssessmentPort` | Mock | Actividades, entregas, notas, lote del Auxiliar, libro de notas por sección, publicación, cierre y apelaciones con respuesta, escalamiento y resolución (notas de los compañeros de ejemplo [S]; cambiar la nota en una apelación se audita pero no recalcula el libro en el mock) | API de MiU con la identidad de quien califica (auditoría) | `MIU_ADAPTER_ASSESSMENT=real` |
 | `CurriculumPort` | Mock | Pensum de Ciencias de la Computación de ejemplo (40 cursos, 8 semestres) [S] | Pensum oficial por carrera y año de ingreso, con UMA y prerrequisitos | `MIU_ADAPTER_CURRICULUM=real` |
 | `InboxPort` | Mock | Proyección sobre los demás puertos más lo leído por usuario | Read model propio (tabla alimentada por eventos), sin cambios en MiU | `MIU_ADAPTER_INBOX=real` |
-| `LedgerPort` / `SolvencyPort` | Mock | Cargos, recibos, estado de cuenta, solvencia y cola de transferencias con comprobante | Sistema financiero de la UFM: cargos, abonos, solvencia y escritura de pagos confirmados | `MIU_ADAPTER_LEDGER=real` |
+| `LedgerPort` / `SolvencyPort` | Mock | Cargos, recibos, estado de cuenta, solvencia, cola de transferencias con comprobante, cobro en caja y reembolsos. «Dos personas» se interpreta como que quien aprobó o cobró un pago no lo reembolsa [S]; la caja solo conoce la cuenta de la estudiante demo | Sistema financiero de la UFM: cargos, abonos, solvencia y escritura de pagos confirmados | `MIU_ADAPTER_LEDGER=real` |
 | `PaymentProviderPort` (Recurrente) | Mock | Checkout alojado simulado (`/pagos/checkout/[id]`), webhook firmado e idempotente, cotización por costo | Llaves de **prueba** de Recurrente y secreto del webhook; URL pública para el webhook | `.env.local` con `RECURRENTE_*` y `MIU_ADAPTER_PAYMENTS=real` |
 | `PaymentProviderPort` (Stripe) | Vacío | Alternativa sin implementar (PLAN §6) | Si la UFM prefiere otro procesador | `MIU_ADAPTER_PAYMENTS=real` y `MIU_PAYMENTS_PROVIDER=stripe` |
 | `StoragePort` | Mock | Archivos en memoria, huella SHA-256, escaneo simulado (EICAR) y bloqueo de ejecutables | Bucket S3 compatible, antivirus (ClamAV u otro) y retención de entregas | `MIU_ADAPTER_STORAGE=real` |
@@ -36,3 +36,15 @@ Los puertos de datos se agregan en E3; esta lista crece con cada etapa.
 | Kit de marca (`/recursos/marca`) | Parcial | Solo los archivos que ya trae MiU; fondos y logotipos completos [S] | Comunicación publica el kit oficial y su manual | Copiar a `public/brand/` y listarlos en la página |
 | `PolicyPort` | Mock | Umbral, metas y comisión de tarjeta editables por el Administrativo (valores iniciales de ejemplo [S]); otorgamiento de «cerrar la nota final» a un Auxiliar por sección. La política de las cuentas demo es compartida; la de cada cuenta de prueba es propia | Reglamento académico, contrato con Recurrente y administración de roles de MiU, con la identidad de quien cambia | `MIU_ADAPTER_POLICY=real` |
 | Extracto de Recurrente (`listSettlements`) | Ejemplo | Refleja los pagos de MiU con tarjeta y ACH más un evento sin recibo [S], para mostrar una diferencia | Reporte o API de liquidaciones de Recurrente | Adaptador real de `PaymentProviderPort` |
+
+## Supuestos `[S]` del backlog de cierre y dónde viven
+
+| # | Supuesto | Dónde está |
+|---|---|---|
+| 1 | Formato de entrega: repositorio local, demo con `npm run dev`, capturas por rol y documentos (sin push ni deploy) | `README.md`, `docs/entrega/` |
+| 2 | Umbral de justificación 61 y metas 71/80/90; ahora editables por el Administrativo | `PolicyPort`, `/admin/politicas` |
+| 3 | Comisión de tarjeta 4.5 % + Q2 como costo de quien paga (pendiente de la UFM); ACH sin comisión | `PolicyPort`, `PaymentProviderPort` |
+| 4 | Lista de bancos ACH del checkout de Recurrente | `PaymentProviderPort` (`getPolicy`) |
+| 5 | Cierre de la nota final solo del Maestro, o del Auxiliar al que el Administrativo se lo otorgue por sección; exige nada por calificar ni publicar | `PolicyPort`, `/catedra/cierre`, `closeReadiness` |
+| 6 | Semana de exámenes del 26 al 30 de octubre y foto del campus | `POLICY.semanaExamenes`, seed |
+| 7 | Metas de LCP < 2.5 s e INP < 200 ms: no son supuesto, vienen de `ARQUITECTURA_MIU.md`; lo medido es con datos mock y servidor local | `docs/etapas/E12/rendimiento.json` |
