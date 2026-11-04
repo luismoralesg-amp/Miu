@@ -1,5 +1,6 @@
 import { academic } from "@/modules/academic";
 import type { Actor } from "@/modules/identity";
+import { closeGrantSections } from "@/modules/policy";
 
 import type { Subject } from "./can";
 
@@ -27,6 +28,11 @@ export async function subjectFor(actor: Actor): Promise<Subject> {
       sectionIds: sections.value.map((s) => s.sectionId),
       courseIds:
         actor.role === "maestro" ? [...new Set(sections.value.map((s) => s.courseId))] : [],
+      // What the Administrativo granted this Auxiliar per section (closing the final grade).
+      grants: closeGrantSections(actor).map((sectionId) => ({
+        permission: "close_final_grade" as const,
+        sectionId,
+      })),
     };
   }
   return base;

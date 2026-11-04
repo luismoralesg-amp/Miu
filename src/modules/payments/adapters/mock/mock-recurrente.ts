@@ -5,9 +5,9 @@ import { z } from "zod";
 import { academicNow } from "@/lib/clock";
 import { parsed } from "@/lib/contract";
 import { fail, ok, type PortResult } from "@/lib/result";
-import { POLICY } from "@/mock/seed";
 import { ledger, type LedgerPort } from "@/modules/finance";
 import type { Actor } from "@/modules/identity";
+import { currentPolicy } from "@/modules/policy";
 
 import { quote, routeByCost } from "../../domain/rules";
 import { sign, verifySignature } from "../../domain/signature";
@@ -42,13 +42,13 @@ export class MockRecurrente implements PaymentProviderPort {
 
   constructor(
     private readonly ledgerPort: () => LedgerPort = ledger,
-    private readonly policy: () => FeePolicy = () => POLICY.comisionTarjeta,
+    private readonly policy: () => FeePolicy = () => currentPolicy().comisionTarjeta,
     private readonly secret = process.env.RECURRENTE_WEBHOOK_SECRET ?? MOCK_WEBHOOK_SECRET,
     private readonly now: () => Date = academicNow,
   ) {}
 
   async getPolicy() {
-    return ok({ ...this.policy(), bancosAch: [...POLICY.bancosAch] });
+    return ok({ ...this.policy(), bancosAch: currentPolicy().bancosAch });
   }
 
   async quote(monto: number, metodo: z.infer<typeof ProviderMethod>): PortResult<Quote> {

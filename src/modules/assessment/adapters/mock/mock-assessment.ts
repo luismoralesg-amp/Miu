@@ -13,6 +13,7 @@ import {
   type SeedSection,
 } from "@/mock/seed";
 import type { Actor } from "@/modules/identity";
+import { currentPolicy, hasCloseGrant } from "@/modules/policy";
 
 import {
   closeReadiness,
@@ -306,8 +307,8 @@ export class MockAssessment implements AssessmentPort {
       cursos,
       promedio: termAverage(cursos.map((c) => c.actual)),
       historial: this.seed.gradeHistory.map(([periodo, promedio]) => ({ periodo, promedio })),
-      metas: this.seed.policy.metas,
-      umbral: this.seed.policy.umbralJustificacion,
+      metas: currentPolicy(actor).metas,
+      umbral: currentPolicy(actor).umbralJustificacion,
     });
   }
 
@@ -408,7 +409,7 @@ export class MockAssessment implements AssessmentPort {
       seccion: section.seccion,
       curso: this.course(section.courseId),
       activity: { id: activity.id, titulo: activity.titulo, cierre: activity.fecha },
-      umbral: this.seed.policy.umbralJustificacion,
+      umbral: currentPolicy(actor).umbralJustificacion,
       entradas: this.entries(actor, section, activity).map((e) => this.toEntry(e, activity)),
     });
   }
@@ -487,14 +488,14 @@ export class MockAssessment implements AssessmentPort {
       })
       .sort((a, b) => a.nombre.localeCompare(b.nombre, "es"));
 
-    const umbral = this.seed.policy.umbralJustificacion;
+    const umbral = currentPolicy(actor).umbralJustificacion;
     const evaluados = estudiantes.filter((e) => e.evaluado > 0);
     return parsed(SectionGradebook, {
       sectionId: section.id,
       seccion: section.seccion,
       curso: this.course(section.courseId),
       umbral,
-      metas: this.seed.policy.metas,
+      metas: currentPolicy(actor).metas,
       cerrada: this.ws(actor).closed.has(section.id),
       actividades,
       estudiantes,
@@ -511,7 +512,7 @@ export class MockAssessment implements AssessmentPort {
     if (!batch.ok) return batch;
     const found = batch.value;
     if (this.ws(actor).closed.has(sectionId)) return fail("invalid", "La nota final ya se cerró");
-    const umbral = this.seed.policy.umbralJustificacion;
+    const umbral = currentPolicy(actor).umbralJustificacion;
     if (needsJustification(nota, umbral) && !hasJustification(justificacion))
       return fail("invalid", `Bajo ${umbral} la justificación es obligatoria`);
     const entries = this.entries(actor, found.section, found.activity);
@@ -546,7 +547,8 @@ export class MockAssessment implements AssessmentPort {
   }
 
   async closeFinalGrade(actor: Actor, sectionId: string) {
-    if (actor.role !== "maestro") return fail("forbidden", "Solo el Maestro cierra la nota final");
+    if (actor.role !== "maestro" && !hasCloseGrant(actor, sectionId))
+      return fail("forbidden", "Solo el Maestro cierra la nota final");
     if (!this.teachingSections(actor).some((s) => s.id === sectionId)) return fail("forbidden");
     const ws = this.ws(actor);
     if (ws.closed.has(sectionId)) return fail("invalid", "Ya está cerrada");

@@ -218,7 +218,11 @@ const STAGES: Record<string, Shot[]> = {
     { name: "marca", path: "/recursos/marca", as: "estudiante" },
     { name: "chatgpt-edu", path: "/recursos/chatgpt-edu", as: "estudiante" },
   ],
-  E11: [{ name: "admin-pagos", path: "/admin/pagos", as: "administrativo" }],
+  E11: [
+    { name: "politicas", path: "/admin/politicas", as: "administrativo" },
+    { name: "roles", path: "/admin/roles", as: "administrativo" },
+    { name: "admin-pagos", path: "/admin/pagos", as: "administrativo" },
+  ],
   E7: [
     { name: "pagos", path: "/pagos", as: "estudiante" },
     { name: "pagar", path: "/pagos/pagar/cuota-noviembre", as: "estudiante" },

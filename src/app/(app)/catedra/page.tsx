@@ -18,6 +18,7 @@ import { withFault } from "@/lib/fault";
 import { academic } from "@/modules/academic";
 import { assessment } from "@/modules/assessment";
 import { requireActor } from "@/modules/identity/session";
+import { closeGrantSections } from "@/modules/policy";
 
 export const metadata: Metadata = { title: "Mis secciones" };
 
@@ -34,6 +35,7 @@ export default async function CatedraPage() {
       )
     : [];
   const rol = actor.role === "maestro" ? "Maestro" : "Auxiliar";
+  const granted = closeGrantSections(actor);
 
   return (
     <div className="pb-10">
@@ -135,6 +137,15 @@ export default async function CatedraPage() {
                     >
                       Libro de notas
                     </Link>
+                    {granted.includes(s.sectionId) && (
+                      <Link
+                        href={route("/catedra/cierre")}
+                        className="inline-flex min-h-11 items-center underline underline-offset-4"
+                        aria-label={`Cerrar la nota final de ${s.corto} ${s.seccion}`}
+                      >
+                        Cerrar nota final
+                      </Link>
+                    )}
                   </span>
                 </div>
               </li>

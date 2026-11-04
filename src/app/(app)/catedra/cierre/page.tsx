@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
+import { notFound } from "next/navigation";
 import Link from "next/link";
 import { Lock, Users } from "lucide-react";
 
-import { requirePermission } from "@/authz/server";
 import {
   Badge,
   CourseDot,
@@ -18,6 +18,7 @@ import { withFault } from "@/lib/fault";
 import { academic } from "@/modules/academic";
 import { assessment, closeReadiness } from "@/modules/assessment";
 import { requireActor } from "@/modules/identity/session";
+import { closeGrantSections } from "@/modules/policy";
 
 import { cerrarNotaFinal } from "./actions";
 
@@ -25,9 +26,17 @@ export const metadata: Metadata = { title: "Cerrar nota final" };
 
 /** Closing the final grade of each section: what still blocks it, what won't count, and the close itself. */
 export default async function CierrePage() {
-  await requirePermission("close_final_grade");
   const actor = await requireActor();
-  const sections = await withFault("academic", () => academic().listTeachingSections(actor));
+  // The Maestro by default [S]; an Auxiliar only for the sections the Administrativo granted them.
+  const granted = closeGrantSections(actor);
+  if (actor.role !== "maestro" && granted.length === 0) notFound();
+  const all = await withFault("academic", () => academic().listTeachingSections(actor));
+  const sections = all.ok
+    ? {
+        ...all,
+        value: all.value.filter((s) => actor.role === "maestro" || granted.includes(s.sectionId)),
+      }
+    : all;
   const books = sections.ok
     ? await Promise.all(
         sections.value.map((s) =>

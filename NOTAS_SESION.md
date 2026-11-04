@@ -10,3 +10,5 @@
 - Siguiente ítem: P2-13 · E10d · Apelaciones, auditoría y estadísticas de cátedra.
 - 2026-11-04 · P2-13 hecho. Lo que se aprendió: cambiar un `<Button type="button">` por uno `submit` en la misma posición durante un clic dispara el envío del formulario (usar `key` distintas); y los componentes con estado deben vivir en una sola lista para sobrevivir al `revalidatePath`.
 - Siguiente ítem: P2-14 · E11a · Administración: políticas y roles.
+- 2026-11-04 · P2-14 hecho: módulo `policy` y `/admin/{politicas,roles}`. Lo que se aprendió: React 19 reinicia los campos no controlados después de un submit, incluso uno rechazado; los de este formulario son controlados. La política de las cuentas de prueba es por cuenta (Pagos no recibe actor, así que solo lee la compartida).
+- Siguiente ítem: P2-15 · E11b · Administración: pagos, conciliación, caja y reembolsos.
