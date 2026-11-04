@@ -179,7 +179,7 @@ export function CoursesTable({ rows, now }: { rows: CourseRow[]; now: string }) 
                     <th scope="row" className="py-4 pr-4 font-normal">
                       <Link
                         href={route(`/cursos/${r.id}`)}
-                        className="flex flex-col after:absolute after:inset-0 focus-visible:outline-none"
+                        className="flex flex-col rounded-sm after:absolute after:inset-0"
                       >
                         <span className="flex items-center gap-2 font-semibold group-hover:underline group-hover:underline-offset-4">
                           <CourseDot slot={r.slot as CourseSlot} />

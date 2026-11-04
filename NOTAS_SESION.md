@@ -20,3 +20,5 @@
 - Siguiente ítem: P2-18 · E12b · Rendimiento (LCP e INP en Hoy, Cursos y Pagos).
 - 2026-11-04 · P2-18 hecho: LCP 260–372 ms e INP 56–96 ms con CPU 4× y 4G, datos mock. Sin cambios de código.
 - Siguiente ítem: P2-19 · E12c · Accesibilidad (axe en todas las rutas y recorrido con teclado).
+- 2026-11-04 · P2-19 hecho: axe sobre todas las rutas de los cuatro roles (0 violaciones) y recorrido con teclado; hallazgo real: el foco de las filas de Cursos era invisible. Cierra P2.
+- Siguiente ítem: P3-1 · Capturas por rol.
