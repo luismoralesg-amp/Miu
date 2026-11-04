@@ -17,6 +17,32 @@ type Shot = {
   fresh?: boolean;
 };
 
+/**
+ * The audit trail with something in it: a fresh test account answers an appeal as the Maestro (the
+ * trail is shared, so the Administrativo sees it too), then opens the audit page of the role.
+ */
+function auditShot(role: "maestro" | "administrativo"): Shot {
+  return {
+    name: "auditoria",
+    carpeta: role,
+    path: "/",
+    as: role,
+    fresh: true,
+    prepare: async (page) => {
+      await switchRole(page, "maestro");
+      await page.goto("/catedra/apelaciones");
+      await page
+        .getByLabel("Tu respuesta")
+        .fill("Revisé la pregunta 4 con la rúbrica y el desarrollo.");
+      await page.getByRole("button", { name: "Responder" }).click();
+      await page.getByRole("status").waitFor();
+      await switchRole(page, role);
+      await page.goto(role === "maestro" ? "/catedra/auditoria" : "/admin/auditoria");
+      await page.waitForLoadState("networkidle");
+    },
+  };
+}
+
 const STAGES: Record<string, Shot[]> = {
   E4: [
     { name: "hoy", path: "/", as: "estudiante" },
@@ -99,6 +125,18 @@ const STAGES: Record<string, Shot[]> = {
         ["pagos", "/pagos"],
         ["pagar", "/pagos/pagar/cuota-noviembre"],
         ["estado-de-cuenta", "/pagos/estado-de-cuenta"],
+        ["recibos", "/pagos/recibos"],
+        ["pensum", "/pensum"],
+        ["historial", "/historial"],
+        ["conferencias", "/conferencias"],
+        ["mis-reservas", "/conferencias/mis-reservas"],
+        ["asignacion", "/asignacion"],
+        ["documentos", "/documentos"],
+        ["cuenta", "/cuenta/informacion"],
+        ["comunicacion", "/comunicacion"],
+        ["soporte", "/soporte"],
+        ["servicios", "/servicios"],
+        ["directorio", "/recursos/directorio"],
       ] as const
     ).map(([name, path]) => ({ name, path, as: "estudiante" as const, carpeta: "estudiante" })),
     ...(
@@ -106,27 +144,50 @@ const STAGES: Record<string, Shot[]> = {
         ["hoy", "/"],
         ["por-calificar", "/catedra/por-calificar"],
         ["lote", "/catedra/por-calificar?seccion=md-a&actividad=md-tarea-4"],
+        ["secciones", "/catedra"],
+        ["seccion", "/catedra/secciones/md-a"],
+        ["libro", "/catedra/libro/md-a"],
+        ["publicar", "/catedra/publicar"],
+        ["cierre", "/catedra/cierre"],
+        ["apelaciones", "/catedra/apelaciones"],
+        ["estadisticas", "/catedra/estadisticas"],
       ] as const
-    ).map(([name, path]) => ({ name, path, as: "maestro" as const, carpeta: "maestro" })),
+    )
+      .map(([name, path]): Shot => ({ name, path, as: "maestro", carpeta: "maestro" }))
+      .concat([auditShot("maestro")]),
     ...(
       [
         ["hoy", "/"],
         ["por-calificar", "/catedra/por-calificar"],
         ["lote", "/catedra/por-calificar?seccion=pp-a&actividad=pp-actividad-6"],
         ["bandeja", "/bandeja"],
+        ["secciones", "/catedra"],
+        ["publicar", "/catedra/publicar"],
+        ["apelaciones", "/catedra/apelaciones"],
+        ["estadisticas", "/catedra/estadisticas"],
       ] as const
     ).map(([name, path]) => ({ name, path, as: "auxiliar" as const, carpeta: "auxiliar" })),
     ...(
       [
         ["hoy", "/"],
         ["bandeja", "/bandeja"],
+        ["comprobantes", "/admin/pagos"],
+        ["caja", "/admin/pagos/caja?carne=2024-0187"],
+        ["conciliacion", "/admin/pagos/conciliacion"],
+        ["reembolsos", "/admin/pagos/reembolsos"],
+        ["politicas", "/admin/politicas"],
+        ["roles", "/admin/roles"],
+        ["apelaciones", "/admin/apelaciones"],
+        ["estadisticas", "/admin/estadisticas"],
       ] as const
-    ).map(([name, path]) => ({
-      name,
-      path,
-      as: "administrativo" as const,
-      carpeta: "administrativo",
-    })),
+    )
+      .map(([name, path]): Shot => ({
+        name,
+        path,
+        as: "administrativo",
+        carpeta: "administrativo",
+      }))
+      .concat([auditShot("administrativo")]),
   ],
   CMDK: [
     {

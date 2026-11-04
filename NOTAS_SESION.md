@@ -22,3 +22,5 @@
 - Siguiente ítem: P2-19 · E12c · Accesibilidad (axe en todas las rutas y recorrido con teclado).
 - 2026-11-04 · P2-19 hecho: axe sobre todas las rutas de los cuatro roles (0 violaciones) y recorrido con teclado; hallazgo real: el foco de las filas de Cursos era invisible. Cierra P2.
 - Siguiente ítem: P3-1 · Capturas por rol.
+- 2026-11-04 · P3-1 hecho: 159 capturas por rol y RECORRIDO.md al día.
+- Siguiente ítem: P3-2 · README de la demo (probar desde un clon limpio).
