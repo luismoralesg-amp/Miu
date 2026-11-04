@@ -14,3 +14,5 @@
 - Siguiente ítem: P2-15 · E11b · Administración: pagos, conciliación, caja y reembolsos.
 - 2026-11-04 · P2-15 hecho: caja, conciliación y reembolsos. Lo que se aprendió: si una acción cambia lo que lista la página (el cargo deja de estar pendiente), la fila con su aviso desaparece al revalidar; en la caja no se revalida.
 - Siguiente ítem: P2-16 · E11c · Administración: auditoría, apelaciones y estadísticas.
+- 2026-11-04 · P2-16 hecho: auditoría, apelaciones escaladas y estadísticas del Administrativo, con componentes compartidos. Cierra E11. Lo que se aprendió: una ruta de Administración que reutiliza un permiso que también tiene el Maestro debe pedir además `configure_policy`, o el Maestro entra.
+- Siguiente ítem: P2-17 · E12a · PWA.

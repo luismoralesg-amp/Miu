@@ -53,7 +53,7 @@ type StoredEntry = {
   justificacion?: string;
   estado: "sin_nota" | "guardada" | "publicada";
 };
-type StoredAppeal = SeedAppeal & { resolucion?: AppealResolution };
+type StoredAppeal = SeedAppeal & { resolucion?: AppealResolution; escalada?: boolean };
 type Workspace = {
   submissions: StoredSubmission[];
   batches: Map<string, StoredEntry[]>;
@@ -415,7 +415,9 @@ export class MockAssessment implements AssessmentPort {
   }
 
   async getSectionGradebook(actor: Actor, sectionId: string): PortResult<SectionGradebook> {
-    const section = this.teachingSections(actor).find((s) => s.id === sectionId);
+    const mine =
+      actor.role === "administrativo" ? this.seed.sections : this.teachingSections(actor);
+    const section = mine.find((s) => s.id === sectionId);
     if (!section) return fail("forbidden", "No tienes asignada esta sección");
     const now = this.now().getTime();
     const inSeed = new Set(this.seed.grades.map((g) => g.activityId));
@@ -593,7 +595,9 @@ export class MockAssessment implements AssessmentPort {
     const all = actor.role === "estudiante" ? this.ws(actor).appeals : this.appealsOf(actor);
     let mine: StoredAppeal[];
     if (actor.role === "estudiante") mine = all.filter((a) => a.studentId === actor.personId);
-    else if (actor.role === "administrativo") mine = all.filter((a) => a.estado === "escalada");
+    // The Administrativo sees what reached them, and keeps seeing it once resolved.
+    else if (actor.role === "administrativo")
+      mine = all.filter((a) => a.estado === "escalada" || (a.estado === "resuelta" && a.escalada));
     else {
       const ids = new Set(this.teachingSections(actor).map((s) => s.id));
       mine = all.filter((a) => ids.has(a.sectionId));
@@ -626,6 +630,7 @@ export class MockAssessment implements AssessmentPort {
       return fail("invalid", "Esta apelación ya no admite respuesta");
     appeal.respuesta = body.data.respuesta;
     appeal.estado = body.data.escalar ? "escalada" : "respondida";
+    if (body.data.escalar) appeal.escalada = true;
     return parsed(Appeal, this.toAppeal(appeal));
   }
 
@@ -640,6 +645,7 @@ export class MockAssessment implements AssessmentPort {
     const section = this.seed.sections.find((s) => s.id === appeal.sectionId)!;
     if (body.data.decision === "modifica" && this.ws(actor).closed.has(section.id))
       return fail("invalid", "La nota final ya se cerró");
+    if (appeal.estado === "escalada") appeal.escalada = true;
     appeal.respuesta = body.data.respuesta;
     appeal.estado = "resuelta";
     appeal.resolucion = {

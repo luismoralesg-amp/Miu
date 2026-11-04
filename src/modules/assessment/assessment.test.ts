@@ -415,7 +415,10 @@ describe("AssessmentPort (mock) · teaching", () => {
     expect(await port.resolveAppeal(jorge, "ap-1", keep)).toMatchObject({ error: "invalid" });
     const done = value(await port.resolveAppeal(rodrigo, "ap-2", keep));
     expect(done.resolucion).toMatchObject({ decision: "mantiene", por: "Rodrigo Ajú" });
-    expect(value(await port.listAppeals(rodrigo))).toEqual([]);
+    // What reached the Administrativo stays visible once resolved.
+    expect(value(await port.listAppeals(rodrigo)).map((a) => a.estado)).toEqual(["resuelta"]);
+    // A teacher's own resolution never was the Administrativo's.
+    expect(value(await port.listAppeals(rodrigo)).map((a) => a.id)).not.toContain("ap-1");
   });
 
   it("the real adapter answers unavailable", async () => {

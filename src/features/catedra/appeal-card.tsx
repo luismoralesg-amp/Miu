@@ -54,8 +54,8 @@ export function AppealCard({
           {timeAgo(new Date(appeal.fecha), new Date(ahora))}
         </span>
       </p>
-      <p className="mt-1 flex flex-wrap items-center gap-1.5 text-label text-fg-muted">
-        <CourseDot slot={appeal.curso.slot as CourseSlot} />
+      <p className="mt-1 text-label text-fg-muted">
+        <CourseDot slot={appeal.curso.slot as CourseSlot} className="mr-1.5 align-middle" />
         {appeal.curso.nombre} · Sección {appeal.seccion} · {appeal.actividad}
         {appeal.nota !== null && (
           <>

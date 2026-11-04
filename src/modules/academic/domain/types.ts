@@ -166,7 +166,7 @@ export const TeachingSection = z.object({
   corto: z.string(),
   slot: CourseSlot,
   /** The actor's role in this section. */
-  rol: z.enum(["catedratico", "auxiliar"]),
+  rol: z.enum(["catedratico", "auxiliar", "administracion"]),
   catedratico: PersonRef,
   auxiliares: z.array(PersonRef),
   estudiantes: z.number().int().nonnegative(),

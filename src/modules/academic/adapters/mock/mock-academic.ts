@@ -251,8 +251,8 @@ export class MockAcademic implements AcademicPort {
   }
 
   async listTeachingSections(actor: Actor): PortResult<TeachingSection[]> {
-    if (actor.role !== "maestro" && actor.role !== "auxiliar")
-      return parsed(z.array(TeachingSection), []);
+    // The Administrativo oversees every section (statistics, audit); students have none.
+    if (actor.role === "estudiante") return parsed(z.array(TeachingSection), []);
     return parsed(
       z.array(TeachingSection),
       this.sectionsOf(actor).map((s) => {
@@ -264,7 +264,12 @@ export class MockAcademic implements AcademicPort {
           nombre: c.nombre,
           corto: c.corto,
           slot: c.slot,
-          rol: s.catedraticoId === actor.personId ? "catedratico" : "auxiliar",
+          rol:
+            actor.role === "administrativo"
+              ? "administracion"
+              : s.catedraticoId === actor.personId
+                ? "catedratico"
+                : "auxiliar",
           catedratico: this.ref(s.catedraticoId),
           auxiliares: s.auxiliarIds.map((id) => this.ref(id)),
           estudiantes: s.estudianteIds.length,

@@ -219,6 +219,9 @@ const STAGES: Record<string, Shot[]> = {
     { name: "chatgpt-edu", path: "/recursos/chatgpt-edu", as: "estudiante" },
   ],
   E11: [
+    { name: "admin-apelaciones", path: "/admin/apelaciones", as: "administrativo" },
+    { name: "admin-estadisticas", path: "/admin/estadisticas", as: "administrativo" },
+    { name: "admin-auditoria", path: "/admin/auditoria", as: "administrativo" },
     { name: "politicas", path: "/admin/politicas", as: "administrativo" },
     { name: "roles", path: "/admin/roles", as: "administrativo" },
     { name: "admin-pagos", path: "/admin/pagos", as: "administrativo" },

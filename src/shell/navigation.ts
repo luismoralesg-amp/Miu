@@ -314,6 +314,20 @@ export const SECTIONS = {
   ),
   roles: S("/admin/roles", "Roles", "user-cog", "E11", "Quién puede hacer qué, y en qué ámbito."),
   auditoria: S("/admin/auditoria", "Auditoría", "scroll", "E11", "Registro de cambios sensibles."),
+  apelacionesAdmin: S(
+    "/admin/apelaciones",
+    "Apelaciones escaladas",
+    "message-square",
+    "E11",
+    "Apelaciones que los equipos docentes pasaron a la administración.",
+  ),
+  estadisticasAdmin: S(
+    "/admin/estadisticas",
+    "Estadísticas",
+    "chart",
+    "E11",
+    "Cómo va cada sección de toda la universidad.",
+  ),
 } as const satisfies Record<string, Section>;
 
 export type SectionKey = keyof typeof SECTIONS;
@@ -378,7 +392,13 @@ export const NAV: Record<Role, Nav> = {
   administrativo: {
     barra: ["hoy", "politicas", "conciliacion", "roles", "auditoria"],
     movil: ["hoy", "politicas", "conciliacion", "roles"],
-    mas: [["Administración", ["auditoria"]], AYUDA, CUENTA, RECURSOS, GOOGLE],
+    mas: [
+      ["Administración", ["auditoria", "apelacionesAdmin", "estadisticasAdmin"]],
+      AYUDA,
+      CUENTA,
+      RECURSOS,
+      GOOGLE,
+    ],
   },
 };
 
@@ -414,6 +434,8 @@ export const SECTION_PERMISSIONS: Partial<Record<SectionKey, Permission[]>> = {
   conciliacion: ["approve_payment"],
   roles: ["manage_roles"],
   auditoria: ["view_audit", "configure_policy"],
+  apelacionesAdmin: ["resolve_appeal", "configure_policy"],
+  estadisticasAdmin: ["view_grade_stats", "configure_policy"],
 };
 
 export function sectionAllowed(role: Role, key: SectionKey) {
@@ -443,6 +465,9 @@ export const BUILT: ReadonlySet<SectionKey> = new Set<SectionKey>([
   "conciliacion",
   "politicas",
   "roles",
+  "auditoria",
+  "apelacionesAdmin",
+  "estadisticasAdmin",
   "conferencias",
   "asignacion",
   "documentos",
