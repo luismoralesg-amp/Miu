@@ -27,12 +27,12 @@ pantalla (no se manda correo) y el menú de cuenta trae el selector de rol.
 1. Escribe un correo `@ufm.edu` y toca **Continuar**.
 2. El código de 6 dígitos aparece en el recuadro "Correo de prueba"; escríbelo (se envía solo al sexto dígito).
 
-| Rol            | Correo de demo                                                | Qué ver primero                                        |
-| -------------- | ------------------------------------------------------------- | ------------------------------------------------------ |
-| Estudiante     | `ana.lopez.demo@ufm.edu`                                      | Hoy, Cursos, una actividad para entregar, Notas, Pagos |
-| Maestro        | `jorge.castillo.demo@ufm.edu`                                 | Hoy (lo que espera nota), Por calificar                |
-| Auxiliar       | `carlos.mendez.demo@ufm.edu` (o `sofia.ramirez.demo@ufm.edu`) | Por calificar → Actividad 6: closures                  |
-| Administrativo | `rodrigo.aju.demo@ufm.edu`                                    | Hoy (cola de comprobantes)                             |
+| Rol            | Correo de demo                                                | Qué ver primero                                                      |
+| -------------- | ------------------------------------------------------------- | -------------------------------------------------------------------- |
+| Estudiante     | `ana.lopez.demo@ufm.edu`                                      | Hoy, Cursos, una actividad para entregar, Notas, Pagos               |
+| Maestro        | `jorge.castillo.demo@ufm.edu`                                 | Hoy (lo que espera nota), Por calificar, Publicar, Cerrar nota final |
+| Auxiliar       | `carlos.mendez.demo@ufm.edu` (o `sofia.ramirez.demo@ufm.edu`) | Por calificar → Actividad 6: closures                                |
+| Administrativo | `rodrigo.aju.demo@ufm.edu`                                    | Hoy (cola de comprobantes), Pagos (caja, conciliación), Políticas    |
 
 Cualquier otro correo `@ufm.edu` entra como estudiante y ve el mismo expediente de demo.
 
@@ -50,7 +50,10 @@ Menú de cuenta (tus iniciales, arriba a la derecha) → **Rol (desarrollo)**. S
    y aparece el recibo con su huella SHA-256.
 4. **Notas:** abre Discreta y mueve el simulador "¿Qué nota necesito?".
 5. **Rol Auxiliar → Por calificar → Actividad 6:** califica con `j`/`k` y Enter; bajo 61 pide justificación;
-   publica.
+   publica (o revisa antes en **Publicar notas**).
+6. **Rol Maestro → Apelaciones:** responde, escala o resuelve; **Estadísticas** y **Auditoría** muestran el efecto.
+7. **Rol Administrativo → Políticas:** cambia el umbral y la comisión de tarjeta y míralo en Notas y Pagos;
+   **Pagos → Caja, Conciliación, Reembolsos**; **Roles** otorga a un Auxiliar cerrar la nota final de una sección.
 
 Más variantes de Hoy reiniciando con otra hora o día:
 
@@ -66,21 +69,30 @@ Todo dato es **ficticio** y la fecha de la demo es fija: **jueves 22 de octubre 
 (`HOY` en `src/lib/clock.ts`). Cada puerto tiene adaptador `mock` y `real`; el real todavía responde
 "no disponible" con el nombre del sistema que falta.
 
-| Puerto                                             | Hoy                                                   | Se conecta a (ver [`INTEGRACIONES_PENDIENTES.md`](docs/INTEGRACIONES_PENDIENTES.md)) |
-| -------------------------------------------------- | ----------------------------------------------------- | ------------------------------------------------------------------------------------ |
-| `IdentityPort`                                     | mock en memoria                                       | Google OIDC @ufm.edu, proveedor de correo, WebAuthn                                  |
-| `AcademicPort`, `AssessmentPort`, `CurriculumPort` | mock sobre `src/mock/seed/`                           | API o CDC de MiU                                                                     |
-| `InboxPort`                                        | proyección sobre los demás puertos                    | read model propio                                                                    |
-| `LedgerPort` / `SolvencyPort`                      | mock                                                  | sistema financiero UFM                                                               |
-| `PaymentProviderPort`                              | Recurrente simulado (checkout local, webhook firmado) | Recurrente sandbox; Stripe vacío                                                     |
-| `StoragePort`                                      | memoria, SHA-256, escaneo simulado                    | almacenamiento S3 compatible                                                         |
-| `AuditPort`                                        | memoria, solo agrega                                  | tabla de auditoría                                                                   |
+| Puerto                                                             | Hoy                                                             | Se conecta a (ver [`INTEGRACIONES_PENDIENTES.md`](docs/INTEGRACIONES_PENDIENTES.md)) |
+| ------------------------------------------------------------------ | --------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
+| `IdentityPort`                                                     | mock en memoria                                                 | Google OIDC @ufm.edu, proveedor de correo, WebAuthn                                  |
+| `AcademicPort`, `AssessmentPort`, `CurriculumPort`                 | mock sobre `src/mock/seed/`                                     | API o CDC de MiU                                                                     |
+| `InboxPort`                                                        | proyección sobre los demás puertos                              | read model propio                                                                    |
+| `LedgerPort` / `SolvencyPort`                                      | mock (cargos, caja, reembolsos)                                 | sistema financiero UFM                                                               |
+| `PaymentProviderPort`                                              | Recurrente simulado (checkout local, webhook firmado, extracto) | Recurrente sandbox; Stripe vacío                                                     |
+| `PolicyPort`                                                       | mock (umbral, metas, comisión, otorgamientos)                   | reglamento académico y administración de roles                                       |
+| `ConferencePort`, `EnrollmentPort`, `DocumentsPort`                | mock                                                            | catálogo de conferencias, calendario de asignación, emisión de documentos            |
+| `AccountPort`, `MessagingPort`, `SupportChatPort`, `DirectoryPort` | mock                                                            | perfil de MiU, mensajería de la UFM, proveedor de chat, directorio                   |
+| `StoragePort`                                                      | memoria, SHA-256, escaneo simulado                              | almacenamiento S3 compatible                                                         |
+| `AuditPort`                                                        | memoria, solo agrega                                            | tabla de auditoría                                                                   |
 
 Se elige con `MIU_ADAPTER_<PUERTO>=mock|real` (por ejemplo `MIU_ADAPTER_LEDGER=real`).
 
 Supuestos sin confirmar con la UFM (marcados `[S]` en los documentos): umbral de justificación 61, metas 71/80/90,
 comisión de tarjeta (4.5% + Q2) como costo de quien paga, bancos del checkout ACH, cierre de nota final solo del
-Maestro y semana de exámenes del 26 al 30 de octubre.
+Maestro (o el Auxiliar al que el Administrativo se lo otorgue) y semana de exámenes del 26 al 30 de octubre.
+
+## App instalable
+
+En el build de producción (`npm run build && npm start`) MiU se puede instalar y, sin conexión, muestra una página propia.
+El service worker guarda solo archivos estáticos: nunca páginas ni respuestas, porque llevan notas, pagos y mensajes.
+En desarrollo no se registra.
 
 ## Calidad
 
@@ -94,7 +106,7 @@ Lint, tipos, formato y pruebas unitarias (Vitest).
 PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH="/Applications/Brave Browser.app/Contents/MacOS/Brave Browser" npm run e2e
 ```
 
-E2E con Playwright en claro, oscuro y móvil, con axe (WCAG 2.2 AA) y revisión de CSP. Usa un Chromium local (aquí
+E2E con Playwright en claro, oscuro y móvil, con axe (WCAG 2.2 AA) sobre todas las pantallas de cada rol, un recorrido con teclado, revisión de CSP y la medición de LCP e INP. Usa un Chromium local (aquí
 Brave) en lugar de descargar el de Playwright. Levanta dos servidores: uno con herramientas de demo (3100) y uno
 como producción (3101).
 
