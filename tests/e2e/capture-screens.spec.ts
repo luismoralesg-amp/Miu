@@ -148,6 +148,7 @@ const STAGES: Record<string, Shot[]> = {
       },
     },
   ],
+  E12: [{ name: "sin-conexion", path: "/offline.html", as: "estudiante" }],
   E10: [
     { name: "catedra", path: "/catedra", as: "maestro" },
     { name: "seccion", path: "/catedra/secciones/md-a", as: "maestro" },

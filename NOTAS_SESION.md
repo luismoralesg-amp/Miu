@@ -16,3 +16,5 @@
 - Siguiente ítem: P2-16 · E11c · Administración: auditoría, apelaciones y estadísticas.
 - 2026-11-04 · P2-16 hecho: auditoría, apelaciones escaladas y estadísticas del Administrativo, con componentes compartidos. Cierra E11. Lo que se aprendió: una ruta de Administración que reutiliza un permiso que también tiene el Maestro debe pedir además `configure_policy`, o el Maestro entra.
 - Siguiente ítem: P2-17 · E12a · PWA.
+- 2026-11-04 · P2-17 hecho: PWA. Lo que se aprendió: `public/brand/escudo.png` y `escudo-osc.png` son marcas de agua al 12 %, no sirven de ícono; el escudo opaco se recorta de `logo-ufm01.png` (x 11, y 10, 148×177) y se renderizó con Brave en canvas (no hay PIL ni ImageMagick). El worker no guarda páginas con datos personales.
+- Siguiente ítem: P2-18 · E12b · Rendimiento (LCP e INP en Hoy, Cursos y Pagos).
