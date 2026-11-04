@@ -26,6 +26,9 @@ import {
 import {
   Appeal,
   AppealInput,
+  AppealReply,
+  AppealResolve,
+  type AppealResolution,
   Batch,
   BatchEntry,
   GradeInput,
@@ -49,11 +52,12 @@ type StoredEntry = {
   justificacion?: string;
   estado: "sin_nota" | "guardada" | "publicada";
 };
+type StoredAppeal = SeedAppeal & { resolucion?: AppealResolution };
 type Workspace = {
   submissions: StoredSubmission[];
   batches: Map<string, StoredEntry[]>;
   closed: Map<string, string>;
-  appeals: SeedAppeal[];
+  appeals: StoredAppeal[];
 };
 type Publication = { nota: number; porId: string; fecha: string };
 
@@ -69,11 +73,19 @@ const GRADED_ONLINE = new Set(["en_linea", "presencial"]);
 export class MockAssessment implements AssessmentPort {
   private readonly workspaces = new Map<string, Workspace>();
   private readonly published = new Map<string, Publication>();
+  /** Appeals of the seeded staff accounts are shared, so an escalation reaches the Administrativo. */
+  private readonly sharedAppeals: StoredAppeal[];
 
   constructor(
     private readonly seed: Seed = buildSeed(),
     private readonly now: () => Date = academicNow,
-  ) {}
+  ) {
+    this.sharedAppeals = structuredClone(seed.appeals);
+  }
+
+  private appealsOf(actor: Actor): StoredAppeal[] {
+    return this.isSeedStaff(actor) ? this.sharedAppeals : this.ws(actor).appeals;
+  }
 
   private ws(actor: Actor): Workspace {
     let ws = this.workspaces.get(actor.userId);
@@ -482,6 +494,7 @@ export class MockAssessment implements AssessmentPort {
       seccion: section.seccion,
       curso: this.course(section.courseId),
       umbral,
+      metas: this.seed.policy.metas,
       cerrada: this.ws(actor).closed.has(section.id),
       actividades,
       estudiantes,
@@ -553,7 +566,7 @@ export class MockAssessment implements AssessmentPort {
     return parsed(z.boolean(), this.ws(actor).closed.has(sectionId));
   }
 
-  private toAppeal(a: SeedAppeal) {
+  private toAppeal(a: StoredAppeal) {
     const activity = this.seed.activities.find((x) => x.id === a.activityId)!;
     const section = this.seed.sections.find((s) => s.id === a.sectionId)!;
     const nota = this.seededFor(section, a.studentId, a.activityId);
@@ -569,13 +582,14 @@ export class MockAssessment implements AssessmentPort {
       fecha: a.fecha,
       estado: a.estado,
       ...(a.respuesta ? { respuesta: a.respuesta } : {}),
-      nota,
+      ...(a.resolucion ? { resolucion: a.resolucion } : {}),
+      nota: a.resolucion?.notaNueva ?? nota,
     };
   }
 
   async listAppeals(actor: Actor): PortResult<Appeal[]> {
-    const all = this.ws(actor).appeals;
-    let mine: SeedAppeal[];
+    const all = actor.role === "estudiante" ? this.ws(actor).appeals : this.appealsOf(actor);
+    let mine: StoredAppeal[];
     if (actor.role === "estudiante") mine = all.filter((a) => a.studentId === actor.personId);
     else if (actor.role === "administrativo") mine = all.filter((a) => a.estado === "escalada");
     else {
@@ -588,6 +602,55 @@ export class MockAssessment implements AssessmentPort {
     );
   }
 
+  /** The appeal if this actor may act on it: a teaching role in its section, or the Administrativo for escalated ones. */
+  private appealFor(actor: Actor, appealId: string): Result<StoredAppeal, PortError> {
+    const appeal = this.appealsOf(actor).find((a) => a.id === appealId);
+    if (!appeal) return fail("not_found");
+    const mine =
+      actor.role === "administrativo"
+        ? appeal.estado === "escalada"
+        : this.teachingSections(actor).some((s) => s.id === appeal.sectionId);
+    return mine ? ok(appeal) : fail("forbidden");
+  }
+
+  async replyAppeal(actor: Actor, appealId: string, input: AppealReply) {
+    const body = AppealReply.safeParse(input);
+    if (!body.success) return fail("invalid", body.error.issues[0]?.message);
+    if (actor.role !== "maestro" && actor.role !== "auxiliar") return fail("forbidden");
+    const found = this.appealFor(actor, appealId);
+    if (!found.ok) return found;
+    const appeal = found.value;
+    if (appeal.estado === "escalada" || appeal.estado === "resuelta")
+      return fail("invalid", "Esta apelación ya no admite respuesta");
+    appeal.respuesta = body.data.respuesta;
+    appeal.estado = body.data.escalar ? "escalada" : "respondida";
+    return parsed(Appeal, this.toAppeal(appeal));
+  }
+
+  async resolveAppeal(actor: Actor, appealId: string, input: AppealResolve) {
+    const body = AppealResolve.safeParse(input);
+    if (!body.success) return fail("invalid", body.error.issues[0]?.message);
+    if (actor.role !== "maestro" && actor.role !== "administrativo") return fail("forbidden");
+    const found = this.appealFor(actor, appealId);
+    if (!found.ok) return found;
+    const appeal = found.value;
+    if (appeal.estado === "resuelta") return fail("invalid", "Esta apelación ya está resuelta");
+    const section = this.seed.sections.find((s) => s.id === appeal.sectionId)!;
+    if (body.data.decision === "modifica" && this.ws(actor).closed.has(section.id))
+      return fail("invalid", "La nota final ya se cerró");
+    appeal.respuesta = body.data.respuesta;
+    appeal.estado = "resuelta";
+    appeal.resolucion = {
+      decision: body.data.decision,
+      ...(body.data.decision === "modifica" && body.data.notaNueva !== undefined
+        ? { notaNueva: body.data.notaNueva }
+        : {}),
+      por: actor.nombre,
+      fecha: this.now().toISOString(),
+    };
+    return parsed(Appeal, this.toAppeal(appeal));
+  }
+
   async createAppeal(actor: Actor, input: { activityId: string; motivo: string }) {
     const body = AppealInput.safeParse(input);
     if (!body.success) return fail("invalid", body.error.issues[0]?.message);
@@ -598,7 +661,7 @@ export class MockAssessment implements AssessmentPort {
     if (!this.gradeOf(actor.personId, activity.id))
       return fail("invalid", "Solo se apela una nota publicada");
     const ws = this.ws(actor);
-    const appeal: SeedAppeal = {
+    const appeal: StoredAppeal = {
       id: `ap-${ws.appeals.length + 1}-${activity.id}`,
       activityId: activity.id,
       sectionId: section.id,

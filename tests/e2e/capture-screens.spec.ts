@@ -1,6 +1,6 @@
 import { test, type Page } from "@playwright/test";
 
-import { DEMO, waitForAnimations } from "./helpers";
+import { DEMO, switchRole, waitForAnimations } from "./helpers";
 
 /**
  * Report screenshots per stage: `CAPTURE=E4 npm run e2e -- capture-screens --workers=1` (una sola cuenta demo por rol: el código tiene 30 s de espera entre envíos).
@@ -154,6 +154,25 @@ const STAGES: Record<string, Shot[]> = {
     { name: "libro", path: "/catedra/libro/md-a", as: "maestro" },
     { name: "publicar", path: "/catedra/publicar", as: "auxiliar" },
     { name: "cierre", path: "/catedra/cierre", as: "maestro" },
+    { name: "apelaciones", path: "/catedra/apelaciones", as: "maestro" },
+    { name: "estadisticas", path: "/catedra/estadisticas", as: "maestro" },
+    {
+      name: "auditoria",
+      path: "/",
+      as: "maestro",
+      fresh: true,
+      prepare: async (page) => {
+        await switchRole(page, "maestro");
+        await page.goto("/catedra/apelaciones");
+        await page
+          .getByLabel("Tu respuesta")
+          .fill("Revisé la pregunta 4 con la rúbrica y el desarrollo.");
+        await page.getByRole("button", { name: "Responder" }).click();
+        await page.getByRole("status").waitFor();
+        await page.goto("/catedra/auditoria");
+        await page.waitForLoadState("networkidle");
+      },
+    },
     { name: "por-calificar", path: "/catedra/por-calificar", as: "auxiliar" },
     {
       name: "lote",

@@ -21,8 +21,11 @@ describe("navigation and authorization agree", () => {
 
 describe("deep links into sections still being built", () => {
   it("land on the closest section instead of a 404", async () => {
-    const { sectionKeyByPath } = await import("./navigation");
-    expect(sectionKeyByPath("/catedra/apelaciones/ap-1")).toBe("apelaciones");
+    const { sectionKeyByPath, BUILT } = await import("./navigation");
+    // Whatever is still unbuilt answers its deep links with its own section; once all are built there is none.
+    for (const [key, s] of Object.entries(SECTIONS))
+      if (!s.externo && s.path !== "/" && !BUILT.has(key as SectionKey))
+        expect(sectionKeyByPath(`${s.path}/x`), key).toBe(key);
     // Built sections answer their own deep links; an unknown one is a real 404.
     expect(sectionKeyByPath("/catedra/no-existe")).toBeUndefined();
     expect(sectionKeyByPath("/catedra/publicar/md-a")).toBeUndefined();

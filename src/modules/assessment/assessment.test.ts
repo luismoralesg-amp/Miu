@@ -356,6 +356,68 @@ describe("AssessmentPort (mock) · teaching", () => {
     expect(value(await fresh().listAppeals(admin())).map((a) => a.estado)).toEqual(["escalada"]);
   });
 
+  it("replyAppeal: the team answers or escalates; the answer is kept", async () => {
+    const port = fresh();
+    const jorge = maestro();
+    expect(await port.replyAppeal(jorge, "ap-1", { respuesta: "corto" })).toMatchObject({
+      error: "invalid",
+    });
+    // Carlos assists pp-a, not md-a.
+    expect(
+      await port.replyAppeal(auxiliar(), "ap-1", { respuesta: "Revisé la pregunta 4." }),
+    ).toMatchObject({ error: "forbidden" });
+    const replied = value(
+      await port.replyAppeal(jorge, "ap-1", { respuesta: "Revisé la pregunta 4 con la rúbrica." }),
+    );
+    expect(replied).toMatchObject({ estado: "respondida", respuesta: expect.any(String) });
+    const escalated = value(
+      await port.replyAppeal(jorge, "ap-1", {
+        respuesta: "Lo paso a la administración.",
+        escalar: true,
+      }),
+    );
+    expect(escalated.estado).toBe("escalada");
+    // Escalated is no longer the team's to answer, and students never reply.
+    expect(
+      await port.replyAppeal(jorge, "ap-1", { respuesta: "Otra respuesta distinta." }),
+    ).toMatchObject({
+      error: "invalid",
+    });
+    expect(
+      await port.replyAppeal(student(), "ap-1", { respuesta: "Soy la estudiante." }),
+    ).toMatchObject({
+      error: "forbidden",
+    });
+  });
+
+  it("resolveAppeal: the Maestro decides; the Administrativo only what was escalated", async () => {
+    const port = fresh();
+    const jorge = maestro();
+    const rodrigo = admin();
+    const keep = { decision: "mantiene", respuesta: "La contrapositiva no aplica aquí." } as const;
+    expect(await port.resolveAppeal(auxiliar(), "ap-2", keep)).toMatchObject({
+      error: "forbidden",
+    });
+    // Changing the grade needs the new grade.
+    expect(
+      await port.resolveAppeal(jorge, "ap-1", { decision: "modifica", respuesta: "Tiene razón." }),
+    ).toMatchObject({ error: "invalid", detail: "Indica la nota nueva" });
+    // md-a's appeal isn't escalated: not the Administrativo's yet.
+    expect(await port.resolveAppeal(rodrigo, "ap-1", keep)).toMatchObject({ error: "forbidden" });
+    const changed = value(
+      await port.resolveAppeal(jorge, "ap-1", {
+        decision: "modifica",
+        notaNueva: 90,
+        respuesta: "Tiene razón: el razonamiento es válido.",
+      }),
+    );
+    expect(changed).toMatchObject({ estado: "resuelta", nota: 90, resolucion: { notaNueva: 90 } });
+    expect(await port.resolveAppeal(jorge, "ap-1", keep)).toMatchObject({ error: "invalid" });
+    const done = value(await port.resolveAppeal(rodrigo, "ap-2", keep));
+    expect(done.resolucion).toMatchObject({ decision: "mantiene", por: "Rodrigo Ajú" });
+    expect(value(await port.listAppeals(rodrigo))).toEqual([]);
+  });
+
   it("the real adapter answers unavailable", async () => {
     expect(await createRealAssessment().getGradebook(student())).toMatchObject({
       error: "unavailable",

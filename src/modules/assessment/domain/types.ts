@@ -209,6 +209,8 @@ export const SectionGradebook = z.object({
   seccion: z.string(),
   curso: CourseTag,
   umbral: z.number(),
+  /** Goals above the threshold (71/80/90 [S]). */
+  metas: z.array(z.number()),
   cerrada: z.boolean(),
   actividades: z.array(TeachingActivity),
   estudiantes: z.array(GradebookStudent),
@@ -217,6 +219,18 @@ export const SectionGradebook = z.object({
   bajoUmbral: z.number().int(),
 });
 export type SectionGradebook = z.infer<typeof SectionGradebook>;
+
+export const AppealDecision = z.enum(["mantiene", "modifica"]);
+export type AppealDecision = z.infer<typeof AppealDecision>;
+
+/** How an appeal ended: the grade stays, or it changes to `notaNueva`. */
+export const AppealResolution = z.object({
+  decision: AppealDecision,
+  notaNueva: z.number().int().min(0).max(100).optional(),
+  por: z.string(),
+  fecha: isoDate,
+});
+export type AppealResolution = z.infer<typeof AppealResolution>;
 
 export const Appeal = z.object({
   id: z.string(),
@@ -230,9 +244,29 @@ export const Appeal = z.object({
   fecha: isoDate,
   estado: z.enum(["nueva", "respondida", "escalada", "resuelta"]),
   respuesta: z.string().optional(),
+  resolucion: AppealResolution.optional(),
   nota: z.number().nullable(),
 });
 export type Appeal = z.infer<typeof Appeal>;
+
+/** Answering an appeal; `escalar` hands it to the Administrativo instead of closing the thread. */
+export const AppealReply = z.object({
+  respuesta: z.string().trim().min(10, "Escribe una respuesta de al menos 10 caracteres").max(1000),
+  escalar: z.boolean().default(false),
+});
+export type AppealReply = z.input<typeof AppealReply>;
+
+export const AppealResolve = z
+  .object({
+    decision: AppealDecision,
+    notaNueva: z.number().int().min(0).max(100).optional(),
+    respuesta: z.string().trim().min(10, "Explica la decisión en al menos 10 caracteres").max(1000),
+  })
+  .refine((v) => v.decision === "mantiene" || v.notaNueva !== undefined, {
+    message: "Indica la nota nueva",
+    path: ["notaNueva"],
+  });
+export type AppealResolve = z.input<typeof AppealResolve>;
 
 export const AppealInput = z.object({
   activityId: z.string(),

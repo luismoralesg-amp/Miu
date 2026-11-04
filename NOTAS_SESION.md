@@ -8,3 +8,5 @@
 - Siguiente ítem: P2-12 · E10c · Publicar y cerrar.
 - 2026-11-04 · P2-12 hecho: `/catedra/publicar` y `/catedra/cierre`. Lo que se aprendió: un componente de cliente con estado (`useActionState`) debe seguir montado tras `revalidatePath`, o el aviso de éxito desaparece antes de leerse; en las pruebas, Jorge ve dos secciones con la misma actividad (Discreta A y B), hay que acotar por región.
 - Siguiente ítem: P2-13 · E10d · Apelaciones, auditoría y estadísticas de cátedra.
+- 2026-11-04 · P2-13 hecho. Lo que se aprendió: cambiar un `<Button type="button">` por uno `submit` en la misma posición durante un clic dispara el envío del formulario (usar `key` distintas); y los componentes con estado deben vivir en una sola lista para sobrevivir al `revalidatePath`.
+- Siguiente ítem: P2-14 · E11a · Administración: políticas y roles.

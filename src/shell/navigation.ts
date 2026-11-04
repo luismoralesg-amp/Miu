@@ -283,6 +283,20 @@ export const SECTIONS = {
     "E10",
     "Solicitudes de revisión de los estudiantes.",
   ),
+  estadisticas: S(
+    "/catedra/estadisticas",
+    "Estadísticas",
+    "chart",
+    "E10",
+    "Cómo va cada sección: distribución de notas y promedio por actividad.",
+  ),
+  auditoriaCatedra: S(
+    "/catedra/auditoria",
+    "Auditoría",
+    "scroll",
+    "E10",
+    "Lo que se calificó, publicó y cerró, y quién lo hizo.",
+  ),
   // Administrative role
   politicas: S(
     "/admin/politicas",
@@ -342,12 +356,24 @@ export const NAV: Record<Role, Nav> = {
   maestro: {
     barra: ["hoy", "catedra", "porCalificar", "libro", "apelaciones"],
     movil: ["hoy", "catedra", "porCalificar", "libro"],
-    mas: [["Cátedra", ["publicar", "cierre", "apelaciones"]], AYUDA, CUENTA, RECURSOS, GOOGLE],
+    mas: [
+      ["Cátedra", ["publicar", "cierre", "apelaciones", "estadisticas", "auditoriaCatedra"]],
+      AYUDA,
+      CUENTA,
+      RECURSOS,
+      GOOGLE,
+    ],
   },
   auxiliar: {
     barra: ["hoy", "catedra", "porCalificar", "publicar", "apelaciones"],
     movil: ["hoy", "catedra", "porCalificar", "publicar"],
-    mas: [["Cátedra", ["libro", "apelaciones"]], AYUDA, CUENTA, RECURSOS, GOOGLE],
+    mas: [
+      ["Cátedra", ["libro", "apelaciones", "estadisticas", "auditoriaCatedra"]],
+      AYUDA,
+      CUENTA,
+      RECURSOS,
+      GOOGLE,
+    ],
   },
   administrativo: {
     barra: ["hoy", "politicas", "conciliacion", "roles", "auditoria"],
@@ -381,6 +407,8 @@ export const SECTION_PERMISSIONS: Partial<Record<SectionKey, Permission[]>> = {
   libro: ["grade"],
   publicar: ["publish_grades"],
   cierre: ["close_final_grade"],
+  estadisticas: ["view_grade_stats", "grade"],
+  auditoriaCatedra: ["view_audit", "grade"],
   apelaciones: ["respond_appeal"],
   politicas: ["configure_policy"],
   conciliacion: ["approve_payment"],
@@ -407,6 +435,9 @@ export const BUILT: ReadonlySet<SectionKey> = new Set<SectionKey>([
   "libro",
   "publicar",
   "cierre",
+  "apelaciones",
+  "estadisticas",
+  "auditoriaCatedra",
   "pensum",
   "historial",
   "conciliacion",

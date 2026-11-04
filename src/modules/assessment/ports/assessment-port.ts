@@ -3,6 +3,8 @@ import type { Actor } from "@/modules/identity";
 
 import type {
   Appeal,
+  AppealReply,
+  AppealResolve,
   Batch,
   BatchEntry,
   Gradebook,
@@ -41,5 +43,9 @@ export interface AssessmentPort {
   closeFinalGrade(actor: Actor, sectionId: string): PortResult<{ cerrada: true; fecha: string }>;
   isClosed(actor: Actor, sectionId: string): PortResult<boolean>;
   listAppeals(actor: Actor): PortResult<Appeal[]>;
+  /** Teaching roles answer an appeal of their section, or escalate it to the Administrativo. */
+  replyAppeal(actor: Actor, appealId: string, input: AppealReply): PortResult<Appeal>;
+  /** Maestro (their course) or Administrativo (escalated only) decide: keep the grade or change it. */
+  resolveAppeal(actor: Actor, appealId: string, input: AppealResolve): PortResult<Appeal>;
   createAppeal(actor: Actor, input: { activityId: string; motivo: string }): PortResult<Appeal>;
 }
