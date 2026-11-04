@@ -139,7 +139,8 @@ Formato de reporte por ítem: `→ hash · qué quedó · pruebas (U n/n, E n/n)
   - → 3819b69 · README al día: los cuatro roles con sus pantallas, recorrido ampliado a Maestro y Administrativo, tabla con los 14 puertos, la app instalable y lo que cubre el E2E · **prueba desde un clon limpio** (`git clone` a una carpeta temporal, Node 24.22.1 por `.nvmrc`, `npm ci --offline` desde la caché de npm, sin descargar nada): `npm run check` 477/477 y `next dev` responde 200 en `/api/health`, `/login` (con «Correo de la UFM») y `/manifest.webmanifest`; servidor detenido por su PID · sin supuestos nuevos
 - [x] **P3-3 · DECISIONES e INTEGRACIONES_PENDIENTES al día.** Una fila por puerto en INTEGRACIONES (PLAN §6) y todos los `[S]` de este backlog. Prueba: revisión con grep de que cada puerto en `src/modules/*/ports` tiene su fila.
   - → f9eb382 · el grep sobre `export interface *Port` de `src/modules/*/ports/*.ts` encuentra los 18 puertos con su fila en INTEGRACIONES (ninguno sin fila); INTEGRACIONES gana la tabla «Supuestos `[S]` del backlog de cierre y dónde viven» (los 7, con su ubicación) y el [S] de «dos personas» y de la caja en la fila del libro mayor; DECISIONES gana la sección «Cátedra, administración y app instalable» (cierre de nota, apelaciones, políticas, reembolsos, conciliación, rutas del Administrativo, service worker, formularios con estado y accesibilidad) · sin supuestos nuevos
-- [ ] **P3-4 · Reporte de cierre.** `docs/etapas/E12/REPORTE.md` (máximo 40 líneas): qué está hecho, pruebas totales, métricas, supuestos, riesgos e ítems `[!]`. Prueba: `npm run check`, `npm run build` y `npm run e2e` verdes en la misma corrida.
+- [x] **P3-4 · Reporte de cierre.** `docs/etapas/E12/REPORTE.md` (máximo 40 líneas): qué está hecho, pruebas totales, métricas, supuestos, riesgos e ítems `[!]`. Prueba: `npm run check`, `npm run build` y `npm run e2e` verdes en la misma corrida.
+  - → HASH34 · reporte de 39 líneas · misma pasada: `check` 477/477 (37 archivos), `build` sin errores (73 rutas), `e2e` 254 pasan, 31 omitidas a propósito y 0 fallan (10.3 min) · bajo la carga de toda la suite el INP de Pagos llegó a 176 ms (meta 200): dentro, pero cerca · sin supuestos nuevos
 
 ---
 
@@ -153,4 +154,4 @@ Formato de reporte por ítem: `→ hash · qué quedó · pruebas (U n/n, E n/n)
 7. Metas de LCP e INP, si el plan no las fija.
 
 ## Bloqueos `[!]`
-(ninguno todavía)
+(ninguno: no quedó ningún ítem bloqueado)
