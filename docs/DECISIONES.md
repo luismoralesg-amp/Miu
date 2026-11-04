@@ -4,7 +4,7 @@ Cada entrada: fecha · decisión · por qué · cómo revertirla.
 
 ## 2026-10-22 · E0
 
-- **Next.js 16.4.2 + React 19.3.1, versiones exactas** (`save-exact`, `package-lock.json`). Última estable con soporte.
+- **Next.js 16.4.2 (16.4.5 desde el 2026-11-04) + React 19.3.1, versiones exactas** (`save-exact`, `package-lock.json`). Última estable con soporte.
 - **TypeScript 6.0.3, no 7.0.** *(Hecho)* `typescript-eslint` 8.72 solo admite `typescript <6.1`. Se sube a 7 cuando
   `typescript-eslint` lo soporte.
 - **Sin `vite-tsconfig-paths`.** Vite 8 resuelve los alias de `tsconfig` por sí mismo (`resolve.tsconfigPaths`), y el
@@ -127,3 +127,9 @@ Cada entrada: fecha · decisión · por qué · cómo revertirla.
 - **Botón píldora:** `Button pill` en lugar de `className="rounded-full"`, que perdía contra el radio del tamaño.
 - **Step-up en línea:** guardar preferencias y botar un curso piden un código nuevo de un solo uso (5 min) en un panel
   dentro de la página, sin ventanas emergentes. En el real, el código o la passkey los da `IdentityPort`.
+
+## 2026-11-04 · Actualización de seguridad
+
+- **Next.js 16.4.2 → 16.4.5** (y `eslint-config-next` a la par), con la aprobación de Luis: es la versión de seguridad de
+  noviembre. Sigue con versión exacta; el lockfile solo cambia los paquetes de Next. `npm audit` mantiene 15 avisos
+  moderados de `minimatch`, que entra por ESLint (solo desarrollo, no llega al build).
