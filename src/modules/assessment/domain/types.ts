@@ -165,6 +165,59 @@ export const QueueItem = z.object({
 });
 export type QueueItem = z.infer<typeof QueueItem>;
 
+/** Where an activity stands for the people who teach the section. */
+export const TeachingActivityStatus = z.enum([
+  "programada",
+  "por_calificar",
+  "sin_publicar",
+  "publicada",
+]);
+export type TeachingActivityStatus = z.infer<typeof TeachingActivityStatus>;
+
+export const TeachingActivity = z.object({
+  id: z.string(),
+  titulo: z.string(),
+  tipo: ActivityKind,
+  peso: z.number(),
+  fecha: isoDate,
+  estado: TeachingActivityStatus,
+  /** Grades saved for the section (published or not), out of `estudiantes`. */
+  calificadas: z.number().int(),
+  publicadas: z.number().int(),
+  /** Mean of the saved grades, one decimal; null before any grade. */
+  promedio: z.number().nullable(),
+  /** The batch can be opened from Por calificar. */
+  enLote: z.boolean(),
+});
+export type TeachingActivity = z.infer<typeof TeachingActivity>;
+
+export const GradebookStudent = z.object({
+  studentId: z.string(),
+  nombre: z.string(),
+  /** Masked for teaching roles. */
+  carne: z.string(),
+  /** Grade per activity id; null while there is none. */
+  notas: z.record(z.string(), z.number().nullable()),
+  evaluado: z.number(),
+  actual: z.number(),
+});
+export type GradebookStudent = z.infer<typeof GradebookStudent>;
+
+/** A section's gradebook: every student against every activity, as the teaching team sees it. */
+export const SectionGradebook = z.object({
+  sectionId: z.string(),
+  seccion: z.string(),
+  curso: CourseTag,
+  umbral: z.number(),
+  cerrada: z.boolean(),
+  actividades: z.array(TeachingActivity),
+  estudiantes: z.array(GradebookStudent),
+  /** Mean of the students' current grades, one decimal. */
+  promedio: z.number(),
+  bajoUmbral: z.number().int(),
+});
+export type SectionGradebook = z.infer<typeof SectionGradebook>;
+
 export const Appeal = z.object({
   id: z.string(),
   activityId: z.string(),

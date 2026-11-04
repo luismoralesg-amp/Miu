@@ -8,6 +8,7 @@ import type {
   Gradebook,
   GradeInput,
   QueueItem,
+  SectionGradebook,
   StudentActivity,
   Submission,
   SubmitInput,
@@ -27,6 +28,8 @@ export interface AssessmentPort {
   /** Teaching roles: activities with submissions to grade in the actor's sections. */
   listGradingQueue(actor: Actor): PortResult<QueueItem[]>;
   listBatch(actor: Actor, sectionId: string, activityId: string): PortResult<Batch>;
+  /** Teaching roles: every student and activity of one of their sections; `forbidden` otherwise. */
+  getSectionGradebook(actor: Actor, sectionId: string): PortResult<SectionGradebook>;
   /** Saves one grade. Under the threshold it needs a justification. */
   gradeSubmission(actor: Actor, input: GradeInput): PortResult<BatchEntry>;
   /** Publishes every saved grade of the batch; students get a notice. */

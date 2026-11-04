@@ -180,6 +180,61 @@ describe("AssessmentPort (mock) · teaching", () => {
     expect(batch.entradas.find((e) => e.nombre === "Gabriela Hernández")!.atrasada).toBe(true);
   });
 
+  it("getSectionGradebook: every student against every activity, only in one's own sections", async () => {
+    const port = fresh();
+    const jorge = maestro();
+    const book = value(await port.getSectionGradebook(jorge, "md-a"));
+    expect(book.estudiantes).toHaveLength(28);
+    expect(book.estudiantes.every((e) => e.carne.includes("••"))).toBe(true);
+    // The demo student's row matches what she sees in Notas.
+    expect(book.estudiantes.find((e) => e.studentId === "p-ana")).toMatchObject({
+      evaluado: 60,
+      actual: 77.7,
+    });
+    const estado = Object.fromEntries(book.actividades.map((a) => [a.id, a.estado]));
+    expect(estado).toMatchObject({
+      "md-quiz-3": "publicada",
+      "md-tarea-4": "por_calificar",
+      "md-parcial-2": "programada",
+    });
+    expect(book.actividades.find((a) => a.id === "md-tarea-4")).toMatchObject({
+      calificadas: 0,
+      enLote: true,
+      promedio: null,
+    });
+    expect(book.bajoUmbral).toBe(book.estudiantes.filter((e) => e.actual < 61).length);
+
+    // A saved grade shows up at once, still unpublished.
+    await port.gradeSubmission(jorge, {
+      sectionId: "md-a",
+      activityId: "md-tarea-4",
+      studentId: "p-ana",
+      nota: 88,
+    });
+    const after = value(await port.getSectionGradebook(jorge, "md-a"));
+    expect(after.actividades.find((a) => a.id === "md-tarea-4")).toMatchObject({
+      calificadas: 1,
+      publicadas: 0,
+      promedio: 88,
+    });
+    expect(after.estudiantes.find((e) => e.studentId === "p-ana")!.notas["md-tarea-4"]).toBe(88);
+
+    expect(await port.getSectionGradebook(auxiliar(), "md-a")).toMatchObject({
+      error: "forbidden",
+    });
+    expect(await port.getSectionGradebook(student(), "md-a")).toMatchObject({ error: "forbidden" });
+    expect(value(await port.getSectionGradebook(auxiliar(), "md-b")).estudiantes).toHaveLength(22);
+  });
+
+  it("appeals show the same grade as the gradebook", async () => {
+    const port = fresh();
+    const jorge = maestro();
+    const [ap] = value(await port.listAppeals(jorge));
+    const book = value(await port.getSectionGradebook(jorge, ap!.sectionId));
+    const row = book.estudiantes.find((e) => e.studentId === ap!.estudiante.id)!;
+    expect(ap!.nota).toBe(row.notas[ap!.activityId]);
+  });
+
   it("gradeSubmission: justification required under 61; other sections are forbidden", async () => {
     const port = fresh();
     const carlos = auxiliar();

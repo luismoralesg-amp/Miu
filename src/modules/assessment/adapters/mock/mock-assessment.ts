@@ -30,10 +30,12 @@ import {
   GradeInput,
   Gradebook,
   QueueItem,
+  SectionGradebook,
   StudentActivity,
   Submission,
   SubmitInput,
   type ActivityStatus,
+  type TeachingActivityStatus,
 } from "../../domain/types";
 import type { AssessmentPort } from "../../ports/assessment-port";
 
@@ -158,6 +160,20 @@ export class MockAssessment implements AssessmentPort {
       fecha: pub.fecha,
       nueva: true,
     };
+  }
+
+  /**
+   * A grade already given in the seed: the demo student keeps hers; classmates get a stable example
+   * grade per activity, so the gradebook, the appeals and the stats agree.
+   */
+  private seededFor(section: SeedSection, studentId: string, activityId: string) {
+    if (studentId === this.seed.student.id)
+      return this.gradeOf(studentId, activityId)?.nota ?? null;
+    const course = this.seed.activities.filter((a) => a.courseId === section.courseId);
+    return seededGrade(
+      section.estudianteIds.indexOf(studentId),
+      course.findIndex((a) => a.id === activityId),
+    );
   }
 
   private studentActivity(actor: Actor, a: SeedActivity) {
@@ -384,6 +400,95 @@ export class MockAssessment implements AssessmentPort {
     });
   }
 
+  async getSectionGradebook(actor: Actor, sectionId: string): PortResult<SectionGradebook> {
+    const section = this.teachingSections(actor).find((s) => s.id === sectionId);
+    if (!section) return fail("forbidden", "No tienes asignada esta sección");
+    const now = this.now().getTime();
+    const inSeed = new Set(this.seed.grades.map((g) => g.activityId));
+    const inBatch = new Set(this.gradable(section).map((a) => a.id));
+    const acts = this.seed.activities
+      .filter((a) => a.courseId === section.courseId)
+      .sort((a, b) => a.fecha.localeCompare(b.fecha));
+
+    // Grade of every student on every activity: seeded ones are published; batch ones keep their state.
+    type Cell = { nota: number | null; publicada: boolean };
+    const cells = new Map<string, Map<string, Cell>>();
+    for (const a of acts) {
+      const byStudent = new Map<string, Cell>();
+      if (inSeed.has(a.id))
+        for (const id of section.estudianteIds)
+          byStudent.set(id, { nota: this.seededFor(section, id, a.id), publicada: true });
+      else if (inBatch.has(a.id))
+        for (const e of this.entries(actor, section, a))
+          byStudent.set(e.studentId, { nota: e.nota, publicada: e.estado === "publicada" });
+      cells.set(a.id, byStudent);
+    }
+
+    const total = section.estudianteIds.length;
+    const actividades = acts.map((a) => {
+      const saved = [...cells.get(a.id)!.values()].filter(
+        (c): c is { nota: number; publicada: boolean } => c.nota !== null,
+      );
+      const publicadas = saved.filter((c) => c.publicada).length;
+      const estado: TeachingActivityStatus =
+        Date.parse(a.fecha) > now
+          ? "programada"
+          : saved.length < total
+            ? "por_calificar"
+            : publicadas < saved.length
+              ? "sin_publicar"
+              : "publicada";
+      return {
+        id: a.id,
+        titulo: a.titulo,
+        tipo: a.tipo,
+        peso: a.peso,
+        fecha: a.fecha,
+        estado,
+        calificadas: saved.length,
+        publicadas,
+        promedio: saved.length ? termAverage(saved.map((c) => c.nota)) : null,
+        enLote: inBatch.has(a.id),
+      };
+    });
+
+    const estudiantes = section.estudianteIds
+      .map((id) => {
+        const p = this.seed.people.find((x) => x.id === id)!;
+        const notas: Record<string, number | null> = {};
+        const graded: Array<{ peso: number; nota: number }> = [];
+        for (const a of acts) {
+          const nota = cells.get(a.id)!.get(id)?.nota ?? null;
+          notas[a.id] = nota;
+          if (nota !== null) graded.push({ peso: a.peso, nota });
+        }
+        const { evaluado, obtenido } = weighted(graded);
+        return {
+          studentId: id,
+          nombre: fullName(p),
+          carne: maskCarne(p.carne),
+          notas,
+          evaluado,
+          actual: currentGrade(evaluado, obtenido),
+        };
+      })
+      .sort((a, b) => a.nombre.localeCompare(b.nombre, "es"));
+
+    const umbral = this.seed.policy.umbralJustificacion;
+    const evaluados = estudiantes.filter((e) => e.evaluado > 0);
+    return parsed(SectionGradebook, {
+      sectionId: section.id,
+      seccion: section.seccion,
+      curso: this.course(section.courseId),
+      umbral,
+      cerrada: this.ws(actor).closed.has(section.id),
+      actividades,
+      estudiantes,
+      promedio: termAverage(evaluados.map((e) => e.actual)),
+      bajoUmbral: evaluados.filter((e) => e.actual < umbral).length,
+    });
+  }
+
   async gradeSubmission(actor: Actor, input: GradeInput): PortResult<BatchEntry> {
     const body = GradeInput.safeParse(input);
     if (!body.success) return fail("invalid", body.error.issues[0]?.message);
@@ -445,10 +550,7 @@ export class MockAssessment implements AssessmentPort {
   private toAppeal(a: SeedAppeal) {
     const activity = this.seed.activities.find((x) => x.id === a.activityId)!;
     const section = this.seed.sections.find((s) => s.id === a.sectionId)!;
-    const nota =
-      a.studentId === this.seed.student.id
-        ? (this.gradeOf(a.studentId, a.activityId)?.nota ?? null)
-        : seededGrade(section.estudianteIds.indexOf(a.studentId), 0);
+    const nota = this.seededFor(section, a.studentId, a.activityId);
     return {
       id: a.id,
       activityId: a.activityId,
