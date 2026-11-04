@@ -186,6 +186,13 @@ const STAGES: Record<string, Shot[]> = {
         await page.getByRole("list", { name: "Chat con Soporte" }).waitFor();
       },
     },
+    { name: "servicios", path: "/servicios", as: "estudiante" },
+    { name: "servicio-graduaciones", path: "/servicios/graduaciones", as: "estudiante" },
+    { name: "directorio", path: "/recursos/directorio?q=jorge", as: "estudiante" },
+    { name: "oficinas", path: "/recursos/oficinas", as: "estudiante" },
+    { name: "eventos", path: "/recursos/eventos", as: "estudiante" },
+    { name: "marca", path: "/recursos/marca", as: "estudiante" },
+    { name: "chatgpt-edu", path: "/recursos/chatgpt-edu", as: "estudiante" },
   ],
   E11: [{ name: "admin-pagos", path: "/admin/pagos", as: "administrativo" }],
   E7: [
