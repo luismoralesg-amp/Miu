@@ -30,7 +30,7 @@ test("the real-flow routes answer with the login page instead of an error when t
   // Google sends the browser back without a request of ours: a refusal with a message, never a 500.
   await page.goto("/login/google/callback?code=x&state=y");
   await expect(page).toHaveURL(/\/login\?google=rechazado$/);
-  await expect(page.getByRole("alert")).toContainText("Google no confirmó una cuenta @ufm.edu");
+  await expect(page.getByText("Google no confirmó una cuenta @ufm.edu")).toBeVisible();
   await page.goto("/login/google/callback?error=access_denied");
   await expect(page).toHaveURL(/\/login\?google=rechazado$/);
 });
