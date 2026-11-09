@@ -1,9 +1,10 @@
 "use server";
 
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
 
 import { identity, normalizeUfmEmail } from "@/modules/identity";
+import { googleMode, requestOrigin, warnMockGoogle } from "@/modules/identity/google/signin";
 import {
   DEVICE_COOKIE,
   clientInfo,
@@ -79,7 +80,16 @@ export async function entrarConEnlace(_prev: FormState, form: FormData): Promise
   redirect("/");
 }
 
+/**
+ * The simulated Google button (the form in `GoogleButton`). With credentials loaded the login page
+ * shows a link to /login/google/start instead; if the credentials appear between that render and
+ * this click, the person is sent to the real flow rather than signed in as the demo student.
+ */
 export async function entrarConGoogle(): Promise<FormState> {
+  const origin = requestOrigin(await headers(), "http://localhost:3000");
+  const decided = googleMode(origin);
+  if (decided.mode === "real") redirect("/login/google/start" as never);
+  warnMockGoogle(decided.reason);
   const result = await identity().signInWithGoogle(await clientInfo());
   if (!result.ok) return { error: "Google no confirmó una cuenta @ufm.edu verificada." };
   await startSession(result.value, false);
