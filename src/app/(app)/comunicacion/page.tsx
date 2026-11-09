@@ -32,6 +32,9 @@ export default async function ComunicacionPage({ searchParams }: Props) {
   const known = new Set(threads.ok ? threads.value.map((t) => t.personaId) : []);
   const nuevos = people.ok ? people.value.filter((p) => !known.has(p.id)) : [];
 
+  // `grid-cols-1` below is `minmax(0, 1fr)`. With no track under `md` the one implicit column grew to the
+  // widest nowrap preview (624 px on a 375 px screen), the page overflowed sideways and a phone browser
+  // shrank it to fit, which looked like the desktop layout.
   return (
     <div className="pb-10">
       <section className="reveal pt-10 pb-8 md:pt-14 md:pb-10">
@@ -43,10 +46,10 @@ export default async function ComunicacionPage({ searchParams }: Props) {
       {!threads.ok ? (
         <PortProblem error={threads.error} what="tus mensajes" className="border-y border-border" />
       ) : (
-        <div className="grid gap-8 md:grid-cols-12">
+        <div className="grid grid-cols-1 gap-8 md:grid-cols-12">
           <nav
             aria-label="Conversaciones"
-            className={cx("md:col-span-4", con && "hidden md:block")}
+            className={cx("min-w-0 md:col-span-4", con && "hidden md:block")}
           >
             <ul className="divide-y divide-border border-y border-border">
               {threads.value.map((t) => (
@@ -98,7 +101,7 @@ export default async function ComunicacionPage({ searchParams }: Props) {
               </>
             )}
           </nav>
-          <section aria-label="Conversación" className="md:col-span-8">
+          <section aria-label="Conversación" className="min-w-0 md:col-span-8">
             {!thread ? (
               <EmptyState
                 icon={<MessagesSquare aria-hidden="true" />}
@@ -138,7 +141,7 @@ export default async function ComunicacionPage({ searchParams }: Props) {
                           : "self-start border border-border bg-surface",
                       )}
                     >
-                      <p className="text-[15px] whitespace-pre-wrap">{m.texto}</p>
+                      <p className="text-[15px] break-words whitespace-pre-wrap">{m.texto}</p>
                       <p className="mt-1 text-caption text-fg-muted">
                         {m.de === "yo" ? "Tú" : thread.value.persona.nombre.split(" ")[0]} ·{" "}
                         {relativeDay(new Date(m.fecha), now)} {hhmm(new Date(m.fecha))}
