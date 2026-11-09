@@ -1,9 +1,10 @@
-import { randomUUID } from "node:crypto";
+import { randomBytes } from "node:crypto";
 
 import { z } from "zod";
 
 import { academicNow } from "@/lib/clock";
 import { parsed } from "@/lib/contract";
+import { signToken, verifyToken } from "@/lib/demo-token";
 import { fail, ok, type PortResult } from "@/lib/result";
 import { ledger, type LedgerPort } from "@/modules/finance";
 import type { Actor } from "@/modules/identity";
@@ -31,14 +32,42 @@ const DETAIL: Record<z.infer<typeof ProviderMethod>, string> = {
   apple_pay: "Apple Pay",
 };
 
-type StoredCheckout = z.infer<typeof Checkout> & { userId: string };
+/**
+ * What a checkout id carries. The id *is* the checkout (`chk_<signed token>`), so a serverless host
+ * that answers the next request from another instance, or a new one, still finds it: nothing about an
+ * open checkout lives in one instance's memory. Whether it was paid is read from the ledger.
+ */
+type CheckoutClaims = {
+  k: "c";
+  /** Who opened it. */
+  u: string;
+  /** Charge. */
+  c: string;
+  m: z.infer<typeof ProviderMethod>;
+  /** Amount of the charge, fee, and what the payer is charged. */
+  a: number;
+  f: number;
+  t: number;
+  /** Expires, epoch seconds. */
+  e: number;
+  /** Two checkouts opened for the same charge and method are still different checkouts. */
+  n: string;
+};
+
+const CHECKOUT_PREFIX = "chk_";
+
+function openCheckout(id: string): { claims: CheckoutClaims } | null {
+  if (!id.startsWith(CHECKOUT_PREFIX)) return null;
+  const claims = verifyToken<CheckoutClaims>(id.slice(CHECKOUT_PREFIX.length));
+  if (!claims || claims.k !== "c" || !ProviderMethod.safeParse(claims.m).success) return null;
+  return { claims };
+}
 
 /**
  * Simulates Recurrente's hosted checkout and its signed webhook. The checkout page is local
  * (/pagos/checkout/[id]); paying there emits the same signed event the real provider would send.
  */
 export class MockRecurrente implements PaymentProviderPort {
-  private readonly checkouts = new Map<string, StoredCheckout>();
   private readonly processed = new Set<string>();
 
   constructor(
@@ -77,10 +106,22 @@ export class MockRecurrente implements PaymentProviderPort {
     if (charge.value.estado !== "pendiente")
       return fail("invalid", "Este cargo ya no está pendiente");
     const q = quote(charge.value.monto, metodo.data, this.policy());
-    const id = `chk_${randomUUID().replaceAll("-", "").slice(0, 16)}`;
-    const checkout: StoredCheckout = {
+    const expira = new Date(this.now().getTime() + 30 * 60_000);
+    const id =
+      CHECKOUT_PREFIX +
+      signToken({
+        k: "c",
+        u: actor.userId,
+        c: charge.value.id,
+        m: metodo.data,
+        a: q.monto,
+        f: q.comision,
+        t: q.total,
+        e: Math.floor(expira.getTime() / 1000),
+        n: randomBytes(4).toString("hex"),
+      } satisfies CheckoutClaims);
+    return parsed(Checkout, {
       id,
-      userId: actor.userId,
       chargeId: charge.value.id,
       concepto: charge.value.concepto,
       metodo: metodo.data,
@@ -88,17 +129,35 @@ export class MockRecurrente implements PaymentProviderPort {
       comision: q.comision,
       total: q.total,
       url: `/pagos/checkout/${id}`,
-      expira: new Date(this.now().getTime() + 30 * 60_000).toISOString(),
+      expira: expira.toISOString(),
       estado: "abierto",
-    };
-    this.checkouts.set(id, checkout);
-    return parsed(Checkout, checkout);
+    });
   }
 
   async getCheckout(actor: Actor, checkoutId: string) {
-    const c = this.checkouts.get(checkoutId);
-    if (!c || c.userId !== actor.userId) return fail("not_found");
-    return parsed(Checkout, c);
+    const opened = openCheckout(checkoutId);
+    if (!opened || opened.claims.u !== actor.userId) return fail("not_found");
+    const { claims } = opened;
+    const charge = await this.ledgerPort().getCharge(actor, claims.c);
+    if (!charge.ok) return fail("not_found");
+    // Paid or not is the ledger's to say: it holds the receipt this checkout's payment produced.
+    const receipts = await this.ledgerPort().listReceipts(actor);
+    const receipt = receipts.ok
+      ? receipts.value.find((r) => r.id === `pg-${checkoutId}` && r.estado === "pagado")
+      : undefined;
+    return parsed(Checkout, {
+      id: checkoutId,
+      chargeId: claims.c,
+      concepto: charge.value.concepto,
+      metodo: claims.m,
+      monto: claims.a,
+      comision: claims.f,
+      total: claims.t,
+      url: `/pagos/checkout/${checkoutId}`,
+      expira: new Date(claims.e * 1000).toISOString(),
+      estado: receipt ? "pagado" : "abierto",
+      ...(receipt ? { reciboId: receipt.id } : {}),
+    });
   }
 
   async handleWebhook(rawBody: string, signature: string | null): PortResult<WebhookResult> {
@@ -115,28 +174,27 @@ export class MockRecurrente implements PaymentProviderPort {
     const e = event.data;
     if (this.processed.has(e.id))
       return parsed(WebhookResult, { eventId: e.id, procesado: false, duplicado: true });
-    const checkout = this.checkouts.get(e.checkoutId);
-    if (!checkout) return fail("not_found", "Checkout desconocido");
+    const opened = openCheckout(e.checkoutId);
+    if (!opened) return fail("not_found", "Checkout desconocido");
+    const checkout = opened.claims;
     if (e.tipo === "checkout.failed") {
       this.processed.add(e.id);
       return parsed(WebhookResult, { eventId: e.id, procesado: true, duplicado: false });
     }
-    if (Math.abs(e.monto - checkout.total) > 0.005)
+    if (Math.abs(e.monto - checkout.t) > 0.005)
       return fail("invalid", "El monto no coincide con el checkout");
     const receipt = await this.ledgerPort().settle({
-      userId: checkout.userId,
-      chargeId: checkout.chargeId,
-      metodo: checkout.metodo,
+      userId: checkout.u,
+      chargeId: checkout.c,
+      metodo: checkout.m,
       detalleMetodo: e.detalle,
       // What the student paid on top of the charge (0 when the university bears the fee).
-      comision: Math.round((checkout.total - checkout.monto) * 100) / 100,
+      comision: Math.round((checkout.t - checkout.a) * 100) / 100,
       fecha: e.fecha,
-      referenciaProveedor: `pg-${checkout.id}`,
+      referenciaProveedor: `pg-${e.checkoutId}`,
     });
     if (!receipt.ok) return receipt;
     this.processed.add(e.id);
-    checkout.estado = "pagado";
-    checkout.reciboId = receipt.value.id;
     return parsed(WebhookResult, {
       eventId: e.id,
       procesado: true,
@@ -178,15 +236,15 @@ export class MockRecurrente implements PaymentProviderPort {
 
   /** Mock only: the event Recurrente would send when the student pays on the hosted page. */
   buildPaidEvent(checkoutId: string) {
-    const c = this.checkouts.get(checkoutId);
+    const c = openCheckout(checkoutId)?.claims;
     if (!c) return null;
     const body = JSON.stringify({
-      id: `evt_${c.id}`,
+      id: `evt_${checkoutId}`,
       tipo: "checkout.paid",
-      checkoutId: c.id,
-      monto: c.total,
-      metodo: c.metodo,
-      detalle: DETAIL[c.metodo],
+      checkoutId,
+      monto: c.t,
+      metodo: c.m,
+      detalle: DETAIL[c.m],
       fecha: this.now().toISOString(),
     } satisfies WebhookEvent);
     return { body, signature: sign(body, this.secret) };

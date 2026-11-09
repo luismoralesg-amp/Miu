@@ -1,6 +1,21 @@
+import { headers } from "next/headers";
+
+import { googleMode, requestOrigin } from "@/modules/identity/google/signin";
+
 import { EmailForm, GoogleButton, PasskeyButton } from "./forms";
 
-export default function LoginPage() {
+const GOOGLE_NOTICES: Record<string, string> = {
+  rechazado: "Google no confirmó una cuenta @ufm.edu verificada. Prueba con tu correo de la UFM.",
+  no_disponible: "No pudimos hablar con Google. Entra con tu correo de la UFM.",
+};
+
+export default async function LoginPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ google?: string }>;
+}) {
+  const real = googleMode(requestOrigin(await headers(), "http://localhost:3000")).mode === "real";
+  const notice = GOOGLE_NOTICES[(await searchParams).google ?? ""];
   return (
     <div className="flex reveal flex-col gap-8">
       <div>
@@ -16,7 +31,7 @@ export default function LoginPage() {
         <span className="h-px flex-1 bg-border" />o<span className="h-px flex-1 bg-border" />
       </div>
       <div className="flex flex-col gap-2">
-        <GoogleButton />
+        <GoogleButton real={real} {...(notice ? { notice } : {})} />
         <p className="text-center text-caption text-fg-muted">Solo cuentas @ufm.edu</p>
         <PasskeyButton />
       </div>

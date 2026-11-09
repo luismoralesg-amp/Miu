@@ -59,6 +59,7 @@ export type IdentityError =
   | "espera"
   | "sin_passkey"
   | "google_rechazado"
+  | "google_no_disponible"
   | "sesion_invalida"
   | "no_encontrado"
   | "no_configurado";

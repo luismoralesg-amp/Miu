@@ -1,5 +1,6 @@
 import type { Result } from "@/lib/result";
 
+import type { GoogleClaims } from "../domain/rules";
 import type { Device, IdentityError, MailMessage, Role, Session, User } from "../domain/types";
 
 /** `deviceId` is this browser's id from a long-lived cookie, so signing in again reuses its device. */
@@ -29,7 +30,15 @@ export interface IdentityPort {
     client: ClientInfo,
     recordar: boolean,
   ): Promise<Result<SignedIn, IdentityError>>;
-  signInWithGoogle(client: ClientInfo): Promise<Result<SignedIn, IdentityError>>;
+  /**
+   * Google. With `verified` (the claims of an ID token the server already checked) the session is
+   * opened for that person; without it the mock signs in its simulated demo student, which is what
+   * the demo uses while the Google credentials are not loaded (src/modules/identity/google/).
+   */
+  signInWithGoogle(
+    client: ClientInfo,
+    verified?: GoogleClaims,
+  ): Promise<Result<SignedIn, IdentityError>>;
   /** Passkey assertion bound to a device this browser already registered. */
   signInWithPasskey(
     deviceId: string | undefined,

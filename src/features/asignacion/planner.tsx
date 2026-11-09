@@ -69,7 +69,7 @@ export function Planner({
   const clash = (codigo: string) => check.choques.some(([a, b]) => a === codigo || b === codigo);
 
   return (
-    <div className="grid gap-10 lg:grid-cols-12">
+    <div className="grid grid-cols-1 gap-10 lg:grid-cols-12">
       <fieldset className="lg:col-span-8" disabled={!abierta}>
         <legend className="sr-only">Cursos que puedes llevar en {w.periodo}</legend>
         <ul className="divide-y divide-border border-y border-border">

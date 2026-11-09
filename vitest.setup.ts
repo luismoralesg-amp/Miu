@@ -6,5 +6,6 @@ import { afterEach, vi } from "vitest";
 afterEach(() => {
   cleanup();
   vi.useRealTimers();
-  document.documentElement.removeAttribute("data-theme");
+  // Server-only suites run in the node environment, where there is no document.
+  if (typeof document !== "undefined") document.documentElement.removeAttribute("data-theme");
 });

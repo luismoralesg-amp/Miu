@@ -4,6 +4,7 @@ import { KeyRound } from "lucide-react";
 import { useActionState, useRef } from "react";
 
 import { Button, Checkbox, TextField } from "@/design-system/components";
+import { buttonClasses } from "@/design-system/components/button";
 
 import {
   entrarConEnlace,
@@ -56,14 +57,32 @@ export function EmailForm() {
   );
 }
 
-export function GoogleButton() {
+/**
+ * `real`: Google's credentials are loaded, so this is a link to the route that starts the OpenID flow.
+ * Otherwise it is the form that signs in the simulated demo student (see google/signin.ts).
+ */
+export function GoogleButton({ real = false, notice }: { real?: boolean; notice?: string }) {
   const [state, action, pending] = useActionState(entrarConGoogle, {});
+  if (real)
+    return (
+      <div className="flex flex-col gap-2">
+        {/* A full navigation to a route handler on purpose: not a client-side <Link>. */}
+        {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
+        <a
+          href="/login/google/start"
+          className={buttonClasses({ size: "lg", className: "w-full" })}
+        >
+          Continuar con Google
+        </a>
+        {notice && <Mensaje state={{ error: notice }} />}
+      </div>
+    );
   return (
     <form action={action} className="flex flex-col gap-2">
       <Button type="submit" size="lg" loading={pending} className="w-full">
         Continuar con Google
       </Button>
-      <Mensaje state={state} />
+      <Mensaje state={notice ? { error: notice } : state} />
     </form>
   );
 }

@@ -38,7 +38,7 @@ export function MethodForm({
   const error = metodo === "comprobante" ? upState.error : payState.error;
 
   return (
-    <div className="grid gap-10 md:grid-cols-12">
+    <div className="grid grid-cols-1 gap-10 md:grid-cols-12">
       <fieldset className="md:col-span-7">
         <legend className="text-label text-fg-muted">Paso 1 de 2 · Elige cómo pagar</legend>
         <div className="mt-4 flex flex-col gap-3">

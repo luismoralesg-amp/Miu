@@ -14,6 +14,7 @@ import {
   describeUserAgent,
   isSixDigitCode,
   normalizeUfmEmail,
+  type GoogleClaims,
 } from "../../domain/rules";
 import type {
   Credential,
@@ -238,9 +239,13 @@ export class MockIdentity implements IdentityPort {
     return ok(this.openSession(correo, client, recordar, "sesion"));
   }
 
-  async signInWithGoogle(client: ClientInfo): Promise<Result<SignedIn, IdentityError>> {
-    // Simulated ID token for the demo student. The same claim checks run in the real adapter.
-    const claims = {
+  async signInWithGoogle(
+    client: ClientInfo,
+    verified?: GoogleClaims,
+  ): Promise<Result<SignedIn, IdentityError>> {
+    // With `verified` the ID token is real and was checked by the caller; the claim rules run again
+    // here on purpose (the adapter must not trust that a caller did). Without it: the demo student.
+    const claims = verified ?? {
       iss: "https://accounts.google.com",
       aud: MOCK_GOOGLE_CLIENT_ID,
       exp: Math.floor(this.now() / 1000) + 300,
@@ -248,9 +253,12 @@ export class MockIdentity implements IdentityPort {
       email_verified: true,
       hd: "ufm.edu",
     };
-    if (!acceptGoogleClaims(claims, MOCK_GOOGLE_CLIENT_ID, Math.floor(this.now() / 1000)))
+    const clientId = verified
+      ? (process.env.GOOGLE_CLIENT_ID?.trim() ?? "")
+      : MOCK_GOOGLE_CLIENT_ID;
+    if (!clientId || !acceptGoogleClaims(claims, clientId, Math.floor(this.now() / 1000)))
       return fail("google_rechazado");
-    return ok(this.openSession(claims.email, client, false, "sesion"));
+    return ok(this.openSession(claims.email.toLowerCase(), client, false, "sesion"));
   }
 
   async signInWithPasskey(
