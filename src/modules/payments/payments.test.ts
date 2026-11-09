@@ -1,7 +1,11 @@
 import { describe, expect, it } from "vitest";
 
 import { at } from "@/mock/seed";
-import { MockLedger } from "@/modules/finance/adapters/mock/mock-ledger";
+import {
+  MockLedger,
+  type Payment,
+  type PaymentOverlay,
+} from "@/modules/finance/adapters/mock/mock-ledger";
 import { admin, student, value } from "@/test/actors";
 
 import { MOCK_WEBHOOK_SECRET, MockRecurrente } from "./adapters/mock/mock-recurrente";
@@ -156,5 +160,130 @@ describe("settlement statement", () => {
     expect(rows.some((r) => r.referencia === "pg-octubre")).toBe(true);
     expect(rows.some((r) => r.referencia === "evt_sin_recibo_4821")).toBe(true);
     expect(rows.every((r) => r.metodo !== ("presencial" as string))).toBe(true);
+  });
+});
+
+/**
+ * Vercel answers each request from a possibly new instance. Every call below builds a brand-new
+ * ledger and provider (an "instance" with an empty memory); the only thing they share is what the
+ * browser carries, which the overlay stands for. Before the fix, an open checkout lived in one
+ * provider's memory and `getCheckout` on the next instance answered `not_found` (a 404 page).
+ */
+describe("a payment across serverless instances", () => {
+  function browser() {
+    const jar = new Map<string, Payment[]>();
+    const overlay: PaymentOverlay = {
+      load: async (userId) => jar.get(userId) ?? [],
+      save: async (userId, payments) => void jar.set(userId, structuredClone(payments)),
+    };
+    const instance = () => {
+      const ledger = new MockLedger(undefined, now, overlay);
+      const provider = new MockRecurrente(
+        () => ledger,
+        () => POLICY,
+        MOCK_WEBHOOK_SECRET,
+        now,
+      );
+      return { ledger, provider };
+    };
+    return { instance };
+  }
+
+  it("opens on one instance, is read on another, is paid on a third and shows paid on a fourth", async () => {
+    const { instance } = browser();
+    const ana = student();
+    const checkout = value(
+      await instance().provider.createCheckout(ana, { chargeId: "cuota-noviembre", metodo: "ach" }),
+    );
+
+    const second = instance();
+    expect(value(await second.provider.getCheckout(ana, checkout.id))).toMatchObject({
+      chargeId: "cuota-noviembre",
+      concepto: "Cuota de noviembre",
+      total: 7387.8,
+      estado: "abierto",
+    });
+
+    const third = instance();
+    const event = third.provider.buildPaidEvent(checkout.id)!;
+    expect(value(await third.provider.handleWebhook(event.body, event.signature))).toMatchObject({
+      procesado: true,
+    });
+
+    const fourth = instance();
+    expect(value(await fourth.provider.getCheckout(ana, checkout.id))).toMatchObject({
+      estado: "pagado",
+      reciboId: `pg-${checkout.id}`,
+    });
+    expect(value(await fourth.ledger.getBalance(ana)).saldo).toBe(0);
+    expect(value(await fourth.ledger.listCharges(ana)).map((c) => c.id)).not.toContain(
+      "cuota-noviembre",
+    );
+    expect(value(await fourth.ledger.listReceipts(ana))[0]).toMatchObject({
+      id: checkout.id.replace(/^/, "pg-"),
+      estado: "pagado",
+      total: 7387.8,
+    });
+  });
+
+  it("a card payment keeps its fee, and a repeated event on another instance pays only once", async () => {
+    const { instance } = browser();
+    const ana = student();
+    const checkout = value(
+      await instance().provider.createCheckout(ana, {
+        chargeId: "cuota-noviembre",
+        metodo: "tarjeta",
+      }),
+    );
+    const a = instance();
+    const event = a.provider.buildPaidEvent(checkout.id)!;
+    await a.provider.handleWebhook(event.body, event.signature);
+    const b = instance();
+    const again = value(await b.provider.handleWebhook(event.body, event.signature));
+    expect(again.reciboId).toBe(`pg-${checkout.id}`);
+    const paid = value(await instance().ledger.listReceipts(ana)).filter(
+      (r) => r.chargeId === "cuota-noviembre",
+    );
+    expect(paid).toHaveLength(1);
+    expect(paid[0]).toMatchObject({ comision: 334.45, total: 7722.25 });
+  });
+
+  it("a transfer with receipt stays in review on the next instance", async () => {
+    const { instance } = browser();
+    const ana = student();
+    value(
+      await instance().ledger.submitTransfer(ana, {
+        chargeId: "cuota-noviembre",
+        banco: "Banco Industrial",
+        boleta: "TRX-77881",
+        archivo: "boleta.pdf",
+      }),
+    );
+    const next = instance();
+    const charge = value(await next.ledger.getCharge(ana, "cuota-noviembre"));
+    expect(charge.estado).toBe("en_revision");
+    expect(
+      value(await next.ledger.listReceipts(ana)).find((r) => r.chargeId === "cuota-noviembre"),
+    ).toMatchObject({ estado: "revision" });
+  });
+
+  it("a checkout cannot be forged, borrowed or read by someone else", async () => {
+    const { instance } = browser();
+    const ana = student();
+    const checkout = value(
+      await instance().provider.createCheckout(ana, { chargeId: "cuota-noviembre", metodo: "ach" }),
+    );
+    const other = instance().provider;
+    // Another person with the same link.
+    expect(await other.getCheckout(student(), checkout.id)).toMatchObject({ error: "not_found" });
+    // A token whose amount was edited no longer matches its signature.
+    const [body, sig] = checkout.id.slice(4).split(".");
+    const claims = JSON.parse(Buffer.from(body!, "base64url").toString());
+    const edited = Buffer.from(JSON.stringify({ ...claims, t: 1, a: 1 })).toString("base64url");
+    expect(await other.getCheckout(ana, `chk_${edited}.${sig}`)).toMatchObject({
+      error: "not_found",
+    });
+    expect(other.buildPaidEvent(`chk_${edited}.${sig}`)).toBeNull();
+    expect(await other.getCheckout(ana, "chk_inventado")).toMatchObject({ error: "not_found" });
   });
 });

@@ -1,6 +1,7 @@
 import { selectAdapter } from "@/lib/adapters";
 import { guarded } from "@/lib/result";
 
+import { cookieOverlay } from "./adapters/mock/cookie-overlay";
 import { MockLedger } from "./adapters/mock/mock-ledger";
 import { createRealLedger } from "./adapters/real/real-ledger";
 import type { LedgerPort, SolvencyPort } from "./ports/ledger-port";
@@ -13,7 +14,7 @@ export type { SettlementRow } from "./domain/rules";
 /** MIU_ADAPTER_LEDGER=mock|real. One adapter answers both the ledger and solvency. */
 export function ledger(): LedgerPort & SolvencyPort {
   return selectAdapter<LedgerPort & SolvencyPort>("ledger", {
-    mock: () => guarded(new MockLedger()),
+    mock: () => guarded(new MockLedger(undefined, undefined, cookieOverlay)),
     real: () => guarded(createRealLedger()),
   });
 }

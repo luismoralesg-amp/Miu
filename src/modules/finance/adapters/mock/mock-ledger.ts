@@ -22,11 +22,23 @@ import {
 } from "../../domain/types";
 import type { LedgerPort, SolvencyPort } from "../../ports/ledger-port";
 
-type Payment = SeedPayment & {
+export type Payment = SeedPayment & {
   numero: string;
   aprobadoPor?: string;
   motivoReembolso?: string;
 };
+
+/**
+ * Where payments a student makes survive an instance change. The mock keeps everything in memory, and
+ * a serverless host answers the next request from another instance (or a new one) that has never seen
+ * them: the receipt page would 404 and Pagos would still show the charge as pending. The app passes a
+ * signed cookie (`cookieOverlay`); tests and `dev` need none.
+ */
+export interface PaymentOverlay {
+  load(userId: string): Promise<Payment[]>;
+  save(userId: string, payments: Payment[]): Promise<void>;
+}
+const NO_OVERLAY: PaymentOverlay = { load: async () => [], save: async () => {} };
 type Workspace = { payments: Payment[]; queue: SeedTransfer[] };
 type StudentTransfer = SeedTransfer & { userId: string; paymentId: string };
 
@@ -49,7 +61,27 @@ export class MockLedger implements LedgerPort, SolvencyPort {
   constructor(
     private readonly seed: Seed = buildSeed(),
     private readonly now: () => Date = academicNow,
+    private readonly overlay: PaymentOverlay = NO_OVERLAY,
   ) {}
+
+  /** Merges what this browser says it already paid into the workspace; call first in every method. */
+  private async hydrate(userId: string) {
+    const saved = await this.overlay.load(userId);
+    if (saved.length === 0) return;
+    const ws = this.ws(userId);
+    for (const p of saved) if (!ws.payments.some((x) => x.id === p.id)) ws.payments.push({ ...p });
+    // New receipt numbers and ids must not repeat the ones already issued.
+    this.counter = Math.max(this.counter, saved.length);
+  }
+
+  /** Hands the payments this student made (not the seeded ones) to the overlay. */
+  private async persist(userId: string) {
+    const seeded = new Set([...this.seed.payments, ...this.seedCash].map((p) => p.id));
+    await this.overlay.save(
+      userId,
+      this.ws(userId).payments.filter((p) => !seeded.has(p.id)),
+    );
+  }
 
   private ws(userId: string): Workspace {
     let ws = this.workspaces.get(userId);
@@ -114,6 +146,7 @@ export class MockLedger implements LedgerPort, SolvencyPort {
   async listCharges(actor: Actor) {
     const denied = this.onlyStudent(actor);
     if (denied) return denied;
+    await this.hydrate(actor.userId);
     return parsed(
       z.array(Charge),
       this.charges(actor)
@@ -125,6 +158,7 @@ export class MockLedger implements LedgerPort, SolvencyPort {
   async getCharge(actor: Actor, chargeId: string) {
     const denied = this.onlyStudent(actor);
     if (denied) return denied;
+    await this.hydrate(actor.userId);
     const c = this.charges(actor).find((x) => x.id === chargeId);
     return c ? parsed(Charge, c) : fail("not_found");
   }
@@ -132,6 +166,7 @@ export class MockLedger implements LedgerPort, SolvencyPort {
   async getBalance(actor: Actor): PortResult<Balance> {
     const denied = this.onlyStudent(actor);
     if (denied) return denied;
+    await this.hydrate(actor.userId);
     const pending = this.charges(actor)
       .filter((c) => c.estado === "pendiente")
       .sort((a, b) => a.vence.localeCompare(b.vence));
@@ -146,6 +181,7 @@ export class MockLedger implements LedgerPort, SolvencyPort {
   async isSolvent(actor: Actor): PortResult<Solvency> {
     const denied = this.onlyStudent(actor);
     if (denied) return denied;
+    await this.hydrate(actor.userId);
     const overdue = this.charges(actor).find(
       (c) => c.estado === "pendiente" && c.diasParaVencer < 0,
     );
@@ -177,6 +213,7 @@ export class MockLedger implements LedgerPort, SolvencyPort {
   async listReceipts(actor: Actor) {
     const denied = this.onlyStudent(actor);
     if (denied) return denied;
+    await this.hydrate(actor.userId);
     return parsed(
       z.array(Receipt),
       [...this.ws(actor.userId).payments]
@@ -188,6 +225,7 @@ export class MockLedger implements LedgerPort, SolvencyPort {
   async getStatement(actor: Actor, range: { desde: string; hasta: string }): PortResult<Statement> {
     const denied = this.onlyStudent(actor);
     if (denied) return denied;
+    await this.hydrate(actor.userId);
     if (range.desde > range.hasta)
       return fail("invalid", "La fecha inicial es posterior a la final");
     const lines = [
@@ -222,6 +260,7 @@ export class MockLedger implements LedgerPort, SolvencyPort {
   }
 
   async settle(payment: SettledPayment): PortResult<z.infer<typeof Receipt>> {
+    await this.hydrate(payment.userId);
     const ws = this.ws(payment.userId);
     const charge = this.seed.charges.find((c) => c.id === payment.chargeId);
     if (!charge) return fail("not_found");
@@ -246,6 +285,7 @@ export class MockLedger implements LedgerPort, SolvencyPort {
       comision: payment.comision,
     };
     ws.payments.push(p);
+    await this.persist(payment.userId);
     return parsed(Receipt, this.toReceipt(p));
   }
 
@@ -254,6 +294,7 @@ export class MockLedger implements LedgerPort, SolvencyPort {
     if (denied) return denied;
     const body = TransferInput.safeParse(input);
     if (!body.success) return fail("invalid", body.error.issues[0]?.message);
+    await this.hydrate(actor.userId);
     const charge = this.charges(actor).find((c) => c.id === body.data.chargeId);
     if (!charge) return fail("not_found");
     if (charge.estado !== "pendiente") return fail("invalid", "Este cargo ya no está pendiente");
@@ -273,6 +314,7 @@ export class MockLedger implements LedgerPort, SolvencyPort {
       comision: 0,
     };
     ws.payments.push(p);
+    await this.persist(actor.userId);
     this.submitted.push({
       id,
       userId: actor.userId,
